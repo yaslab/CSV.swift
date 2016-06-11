@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.summary = 'CSV reading library written in Swift.'
   s.homepage = 'https://github.com/yaslab/CSV.swift'
   s.authors = { 'Yasuhiro Hatta' => 'hatta.yasuhiro@gmail.com' }
-  s.source = { :git => 'https://github.com/yaslab/CSV.swift', :tag => s.version }
+  s.source = { :git => 'https://github.com/yaslab/CSV.swift.git', :tag => s.version }
 
   s.ios.deployment_target = '8.0'
   s.osx.deployment_target = '10.9'
