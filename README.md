@@ -32,14 +32,18 @@ for row in try! CSV(path: "/path/to/file.csv") {
 ### Getting the header row
 
 ```swift
+let csvString = "\"id\",\"name\"\n1,\"foo\"\n2,\"bar\""
 let csv = try! CSV(
-    path: "/path/to/file.csv",
+    string: csvString,
     hasHeaderRow: true) // default: false
 
 let headerRow = csv.headerRow!
+print("\(headerRow)") // => ["id", "name"]
 
 for row in csv {
-    // ...
+    print("\(row)")
+    // => ["1", "foo"]
+    // => ["2", "bar"]
 }
 ```
 
