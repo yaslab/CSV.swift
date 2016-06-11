@@ -7,8 +7,8 @@ Pod::Spec.new do |s|
   s.authors = { 'Yasuhiro Hatta' => 'hatta.yasuhiro@gmail.com' }
   s.source = { :git => 'https://github.com/yaslab/CSV.swift.git', :tag => s.version }
 
-  s.ios.deployment_target = '8.0'
   s.osx.deployment_target = '10.9'
+  s.ios.deployment_target = '8.0'
   s.tvos.deployment_target = '9.0'
   s.watchos.deployment_target = '2.0'
 
