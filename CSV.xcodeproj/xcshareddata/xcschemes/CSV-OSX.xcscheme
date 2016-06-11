@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0E7E8C591D0BC53D0057A1C1"
+               BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
                BuildableName = "CSV-OSX.framework"
                BlueprintName = "CSV-OSX"
                ReferencedContainer = "container:CSV.xcodeproj">
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0E7E8C621D0BC53D0057A1C1"
-               BuildableName = "CSV-OSXTests.xctest"
-               BlueprintName = "CSV-OSXTests"
+               BlueprintIdentifier = "0E7E8CCE1D0BCA2A0057A1C1"
+               BuildableName = "CSVTests-OSX.xctest"
+               BlueprintName = "CSVTests-OSX"
                ReferencedContainer = "container:CSV.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -42,7 +42,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8C591D0BC53D0057A1C1"
+            BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
             BuildableName = "CSV-OSX.framework"
             BlueprintName = "CSV-OSX"
             ReferencedContainer = "container:CSV.xcodeproj">
@@ -64,7 +64,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8C591D0BC53D0057A1C1"
+            BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
             BuildableName = "CSV-OSX.framework"
             BlueprintName = "CSV-OSX"
             ReferencedContainer = "container:CSV.xcodeproj">
@@ -82,7 +82,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8C591D0BC53D0057A1C1"
+            BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
             BuildableName = "CSV-OSX.framework"
             BlueprintName = "CSV-OSX"
             ReferencedContainer = "container:CSV.xcodeproj">

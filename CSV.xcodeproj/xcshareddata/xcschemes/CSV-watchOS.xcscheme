@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0E7E8C481D0BC1D40057A1C1"
+               BlueprintIdentifier = "0E7E8CB41D0BC98B0057A1C1"
                BuildableName = "CSV.framework"
                BlueprintName = "CSV-watchOS"
                ReferencedContainer = "container:CSV.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8C481D0BC1D40057A1C1"
+            BlueprintIdentifier = "0E7E8CB41D0BC98B0057A1C1"
             BuildableName = "CSV.framework"
             BlueprintName = "CSV-watchOS"
             ReferencedContainer = "container:CSV.xcodeproj">
@@ -63,7 +63,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8C481D0BC1D40057A1C1"
+            BlueprintIdentifier = "0E7E8CB41D0BC98B0057A1C1"
             BuildableName = "CSV.framework"
             BlueprintName = "CSV-watchOS"
             ReferencedContainer = "container:CSV.xcodeproj">

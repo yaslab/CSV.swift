@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0E7E8C241D0BBA720057A1C1"
+               BlueprintIdentifier = "0E7E8C801D0BC7BB0057A1C1"
                BuildableName = "CSV.framework"
                BlueprintName = "CSV-iOS"
                ReferencedContainer = "container:CSV.xcodeproj">
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0E7E8C2D1D0BBA720057A1C1"
-               BuildableName = "CSVTests.xctest"
-               BlueprintName = "CSV-iOSTests"
+               BlueprintIdentifier = "0E7E8C8A1D0BC7BB0057A1C1"
+               BuildableName = "CSVTests-iOS.xctest"
+               BlueprintName = "CSVTests-iOS"
                ReferencedContainer = "container:CSV.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -42,7 +42,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8C241D0BBA720057A1C1"
+            BlueprintIdentifier = "0E7E8C801D0BC7BB0057A1C1"
             BuildableName = "CSV.framework"
             BlueprintName = "CSV-iOS"
             ReferencedContainer = "container:CSV.xcodeproj">
@@ -64,7 +64,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8C241D0BBA720057A1C1"
+            BlueprintIdentifier = "0E7E8C801D0BC7BB0057A1C1"
             BuildableName = "CSV.framework"
             BlueprintName = "CSV-iOS"
             ReferencedContainer = "container:CSV.xcodeproj">
@@ -82,7 +82,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8C241D0BBA720057A1C1"
+            BlueprintIdentifier = "0E7E8C801D0BC7BB0057A1C1"
             BuildableName = "CSV.framework"
             BlueprintName = "CSV-iOS"
             ReferencedContainer = "container:CSV.xcodeproj">
