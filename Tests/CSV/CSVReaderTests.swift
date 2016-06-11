@@ -212,10 +212,10 @@ class CSVReaderTests: XCTestCase {
 
     func parseData(data: NSData, encoding: NSStringEncoding) -> [[String]] {
         let stream = NSInputStream(data: data)
-        let reader = try! CSVReader(stream: stream, encoding: encoding)
+        let reader = try! CSV(stream: stream, encoding: encoding)
         var records = [[String]]()
-        while try! reader.moveNext() {
-            records.append(reader.current!)
+        for row in reader {
+            records.append(row)
         }
         return records
     }

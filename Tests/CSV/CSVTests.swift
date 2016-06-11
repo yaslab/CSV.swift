@@ -24,7 +24,7 @@ class CSVTests: XCTestCase {
         }
         XCTAssertEqual(i, 2)
     }
-
+    
     func testSample2() {
         let csv = "\"abc\",1,2\n\"cde\",3,4\n"
         var i = 0
@@ -68,5 +68,5 @@ class CSVTests: XCTestCase {
         }
         XCTAssertEqual(i, 3)
     }
-
+    
 }
