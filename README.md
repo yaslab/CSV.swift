@@ -1,5 +1,7 @@
 # CSV.swift
 
+[![Build Status](https://travis-ci.org/yaslab/CSV.swift.svg?branch=master)](https://travis-ci.org/yaslab/CSV.swift)
+
 CSV reading library written in Swift.
 
 ## Usage
@@ -77,6 +79,10 @@ let package = Package(
     ]
 )
 ```
+
+## Reference specification
+
+- [RFC4180](http://www.ietf.org/rfc/rfc4180.txt) ([en](http://www.ietf.org/rfc/rfc4180.txt), [ja](http://www.kasai.fm/wiki/rfc4180jp))
 
 ## License
 
