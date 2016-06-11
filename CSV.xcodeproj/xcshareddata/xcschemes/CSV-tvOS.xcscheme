@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
+               BlueprintIdentifier = "0E7E8CE71D0BCD0B0057A1C1"
                BuildableName = "CSV.framework"
-               BlueprintName = "CSV-OSX"
+               BlueprintName = "CSV-tvOS"
                ReferencedContainer = "container:CSV.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0E7E8CCE1D0BCA2A0057A1C1"
-               BuildableName = "CSVTests-OSX.xctest"
-               BlueprintName = "CSVTests-OSX"
+               BlueprintIdentifier = "0E7E8CF01D0BCD0B0057A1C1"
+               BuildableName = "CSVTests-tvOS.xctest"
+               BlueprintName = "CSVTests-tvOS"
                ReferencedContainer = "container:CSV.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -42,9 +42,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
+            BlueprintIdentifier = "0E7E8CE71D0BCD0B0057A1C1"
             BuildableName = "CSV.framework"
-            BlueprintName = "CSV-OSX"
+            BlueprintName = "CSV-tvOS"
             ReferencedContainer = "container:CSV.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -64,9 +64,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
+            BlueprintIdentifier = "0E7E8CE71D0BCD0B0057A1C1"
             BuildableName = "CSV.framework"
-            BlueprintName = "CSV-OSX"
+            BlueprintName = "CSV-tvOS"
             ReferencedContainer = "container:CSV.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -82,9 +82,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
+            BlueprintIdentifier = "0E7E8CE71D0BCD0B0057A1C1"
             BuildableName = "CSV.framework"
-            BlueprintName = "CSV-OSX"
+            BlueprintName = "CSV-tvOS"
             ReferencedContainer = "container:CSV.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
