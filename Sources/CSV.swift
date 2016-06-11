@@ -254,6 +254,10 @@ public class CSV: SequenceType, GeneratorType {
             if c == delimiter && prev == DQUOTE && (quotationCount % 2 == 0) {
                 escaping = false
             }
+            
+            if (c == CR || c == LF) && prev == DQUOTE && (quotationCount % 2 == 0) {
+                escaping = false
+            }
 
             // 行の終わり
             if prev == CR && c != LF && !escaping {
