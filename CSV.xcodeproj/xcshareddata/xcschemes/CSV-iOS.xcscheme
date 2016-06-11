@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "9999"
+   LastUpgradeVersion = "0730"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "______Target_CSV"
-               BuildableName = "CSV.framework"
-               BlueprintName = "CSV"
+               BlueprintIdentifier = "0E7E8C241D0BBA720057A1C1"
+               BuildableName = "CSV-iOS.framework"
+               BlueprintName = "CSV-iOS"
                ReferencedContainer = "container:CSV.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,13 +32,22 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "______Target_CSVTestSuite"
-               BuildableName = "CSVTestSuite.xctest"
-               BlueprintName = "CSVTestSuite"
+               BlueprintIdentifier = "0E7E8C2D1D0BBA720057A1C1"
+               BuildableName = "CSV-iOSTests.xctest"
+               BlueprintName = "CSV-iOSTests"
                ReferencedContainer = "container:CSV.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "0E7E8C241D0BBA720057A1C1"
+            BuildableName = "CSV-iOS.framework"
+            BlueprintName = "CSV-iOS"
+            ReferencedContainer = "container:CSV.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -55,9 +64,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "______Target_CSV"
-            BuildableName = "CSV.framework"
-            BlueprintName = "CSV"
+            BlueprintIdentifier = "0E7E8C241D0BBA720057A1C1"
+            BuildableName = "CSV-iOS.framework"
+            BlueprintName = "CSV-iOS"
             ReferencedContainer = "container:CSV.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -70,6 +79,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "0E7E8C241D0BBA720057A1C1"
+            BuildableName = "CSV-iOS.framework"
+            BlueprintName = "CSV-iOS"
+            ReferencedContainer = "container:CSV.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
