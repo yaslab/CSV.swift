@@ -7,6 +7,6 @@ git:
 before_install:
   - git submodule update --init --recursive
 script:
-  - set -o pipefail && xcodebuild test -scheme CSVTests-OSX
+  - set -o pipefail && xcodebuild test -scheme CSV-OSX
 notifications:
   email: false
