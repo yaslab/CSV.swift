@@ -1,0 +1,266 @@
+// !$*UTF8*$!
+{
+    archiveVersion = 1;
+    classes = {};
+    objectVersion = 46;
+    rootObject = __RootObject_;
+    objects = {
+        __RootObject_ = {
+            isa = PBXProject;
+            attributes = {LastUpgradeCheck = 9999;};
+            buildConfigurationList = ___RootConfs_;
+            compatibilityVersion = 'Xcode 3.2';
+            developmentRegion = English;
+            hasScannedForEncodings = 0;
+            knownRegions = (en);
+            mainGroup = ___RootGroup_;
+            productRefGroup = ____Products_;
+            projectDirPath = '';
+            projectRoot = '';
+            targets = (______Target_CSV, ______Target_CSVTestSuite);
+        };
+        '__PBXFileRef_Package.swift' = {
+            isa = PBXFileReference;
+            lastKnownFileType = sourcecode.swift;
+            name = 'Package.swift';
+            path = 'Package.swift';
+            sourceTree = '<group>';
+        };
+        ___RootGroup_ = {
+            isa = PBXGroup;
+            children = ('__PBXFileRef_Package.swift', _____Configs_, _____Sources_, Dependencies_, _______Tests_, ____Products_);
+            sourceTree = '<group>';
+        };
+        __PBXFileRef_CSV_Info.plist = {
+            isa = PBXFileReference;
+            lastKnownFileType = text.plist.xml;
+            name = 'CSV_Info.plist';
+            path = 'CSV.xcodeproj/CSV_Info.plist';
+            sourceTree = SOURCE_ROOT;
+        };
+        _______Group_CSV = {
+            isa = PBXGroup;
+            name = CSV;
+            path = 'Sources';
+            sourceTree = '<group>';
+            children = ('__PBXFileRef_Sources/ByteOrder.swift', '__PBXFileRef_Sources/CSV.swift', '__PBXFileRef_Sources/CSVError.swift', __PBXFileRef_CSV_Info.plist);
+        };
+        '__PBXFileRef_Sources/ByteOrder.swift' = {
+            isa = PBXFileReference;
+            lastKnownFileType = sourcecode.swift;
+            name = 'ByteOrder.swift';
+            sourceTree = '<group>';
+        };
+        '__PBXFileRef_Sources/CSV.swift' = {
+            isa = PBXFileReference;
+            lastKnownFileType = sourcecode.swift;
+            name = 'CSV.swift';
+            sourceTree = '<group>';
+        };
+        '__PBXFileRef_Sources/CSVError.swift' = {
+            isa = PBXFileReference;
+            lastKnownFileType = sourcecode.swift;
+            name = 'CSVError.swift';
+            sourceTree = '<group>';
+        };
+        ______Target_CSV = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = _______Confs_CSV;
+            buildPhases = (CompilePhase_CSV, ___LinkPhase_CSV);
+            buildRules = ();
+            dependencies = ();
+            name = CSV;
+            productName = CSV;
+            productReference = _____Product_CSV;
+            productType = 'com.apple.product-type.framework';
+        };
+        _____Product_CSV = {
+            isa = PBXFileReference;
+            explicitFileType = 'wrapper.framework';
+            path = 'CSV.framework';
+            sourceTree = BUILT_PRODUCTS_DIR;
+        };
+        CompilePhase_CSV = {
+            isa = PBXSourcesBuildPhase;
+            files = ('__src_cc_ref_Sources/ByteOrder.swift', '__src_cc_ref_Sources/CSV.swift', '__src_cc_ref_Sources/CSVError.swift');
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        '__src_cc_ref_Sources/ByteOrder.swift' = {
+            isa = PBXBuildFile;
+            fileRef = '__PBXFileRef_Sources/ByteOrder.swift';
+        };
+        '__src_cc_ref_Sources/CSV.swift' = {
+            isa = PBXBuildFile;
+            fileRef = '__PBXFileRef_Sources/CSV.swift';
+        };
+        '__src_cc_ref_Sources/CSVError.swift' = {
+            isa = PBXBuildFile;
+            fileRef = '__PBXFileRef_Sources/CSVError.swift';
+        };
+        ___LinkPhase_CSV = {
+            isa = PBXFrameworksBuildPhase;
+            files = ();
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        _______Confs_CSV = {
+            isa = XCConfigurationList;
+            buildConfigurations = (___DebugConf_CSV, _ReleaseConf_CSV);
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Debug;
+        };
+        ___DebugConf_CSV = {
+            isa = XCBuildConfiguration;
+            buildSettings = { LD_RUNPATH_SEARCH_PATHS = '$(TOOLCHAIN_DIR)/usr/lib/swift/macosx'; PRODUCT_MODULE_NAME = '$(TARGET_NAME:c99extidentifier)'; ENABLE_TESTABILITY = 'YES'; OTHER_SWIFT_FLAGS = '$(inherited)'; INFOPLIST_FILE = 'CSV.xcodeproj/CSV_Info.plist'; FRAMEWORK_SEARCH_PATHS = '$(PLATFORM_DIR)/Developer/Library/Frameworks'; SWIFT_OPTIMIZATION_LEVEL = '-Onone'; OTHER_LDFLAGS = '$(inherited)'; PRODUCT_NAME = '$(TARGET_NAME:c99extidentifier)'; };
+            name = Debug;
+        };
+        _ReleaseConf_CSV = {
+            isa = XCBuildConfiguration;
+            buildSettings = { LD_RUNPATH_SEARCH_PATHS = '$(TOOLCHAIN_DIR)/usr/lib/swift/macosx'; PRODUCT_MODULE_NAME = '$(TARGET_NAME:c99extidentifier)'; ENABLE_TESTABILITY = 'YES'; OTHER_SWIFT_FLAGS = '$(inherited)'; INFOPLIST_FILE = 'CSV.xcodeproj/CSV_Info.plist'; FRAMEWORK_SEARCH_PATHS = '$(PLATFORM_DIR)/Developer/Library/Frameworks'; OTHER_LDFLAGS = '$(inherited)'; PRODUCT_NAME = '$(TARGET_NAME:c99extidentifier)'; };
+            name = Release;
+        };
+        __Dependency_CSV = {
+            isa = PBXTargetDependency;
+            target = ______Target_CSV;
+        };
+        __PBXFileRef_CSVTestSuite_Info.plist = {
+            isa = PBXFileReference;
+            lastKnownFileType = text.plist.xml;
+            name = 'CSVTestSuite_Info.plist';
+            path = 'CSV.xcodeproj/CSVTestSuite_Info.plist';
+            sourceTree = SOURCE_ROOT;
+        };
+        _______Group_CSVTestSuite = {
+            isa = PBXGroup;
+            name = CSVTestSuite;
+            path = 'Tests/CSV';
+            sourceTree = '<group>';
+            children = ('__PBXFileRef_Tests/CSV/CSVReaderTests.swift', '__PBXFileRef_Tests/CSV/CSVTests.swift', __PBXFileRef_CSVTestSuite_Info.plist);
+        };
+        '__PBXFileRef_Tests/CSV/CSVReaderTests.swift' = {
+            isa = PBXFileReference;
+            lastKnownFileType = sourcecode.swift;
+            name = 'CSVReaderTests.swift';
+            sourceTree = '<group>';
+        };
+        '__PBXFileRef_Tests/CSV/CSVTests.swift' = {
+            isa = PBXFileReference;
+            lastKnownFileType = sourcecode.swift;
+            name = 'CSVTests.swift';
+            sourceTree = '<group>';
+        };
+        ______Target_CSVTestSuite = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = _______Confs_CSVTestSuite;
+            buildPhases = (CompilePhase_CSVTestSuite, ___LinkPhase_CSVTestSuite);
+            buildRules = ();
+            dependencies = (__Dependency_CSV);
+            name = CSVTestSuite;
+            productName = CSVTestSuite;
+            productReference = _____Product_CSVTestSuite;
+            productType = 'com.apple.product-type.bundle.unit-test';
+        };
+        _____Product_CSVTestSuite = {
+            isa = PBXFileReference;
+            explicitFileType = 'compiled.mach-o.wrapper.cfbundle';
+            path = 'CSVTestSuite.xctest';
+            sourceTree = BUILT_PRODUCTS_DIR;
+        };
+        CompilePhase_CSVTestSuite = {
+            isa = PBXSourcesBuildPhase;
+            files = ('__src_cc_ref_Tests/CSV/CSVReaderTests.swift', '__src_cc_ref_Tests/CSV/CSVTests.swift');
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        '__src_cc_ref_Tests/CSV/CSVReaderTests.swift' = {
+            isa = PBXBuildFile;
+            fileRef = '__PBXFileRef_Tests/CSV/CSVReaderTests.swift';
+        };
+        '__src_cc_ref_Tests/CSV/CSVTests.swift' = {
+            isa = PBXBuildFile;
+            fileRef = '__PBXFileRef_Tests/CSV/CSVTests.swift';
+        };
+        ___LinkPhase_CSVTestSuite = {
+            isa = PBXFrameworksBuildPhase;
+            files = (_LinkFileRef_CSV_via_CSVTestSuite);
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+        _LinkFileRef_CSV_via_CSVTestSuite = {
+            isa = PBXBuildFile;
+            fileRef = _____Product_CSV;
+        };
+        _______Confs_CSVTestSuite = {
+            isa = XCConfigurationList;
+            buildConfigurations = (___DebugConf_CSVTestSuite, _ReleaseConf_CSVTestSuite);
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Debug;
+        };
+        ___DebugConf_CSVTestSuite = {
+            isa = XCBuildConfiguration;
+            buildSettings = { LD_RUNPATH_SEARCH_PATHS = '@loader_path/../Frameworks'; FRAMEWORK_SEARCH_PATHS = '$(PLATFORM_DIR)/Developer/Library/Frameworks'; OTHER_SWIFT_FLAGS = '$(inherited)'; INFOPLIST_FILE = 'CSV.xcodeproj/CSVTestSuite_Info.plist'; SWIFT_OPTIMIZATION_LEVEL = '-Onone'; EMBEDDED_CONTENT_CONTAINS_SWIFT = 'YES'; OTHER_LDFLAGS = '$(inherited)'; };
+            name = Debug;
+        };
+        _ReleaseConf_CSVTestSuite = {
+            isa = XCBuildConfiguration;
+            buildSettings = { LD_RUNPATH_SEARCH_PATHS = '@loader_path/../Frameworks'; FRAMEWORK_SEARCH_PATHS = '$(PLATFORM_DIR)/Developer/Library/Frameworks'; EMBEDDED_CONTENT_CONTAINS_SWIFT = 'YES'; OTHER_LDFLAGS = '$(inherited)'; INFOPLIST_FILE = 'CSV.xcodeproj/CSVTestSuite_Info.plist'; OTHER_SWIFT_FLAGS = '$(inherited)'; };
+            name = Release;
+        };
+        __Dependency_CSVTestSuite = {
+            isa = PBXTargetDependency;
+            target = ______Target_CSVTestSuite;
+        };
+        '__PBXFileRef_CSV.xcodeproj/Configs/Project.xcconfig' = {
+            isa = PBXFileReference;
+            lastKnownFileType = text.xcconfig;
+            name = 'Project.xcconfig';
+            path = 'CSV.xcodeproj/Configs/Project.xcconfig';
+            sourceTree = '<group>';
+        };
+        _____Configs_ = {
+            isa = PBXGroup;
+            children = ('__PBXFileRef_CSV.xcodeproj/Configs/Project.xcconfig');
+            name = Configs;
+            sourceTree = '<group>';
+        };
+        _____Sources_ = {
+            isa = PBXGroup;
+            children = (_______Group_CSV);
+            name = Sources;
+            sourceTree = '<group>';
+        };
+        _______Tests_ = {
+            isa = PBXGroup;
+            children = (_______Group_CSVTestSuite);
+            name = Tests;
+            sourceTree = '<group>';
+        };
+       TestProducts_ = {
+            isa = PBXGroup;
+            children = (_____Product_CSVTestSuite);
+            name = Tests;
+            sourceTree = '<group>';
+        };
+        ____Products_ = {
+            isa = PBXGroup;
+            children = (TestProducts_, _____Product_CSV);
+            name = Products;
+            sourceTree = '<group>';
+        };
+        _______Debug_ = {
+            isa = XCBuildConfiguration;
+            baseConfigurationReference = '__PBXFileRef_CSV.xcodeproj/Configs/Project.xcconfig';
+            buildSettings = {};
+            name = Debug;
+        };
+        _____Release_ = {
+            isa = XCBuildConfiguration;
+            baseConfigurationReference = '__PBXFileRef_CSV.xcodeproj/Configs/Project.xcconfig';
+            buildSettings = {};
+            name = Release;
+        };
+        ___RootConfs_ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (_______Debug_, _____Release_);
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Debug;
+        };
+    };
+}
