@@ -84,4 +84,48 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(i, 3)
     }
     
+    func testBufferSizeMod0() {
+        let csvString = "0,1,2,3,4,5,6,7,8,9\n"
+        let csv = try! CSV(string: csvString, bufferSize: 12)
+        XCTAssertEqual(csv.bufferSize, 12)
+    }
+    
+    func testBufferSizeMod1() {
+        let csvString = "0,1,2,3,4,5,6,7,8,9\n"
+        let csv = try! CSV(string: csvString, bufferSize: 13)
+        XCTAssertEqual(csv.bufferSize, 16)
+    }
+    
+    func testBufferSizeMod2() {
+        let csvString = "0,1,2,3,4,5,6,7,8,9\n"
+        let csv = try! CSV(string: csvString, bufferSize: 14)
+        XCTAssertEqual(csv.bufferSize, 16)
+    }
+    
+    func testBufferSizeMod3() {
+        let csvString = "0,1,2,3,4,5,6,7,8,9\n"
+        let csv = try! CSV(string: csvString, bufferSize: 15)
+        XCTAssertEqual(csv.bufferSize, 16)
+    }
+    
+    func testBufferSizeMod4() {
+        let csvString = "0,1,2,3,4,5,6,7,8,9\n"
+        let csv = try! CSV(string: csvString, bufferSize: 16)
+        XCTAssertEqual(csv.bufferSize, 16)
+    }
+    
+    func testSmallBufferSize() {
+        let line = "0,1,2,3,4,5,6,7,8,9\n"
+        var csv = ""
+        for _ in 0..<10000 {
+            csv += line
+        }
+        var i = 0
+        for row in try! CSV(string: csv, bufferSize: 10) {
+            XCTAssertEqual(row, ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
+            i += 1
+        }
+        XCTAssertEqual(i, 10000)
+    }
+    
 }

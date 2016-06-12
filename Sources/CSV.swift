@@ -25,23 +25,30 @@ internal let utf32LittleEndianBOM: [UInt8] = [0xff, 0xfe, 0x00, 0x00]
 
 public class CSV: SequenceType, GeneratorType {
 
-    private let stream: NSInputStream
-    private let encoding: NSStringEncoding
-    private let delimiter: UInt32
-    private let bufferSize: Int
+    internal let stream: NSInputStream
+    internal let encoding: NSStringEncoding
+    internal let delimiter: UInt32
+    internal let bufferSize: Int
 
-    private var buffer: UnsafeMutablePointer<UInt8>!
-    private var bufferOffset: Int
-    private var lastReadCount: Int
+    internal var buffer: UnsafeMutablePointer<UInt8>!
+    internal var bufferOffset: Int
+    internal var lastReadCount: Int
 
-    private let charWidth: Int
+    internal let charWidth: Int
 
-    private let fieldBuffer: NSMutableData
+    internal let fieldBuffer: NSMutableData
+
+    internal var closed: Bool = false
+
+    /**
+     CSV header row. To set a value for this property, you set `true` to `hasHeaerRow` in initializer.
+     */
+    public var headerRow: [String]? { return _headerRow }
     private var _headerRow: [String]? = nil
-
-    private var closed: Bool = false
     
-    /** The value is set when an error occurs. */
+    /** 
+     The value is set when an error occurs.
+     */
     public private(set) var lastError: CSVError? = nil
 
     /**
@@ -70,7 +77,11 @@ public class CSV: SequenceType, GeneratorType {
         if bs < 8 {
             bs = 8
         }
-        self.bufferSize = bs + (4 - (bs % 4))
+        let mod = bs % 4
+        if mod != 0 {
+            bs += 4 - mod
+        }
+        self.bufferSize = bs
 
         self.delimiter = UInt32(delimiter)
 
@@ -175,16 +186,8 @@ public class CSV: SequenceType, GeneratorType {
                 free(buffer)
                 buffer = nil
             }
-            _headerRow = nil
             closed = true
         }
-    }
-
-    /**
-     CSV header row. To set a value for this property, you set `true` to `hasHeaerRow` in initializer.
-     */
-    public var headerRow: [String]? {
-        return _headerRow
     }
 
     // MARK: GeneratorType
@@ -259,14 +262,10 @@ public class CSV: SequenceType, GeneratorType {
                 escaping = true
             }
 
-            if c == delimiter && prev == DQUOTE && (quotationCount % 2 == 0) {
+            if (c == delimiter || c == CR || c == LF) && prev == DQUOTE && (quotationCount % 2 == 0) {
                 escaping = false
             }
             
-            if (c == CR || c == LF) && prev == DQUOTE && (quotationCount % 2 == 0) {
-                escaping = false
-            }
-
             // 行の終わり
             if prev == CR && c != LF && !escaping {
                 fieldBuffer.appendBytes(buffer + fieldStart, length: charWidth * charLength)
@@ -365,30 +364,46 @@ extension CSV {
     public convenience init(
         path: String,
         hasHeaderRow: Bool = defaultHasHeaderRow,
-        encoding: NSStringEncoding = defaultEncoding)
+        encoding: NSStringEncoding = defaultEncoding,
+        delimiter: CChar = defaultDelimiter,
+        bufferSize: Int = defaultBufferSize)
         throws
     {
         guard let stream = NSInputStream(fileAtPath: path) else {
             throw CSVError.StreamError
         }
-        try self.init(stream: stream, hasHeaderRow: hasHeaderRow, encoding: encoding)
+        try self.init(
+            stream: stream,
+            hasHeaderRow: hasHeaderRow,
+            encoding: encoding,
+            delimiter: delimiter,
+            bufferSize: bufferSize)
     }
     
     public convenience init(
         url: NSURL,
         hasHeaderRow: Bool = defaultHasHeaderRow,
-        encoding: NSStringEncoding = defaultEncoding)
+        encoding: NSStringEncoding = defaultEncoding,
+        delimiter: CChar = defaultDelimiter,
+        bufferSize: Int = defaultBufferSize)
         throws
     {
         guard let stream = NSInputStream(URL: url) else {
             throw CSVError.StreamError
         }
-        try self.init(stream: stream, hasHeaderRow: hasHeaderRow, encoding: encoding)
+        try self.init(
+            stream: stream,
+            hasHeaderRow: hasHeaderRow,
+            encoding: encoding,
+            delimiter: delimiter,
+            bufferSize: bufferSize)
     }
     
     public convenience init(
         string: String,
-        hasHeaderRow: Bool = defaultHasHeaderRow)
+        hasHeaderRow: Bool = defaultHasHeaderRow,
+        delimiter: CChar = defaultDelimiter,
+        bufferSize: Int = defaultBufferSize)
         throws
     {
         let encoding = defaultEncoding
@@ -396,7 +411,12 @@ extension CSV {
             throw CSVError.StringEncodingMismatch
         }
         let memoryStream = NSInputStream(data: data)
-        try self.init(stream: memoryStream, hasHeaderRow: hasHeaderRow, encoding: encoding)
+        try self.init(
+            stream: memoryStream,
+            hasHeaderRow: hasHeaderRow,
+            encoding: encoding,
+            delimiter: delimiter,
+            bufferSize: bufferSize)
     }
     
 }
