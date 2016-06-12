@@ -108,6 +108,63 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
 
+    func testLineBreak1() {
+        let csv = "qwe,asd\nzxc,rty"
+        let encoding = NSUTF8StringEncoding
+        let records = parseCSV(csv, encoding: encoding)
+        XCTAssertEqual(records.count, 2)
+        XCTAssertEqual(records[0], ["qwe", "asd"])
+        XCTAssertEqual(records[1], ["zxc", "rty"])
+    }
+    
+    func testLineBreak2() {
+        let csv = "qwe,asd\rzxc,rty"
+        let encoding = NSUTF8StringEncoding
+        let records = parseCSV(csv, encoding: encoding)
+        XCTAssertEqual(records.count, 2)
+        XCTAssertEqual(records[0], ["qwe", "asd"])
+        XCTAssertEqual(records[1], ["zxc", "rty"])
+    }
+    
+    func testLineBreak3() {
+        let csv = "qwe,asd\r\nzxc,rty"
+        let encoding = NSUTF8StringEncoding
+        let records = parseCSV(csv, encoding: encoding)
+        XCTAssertEqual(records.count, 2)
+        XCTAssertEqual(records[0], ["qwe", "asd"])
+        XCTAssertEqual(records[1], ["zxc", "rty"])
+    }
+    
+    func testLineBreak4() {
+        let csv = "qwe,asd\n\nzxc,rty"
+        let encoding = NSUTF8StringEncoding
+        let records = parseCSV(csv, encoding: encoding)
+        XCTAssertEqual(records.count, 3)
+        XCTAssertEqual(records[0], ["qwe", "asd"])
+        XCTAssertEqual(records[1], [""])
+        XCTAssertEqual(records[2], ["zxc", "rty"])
+    }
+
+    func testLineBreak5() {
+        let csv = "qwe,asd\r\rzxc,rty"
+        let encoding = NSUTF8StringEncoding
+        let records = parseCSV(csv, encoding: encoding)
+        XCTAssertEqual(records.count, 3)
+        XCTAssertEqual(records[0], ["qwe", "asd"])
+        XCTAssertEqual(records[1], [""])
+        XCTAssertEqual(records[2], ["zxc", "rty"])
+    }
+
+    func testLineBreak6() {
+        let csv = "qwe,asd\r\n\r\nzxc,rty"
+        let encoding = NSUTF8StringEncoding
+        let records = parseCSV(csv, encoding: encoding)
+        XCTAssertEqual(records.count, 3)
+        XCTAssertEqual(records[0], ["qwe", "asd"])
+        XCTAssertEqual(records[1], [""])
+        XCTAssertEqual(records[2], ["zxc", "rty"])
+    }
+
     func testEncodingWithoutBOM() {
         var index = 0
         let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","

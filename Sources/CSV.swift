@@ -280,14 +280,12 @@ public class CSV: SequenceType, GeneratorType {
             }
 
             prev = c
+            bufferOffset += charWidth
 
             // 行の終わり
             if c == CR && !escaping {
-                bufferOffset += charWidth
                 continue
             }
-
-            bufferOffset += charWidth
 
             // フィールドの終わり
             if c == delimiter && !escaping {
