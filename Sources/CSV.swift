@@ -38,7 +38,6 @@ public class CSV: SequenceType, GeneratorType {
 
     private let fieldBuffer: NSMutableData
     private var _headerRow: [String]? = nil
-    private var _currentRow: [String]? = nil
 
     private var closed: Bool = false
     
@@ -149,7 +148,6 @@ public class CSV: SequenceType, GeneratorType {
                 throw CSVError.HeaderReadError
             }
             _headerRow = nextRow
-            _currentRow = nil
         }
     }
 
@@ -165,7 +163,6 @@ public class CSV: SequenceType, GeneratorType {
                 buffer = nil
             }
             _headerRow = nil
-            _currentRow = nil
             closed = true
         }
     }
@@ -174,15 +171,10 @@ public class CSV: SequenceType, GeneratorType {
         return _headerRow
     }
 
-    public var currentRow: [String]? {
-        return _currentRow
-    }
-
     // MARK: GeneratorType
     
     public func next() -> [String]? {
         fieldBuffer.length = 0
-        _currentRow = nil
         
         if closed {
             return nil
@@ -313,7 +305,6 @@ public class CSV: SequenceType, GeneratorType {
         }
 
         fields.append(field)
-        _currentRow = fields
 
         return fields
     }
