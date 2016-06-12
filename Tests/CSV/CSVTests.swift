@@ -11,7 +11,20 @@ import XCTest
 
 class CSVTests: XCTestCase {
 
-    func testSample1() {
+    func test1Line() {
+        let csv = "\"abc\",1,2"
+        var i = 0
+        for row in try! CSV(string: csv) {
+            switch i {
+            case 0: XCTAssertEqual(row, ["abc", "1", "2"])
+            default: break
+            }
+            i += 1
+        }
+        XCTAssertEqual(i, 1)
+    }
+    
+    func test2Lines() {
         let csv = "\"abc\",1,2\n\"cde\",3,4"
         var i = 0
         for row in try! CSV(string: csv) {
@@ -25,7 +38,7 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(i, 2)
     }
     
-    func testSample2() {
+    func testLastLineIsEmpty() {
         let csv = "\"abc\",1,2\n\"cde\",3,4\n"
         var i = 0
         for row in try! CSV(string: csv) {
@@ -39,7 +52,7 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(i, 2)
     }
 
-    func testSample3() {
+    func testLastLineIsWhiteSpace() {
         let csv = "\"abc\",1,2\n\"cde\",3,4\n "
         var i = 0
         for row in try! CSV(string: csv) {
@@ -54,7 +67,7 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(i, 3)
     }
 
-    func testSample4() {
+    func testMiddleLineEmpty() {
         let csv = "\"abc\",1,2\n\n\"cde\",3,4"
         var i = 0
         for row in try! CSV(string: csv) {
@@ -69,7 +82,7 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(i, 3)
     }
     
-    func testSample5() {
+    func testDoubleQuoteBeforeLineBreak() {
         let csv = "\"abc\",1,\"2\"\n\n\"cde\",3,\"4\""
         var i = 0
         for row in try! CSV(string: csv) {
@@ -114,7 +127,7 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(csv.bufferSize, 16)
     }
     
-    func testSmallBufferSize() {
+    func testBigDataAndSmallBufferSize() {
         let line = "0,1,2,3,4,5,6,7,8,9\n"
         var csv = ""
         for _ in 0..<10000 {
@@ -131,18 +144,21 @@ class CSVTests: XCTestCase {
     func testSubscript() {
         let csvString = "id,name\n001,hoge\n002,fuga"
         let csv = try! CSV(string: csvString, hasHeaderRow: true)
-        var table = [[String]]()
+        var i = 0
         while csv.next() != nil {
-            var row = [String]()
-            row.append(csv["id"]!)
-            row.append(csv["name"]!)
-            table.append(row)
+            switch i {
+            case 0:
+                XCTAssertEqual(csv["id"], "001")
+                XCTAssertEqual(csv["name"], "hoge")
+            case 1:
+                XCTAssertEqual(csv["id"], "002")
+                XCTAssertEqual(csv["name"], "fuga")
+            default:
+                break
+            }
+            i += 1
         }
-        XCTAssertEqual(table.count, 2)
-        XCTAssertEqual(table[0][0], "001")
-        XCTAssertEqual(table[0][1], "hoge")
-        XCTAssertEqual(table[1][0], "002")
-        XCTAssertEqual(table[1][1], "fuga")
+        XCTAssertEqual(i, 2)
     }
     
 }
