@@ -128,4 +128,21 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(i, 10000)
     }
     
+    func testSubscript() {
+        let csvString = "id,name\n001,hoge\n002,fuga"
+        let csv = try! CSV(string: csvString, hasHeaderRow: true)
+        var table = [[String]]()
+        while csv.next() != nil {
+            var row = [String]()
+            row.append(csv["id"]!)
+            row.append(csv["name"]!)
+            table.append(row)
+        }
+        XCTAssertEqual(table.count, 2)
+        XCTAssertEqual(table[0][0], "001")
+        XCTAssertEqual(table[0][1], "hoge")
+        XCTAssertEqual(table[1][0], "002")
+        XCTAssertEqual(table[1][1], "fuga")
+    }
+    
 }
