@@ -41,8 +41,18 @@ public class CSV: SequenceType, GeneratorType {
 
     private var closed: Bool = false
     
+    /** The value is set when an error occurs. */
     public private(set) var lastError: CSVError? = nil
 
+    /**
+     Create CSV instance with `NSInputStream`.
+     
+     - parameter stream: An `NSInputStream` object. If the stream is not open, initializer opens automatically.
+     - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
+     - parameter encoding: The character encoding for `stream`. Default: `NSUTF8StringEncoding`.
+     - parameter delimiter: Default: `","`.
+     - parameter bufferSize: Size in bytes to be read at a time from the stream. Default: `8192`.
+     */
     public init(
         stream: NSInputStream,
         hasHeaderRow: Bool = defaultHasHeaderRow,
@@ -155,6 +165,9 @@ public class CSV: SequenceType, GeneratorType {
         close()
     }
 
+    /**
+     Close stream.
+     */
     public func close() {
         if !closed {
             stream.close()
@@ -167,6 +180,9 @@ public class CSV: SequenceType, GeneratorType {
         }
     }
 
+    /**
+     CSV header row. To set a value for this property, you set `true` to `hasHeaerRow` in initializer.
+     */
     public var headerRow: [String]? {
         return _headerRow
     }
