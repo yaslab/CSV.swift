@@ -73,13 +73,13 @@ let csv = try! CSV(
 ### CocoaPods
 
 ```ruby
-pod 'CSV.swift', '~> 0.1'
+pod 'CSV.swift', '~> 0.2'
 ```
 
 ### Carthage
 
 ```
-github "yaslab/CSV.swift" ~> 0.1
+github "yaslab/CSV.swift" ~> 0.2
 ```
 
 ### Swift Package Manager
@@ -90,7 +90,7 @@ import PackageDescription
 let package = Package(
     name: "PackageName",
     dependencies: [
-        .Package(url: "https://github.com/yaslab/CSV.swift", majorVersion: 0, minor: 1)
+        .Package(url: "https://github.com/yaslab/CSV.swift", majorVersion: 0, minor: 2)
     ]
 )
 ```
