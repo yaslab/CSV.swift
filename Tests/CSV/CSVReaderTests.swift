@@ -11,21 +11,21 @@ import XCTest
 
 class CSVReaderTests: XCTestCase {
 
-    func testExample1() {
+    func test1Line() {
         let csv = "abab,cdcd,efef"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
         XCTAssertEqual(records[0], ["abab", "cdcd", "efef"])
     }
 
-    func testExample2() {
+    func testQuoted() {
         let csv = "abab,\"cdcd\",efef"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
         XCTAssertEqual(records[0], ["abab", "cdcd", "efef"])
     }
 
-    func testExample3() {
+    func testLF() {
         let csv = "abab,cdcd,efef\nzxcv,asdf,qwer"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -33,14 +33,14 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qwer"])
     }
 
-    func testExample4() {
+    func testCommaInQuotationMarks() {
         let csv = "abab,\"cd,cd\",efef"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
         XCTAssertEqual(records[0], ["abab", "cd,cd", "efef"])
     }
 
-    func testExample5() {
+    func testCRLF() {
         let csv = "abab,cdcd,efef\r\nzxcv,asdf,qwer"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -48,7 +48,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qwer"])
     }
 
-    func testExample6() {
+    func testEscapedQuotationMark() {
         let csv = "abab,\"\"\"cdcd\",efef\r\nzxcv,asdf,qwer"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -56,7 +56,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qwer"])
     }
 
-    func testExample7() {
+    func testQuotationMark2() {
         let csv = "abab,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\""
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -64,7 +64,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er"])
     }
 
-    func testExample8() {
+    func testEmptyField() {
         let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -72,7 +72,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    func testExample9() {
+    func testLastCR() {
         let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\r"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -81,7 +81,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    func testExample10() {
+    func testLastCRLF() {
         let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\r\n"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -90,7 +90,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    func testExample11() {
+    func testLastLF() {
         let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\n"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -99,7 +99,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    func testExample12() {
+    func testLFInQuotationMarks() {
         let csv = "abab,,\"\rcdcd\n\",efef\r\nzxcv,asdf,\"qw\"\"er\",\n"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -108,7 +108,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    func testLineBreak1() {
+    func testLineBreakLF() {
         let csv = "qwe,asd\nzxc,rty"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -117,7 +117,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxc", "rty"])
     }
     
-    func testLineBreak2() {
+    func testLineBreakCR() {
         let csv = "qwe,asd\rzxc,rty"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -126,7 +126,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxc", "rty"])
     }
     
-    func testLineBreak3() {
+    func testLineBreakCRLF() {
         let csv = "qwe,asd\r\nzxc,rty"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -135,7 +135,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["zxc", "rty"])
     }
     
-    func testLineBreak4() {
+    func testLineBreakLFLF() {
         let csv = "qwe,asd\n\nzxc,rty"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -145,7 +145,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[2], ["zxc", "rty"])
     }
 
-    func testLineBreak5() {
+    func testLineBreakCRCR() {
         let csv = "qwe,asd\r\rzxc,rty"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -155,7 +155,7 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[2], ["zxc", "rty"])
     }
 
-    func testLineBreak6() {
+    func testLineBreakCRLFCRLF() {
         let csv = "qwe,asd\r\n\r\nzxc,rty"
         let encoding = NSUTF8StringEncoding
         let records = parseCSV(csv, encoding: encoding)
@@ -279,7 +279,7 @@ class CSVReaderTests: XCTestCase {
 
     static var allTests : [(String, (CSVReaderTests) -> () throws -> Void)] {
         return [
-            ("testExample1", testExample1),
+            //("testExample1", testExample1),
         ]
     }
 
