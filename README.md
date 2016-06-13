@@ -11,8 +11,7 @@ CSV reading library written in Swift.
 ```swift
 import CSV
 
-let csvString = "1,\"foo\"\n2,\"bar\""
-for row in try! CSV(string: csvString) {
+for row in try! CSV(string: "1,foo\n2,bar") {
     print("\(row)")
     // => ["1", "foo"]
     // => ["2", "bar"]
@@ -32,9 +31,8 @@ for row in try! CSV(path: "/path/to/file.csv") {
 ### Getting the header row
 
 ```swift
-let csvString = "\"id\",\"name\"\n1,\"foo\"\n2,\"bar\""
 let csv = try! CSV(
-    string: csvString,
+    string: "id,name\n1,foo\n2,bar",
     hasHeaderRow: true) // default: false
 
 let headerRow = csv.headerRow!
@@ -44,6 +42,19 @@ for row in csv {
     print("\(row)")
     // => ["1", "foo"]
     // => ["2", "bar"]
+}
+```
+
+### Get the field value using subscript
+
+```swift
+let csv = try! CSV(
+    string: "id,name\n1,foo",
+    hasHeaderRow: true) // It must be true.
+
+while csv.next() != nil {
+    print("\(csv["id"]!)")   // => "1"
+    print("\(csv["name"]!)") // => "foo"
 }
 ```
 
