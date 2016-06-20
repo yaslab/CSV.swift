@@ -15,7 +15,7 @@ extension CSV {
             guard let headerRow = headerRow else {
                 return nil
             }
-            guard let index = headerRow.indexOf(key) else {
+            guard let index = headerRow.index(of: key) else {
                 return nil
             }
             guard let currentRow = currentRow else {

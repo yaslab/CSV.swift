@@ -13,12 +13,12 @@ extension CSV {
     public convenience init(
         path: String,
         hasHeaderRow: Bool = defaultHasHeaderRow,
-        encoding: NSStringEncoding = defaultEncoding,
+        encoding: String.Encoding = defaultEncoding,
         delimiter: CChar = defaultDelimiter,
         bufferSize: Int = defaultBufferSize)
         throws
     {
-        guard let stream = NSInputStream(fileAtPath: path) else {
+        guard let stream = InputStream(fileAtPath: path) else {
             throw CSVError.StreamError
         }
         try self.init(
@@ -30,14 +30,14 @@ extension CSV {
     }
     
     public convenience init(
-        url: NSURL,
+        url: URL,
         hasHeaderRow: Bool = defaultHasHeaderRow,
-        encoding: NSStringEncoding = defaultEncoding,
+        encoding: String.Encoding = defaultEncoding,
         delimiter: CChar = defaultDelimiter,
         bufferSize: Int = defaultBufferSize)
         throws
     {
-        guard let stream = NSInputStream(URL: url) else {
+        guard let stream = InputStream(url: url) else {
             throw CSVError.StreamError
         }
         try self.init(
@@ -56,11 +56,11 @@ extension CSV {
         throws
     {
         let encoding = defaultEncoding
-        guard let data = string.dataUsingEncoding(encoding) else {
+        guard let data = string.data(using: encoding) else {
             throw CSVError.StringEncodingMismatch
         }
         try self.init(
-            stream: NSInputStream(data: data),
+            stream: InputStream(data: data),
             hasHeaderRow: hasHeaderRow,
             encoding: encoding,
             delimiter: delimiter,

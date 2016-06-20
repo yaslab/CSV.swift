@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum CSVError: ErrorType {
+public enum CSVError: ErrorProtocol {
     case ParameterError
     case StreamError
     case HeaderReadError
