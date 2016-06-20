@@ -161,4 +161,18 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(i, 2)
     }
     
+    func testCSVState1() {
+        var it = "あ,い1,\"う\",えお\n,,x,".unicodeScalars.makeIterator()
+        var state = CSVState(it: &it, delimiter: defaultDelimiter)
+        
+        var rows = [[String]]()
+        
+        while let row = state.next() {
+            rows.append(row)
+        }
+        XCTAssertEqual(rows.count, 2)
+        XCTAssertEqual(rows[0], ["あ", "い1", "う", "えお"])
+        XCTAssertEqual(rows[1], ["", "", "x", ""])
+    }
+    
 }

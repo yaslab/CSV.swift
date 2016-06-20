@@ -14,7 +14,7 @@ extension CSV {
         path: String,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         encoding: String.Encoding = defaultEncoding,
-        delimiter: CChar = defaultDelimiter,
+        delimiter: UnicodeScalar = defaultDelimiter,
         bufferSize: Int = defaultBufferSize)
         throws
     {
@@ -33,7 +33,7 @@ extension CSV {
         url: URL,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         encoding: String.Encoding = defaultEncoding,
-        delimiter: CChar = defaultDelimiter,
+        delimiter: UnicodeScalar = defaultDelimiter,
         bufferSize: Int = defaultBufferSize)
         throws
     {
@@ -51,7 +51,7 @@ extension CSV {
     public convenience init(
         string: String,
         hasHeaderRow: Bool = defaultHasHeaderRow,
-        delimiter: CChar = defaultDelimiter,
+        delimiter: UnicodeScalar = defaultDelimiter,
         bufferSize: Int = defaultBufferSize)
         throws
     {

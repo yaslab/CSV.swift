@@ -8,13 +8,13 @@
 
 import Foundation
 
-private let LF: UInt32 = 0x0a //'\n'
-private let CR: UInt32 = 0x0d //'\r'
-private let DQUOTE: UInt32 = 0x22 //'"'
+private let LF = UnicodeScalar(UInt32(0x0a)) //'\n'
+private let CR = UnicodeScalar(UInt32(0x0d)) //'\r'
+private let DQUOTE = UnicodeScalar(UInt32(0x22)) //'"'
 
 internal let defaultHasHeaderRow = false
 internal let defaultEncoding: String.Encoding = .utf8
-internal let defaultDelimiter: CChar = 0x2c //','
+internal let defaultDelimiter = UnicodeScalar(UInt32(0x2c)) //','
 internal let defaultBufferSize = 8192
 
 internal let utf8BOM: [UInt8] = [0xef, 0xbb, 0xbf]
@@ -27,7 +27,7 @@ public class CSV: Sequence, IteratorProtocol {
 
     internal let stream: InputStream
     internal let encoding: String.Encoding
-    internal let delimiter: UInt32
+    internal let delimiter: UnicodeScalar
     internal let bufferSize: Int
 
     internal var buffer: UnsafeMutablePointer<UInt8>!
@@ -66,7 +66,7 @@ public class CSV: Sequence, IteratorProtocol {
         stream: InputStream,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         encoding: String.Encoding = defaultEncoding,
-        delimiter: CChar = defaultDelimiter,
+        delimiter: UnicodeScalar = defaultDelimiter,
         bufferSize: Int = defaultBufferSize)
         throws
     {
@@ -85,7 +85,7 @@ public class CSV: Sequence, IteratorProtocol {
         }
         self.bufferSize = bs
 
-        self.delimiter = UInt32(delimiter)
+        self.delimiter = UnicodeScalar(UInt32(delimiter))
 
         let b = malloc(bufferSize)
         if b == nil {
@@ -213,7 +213,7 @@ public class CSV: Sequence, IteratorProtocol {
         var escaping = false
         var quotationCount = 0
 
-        var prev: UInt32 = 0
+        var prev = UnicodeScalar(0)
 
         while true {
             if bufferOffset >= lastReadCount {
@@ -236,26 +236,28 @@ public class CSV: Sequence, IteratorProtocol {
                 }
             }
 
-            var c: UInt32 = 0
+            var c = UnicodeScalar(0)
 
             switch encoding {
             case String.Encoding.utf16BigEndian:
                 let _c = ReadBigInt16(base: buffer, byteOffset: bufferOffset)
-                c = UInt32(_c)
+                c = UnicodeScalar(UInt32(_c))
 
             case String.Encoding.utf16LittleEndian:
                 let _c = ReadLittleInt16(base: buffer, byteOffset: bufferOffset)
-                c = UInt32(_c)
+                c = UnicodeScalar(UInt32(_c))
 
             case String.Encoding.utf32BigEndian:
-                c = ReadBigInt32(base: buffer, byteOffset: bufferOffset)
+                let _c = ReadBigInt32(base: buffer, byteOffset: bufferOffset)
+                c = UnicodeScalar(UInt32(_c))
 
             case String.Encoding.utf32LittleEndian:
-                c = ReadLittleInt32(base: buffer, byteOffset: bufferOffset)
+                let _c = ReadLittleInt32(base: buffer, byteOffset: bufferOffset)
+                c = UnicodeScalar(UInt32(_c))
 
             default: // multi-byte character encodings
                 let _c = (buffer + bufferOffset)[0]
-                c = UInt32(_c)
+                c = UnicodeScalar(UInt32(_c))
             }
 
             if c == DQUOTE {
@@ -355,4 +357,122 @@ public class CSV: Sequence, IteratorProtocol {
         return field
     }
 
+}
+
+public struct CSVState<T: IteratorProtocol where T.Element == UnicodeScalar>: IteratorProtocol {
+
+    private var it: T
+    private let delimiter: UnicodeScalar
+
+    private var back: T.Element? = nil
+    
+    public init(it: inout T, delimiter: UnicodeScalar) {
+        self.it = it
+        self.delimiter = delimiter
+    }
+    
+    public mutating func next() -> [String]? {
+        return readRow()
+    }
+    
+    mutating func moveNext() -> T.Element? {
+        if back != nil {
+            defer { back = nil }
+            return back
+        }
+        return it.next()
+    }
+    
+    mutating func readRow() -> [String]? {
+        var next = moveNext()
+        if next == nil {
+            return nil
+        }
+        
+        var row = [String]()
+        while true {
+            var field: String
+            var end: Bool
+            if next == nil {
+                (field, end) = ("", true)
+            }
+            else if next == DQUOTE {
+                (field, end) = readField(quoted: true)
+            }
+            else {
+                back = next
+                (field, end) = readField(quoted: false)
+            }
+            row.append(field)
+            if end {
+                break
+            }
+            next = moveNext()
+        }
+        return row
+    }
+    
+    mutating func readField(quoted: Bool) -> (String, Bool) {
+        var next = moveNext()
+        
+        var field = ""
+        //var end = false
+        
+        while let c = next {
+            if quoted {
+                switch c {
+                case DQUOTE:
+                    let n = moveNext()
+                    if n == DQUOTE {
+                        // ESC
+                        field.append(c)
+                    }
+                    else if n == delimiter {
+                        // END FIELD
+                        return (field, false)
+                    }
+                    else if n == CR || n == LF {
+                        if n == CR {
+                            let nn = moveNext()
+                            if nn != LF {
+                                back = nn
+                            }
+                        }
+                        // END ROW
+                        return (field, true)
+                    }
+                    else {
+                        // ERROR??
+                        field.append(c)
+                    }
+                default:
+                    field.append(c)
+                }
+            }
+            else {
+                switch c {
+                case CR:
+                    let nn = moveNext()
+                    if nn != LF {
+                        back = nn
+                    }
+                    // END ROW
+                    return (field, true)
+                case LF:
+                    // END ROW
+                    return (field, true)
+                case delimiter:
+                    // END FIELD
+                    return (field, false)
+                default:
+                    field.append(c)
+                }
+            }
+            
+            next = moveNext()
+        }
+        
+        return (field, true)
+    }
+    
 }
