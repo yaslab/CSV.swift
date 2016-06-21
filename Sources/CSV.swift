@@ -132,9 +132,9 @@ public struct CSV: IteratorProtocol, Sequence {
         }
         
         var row = [String]()
+        var field: String
+        var end: Bool
         while true {
-            var field: String
-            var end: Bool
             if next == nil {
                 (field, end) = ("", true)
             }
@@ -157,60 +157,56 @@ public struct CSV: IteratorProtocol, Sequence {
     }
     
     internal mutating func readField(quoted: Bool) -> (String, Bool) {
-        var next = moveNext()
         var field = ""
-        
+
+        var next = moveNext()
         while let c = next {
             if quoted {
-                switch c {
-                case DQUOTE:
-                    let n = moveNext()
-                    if n == nil {
-                        // END ROW
-                        return (field, true)
-                    }
-                    else if n == DQUOTE {
-                        // ESC
-                        field.append(c)
-                    }
-                    else if n == delimiter {
-                        // END FIELD
-                        return (field, false)
-                    }
-                    else if n == CR || n == LF {
-                        if n == CR {
-                            let nn = moveNext()
-                            if nn != LF {
-                                back = nn
+                if c == DQUOTE {
+                    let cNext = moveNext()
+                    if cNext == nil || cNext == CR || cNext == LF {
+                        if cNext == CR {
+                            let cNextNext = moveNext()
+                            if cNextNext != LF {
+                                back = cNextNext
                             }
                         }
                         // END ROW
                         return (field, true)
                     }
+                    else if cNext == delimiter {
+                        // END FIELD
+                        return (field, false)
+                    }
+                    else if cNext == DQUOTE {
+                        // ESC
+                        field.append(DQUOTE)
+                    }
                     else {
                         // ERROR??
                         field.append(c)
                     }
-                default:
+                }
+                else {
                     field.append(c)
                 }
             }
             else {
-                switch c {
-                case CR:
-                    let nn = moveNext()
-                    if nn != LF {
-                        back = nn
+                if c == CR || c == LF {
+                    if c == CR {
+                        let cNext = moveNext()
+                        if cNext != LF {
+                            back = cNext
+                        }
                     }
                     // END ROW
                     return (field, true)
-                case LF:
-                    // END ROW
-                    return (field, true)
-                case delimiter:
+                }
+                else if c == delimiter {
                     // END FIELD
                     return (field, false)
-                default:
+                }
+                else {
                     field.append(c)
                 }
             }
