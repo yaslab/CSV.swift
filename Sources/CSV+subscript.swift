@@ -12,13 +12,10 @@ extension CSV {
     
     public subscript(key: String) -> String? {
         get {
-            guard let headerRow = headerRow else {
+            guard let headerRow = headerRow, currentRow = currentRow else {
                 return nil
             }
             guard let index = headerRow.index(of: key) else {
-                return nil
-            }
-            guard let currentRow = currentRow else {
                 return nil
             }
             if index >= currentRow.count {

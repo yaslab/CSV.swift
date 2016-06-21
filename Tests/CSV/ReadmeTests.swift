@@ -41,7 +41,7 @@ class ReadmeTests: XCTestCase {
     }
     
     func testGetTheFieldValueUsingSubscript() {
-        let csv = try! CSV(
+        var csv = try! CSV(
             string: "id,name\n1,foo",
             hasHeaderRow: true) // It must be true.
         

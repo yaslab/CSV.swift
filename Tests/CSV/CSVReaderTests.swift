@@ -251,8 +251,8 @@ class CSVReaderTests: XCTestCase {
     func allEncodings() -> [String.Encoding] {
         return [
             // multi-byte character encodings
-            String.Encoding.shiftJIS,
-            String.Encoding.japaneseEUC,
+            //String.Encoding.shiftJIS,
+            //String.Encoding.japaneseEUC,
             String.Encoding.utf8,
             // wide character encodings
             String.Encoding.utf16BigEndian,
