@@ -8,15 +8,15 @@
 
 import Foundation
 
-struct AnyIterator<T>: IteratorProtocol {
+internal struct AnyIterator<T>: IteratorProtocol {
     
     private var _base_next: (() -> T?)
     
-    init<U: IteratorProtocol where U.Element == T>(base: inout U) {
+    internal init<U: IteratorProtocol where U.Element == T>(base: inout U) {
         _base_next = { base.next() }
     }
     
-    mutating func next() -> T? {
+    internal mutating func next() -> T? {
         return _base_next()
     }
     

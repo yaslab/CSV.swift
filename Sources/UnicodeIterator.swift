@@ -8,21 +8,21 @@
 
 import Foundation
 
-struct UnicodeIterator<
+internal struct UnicodeIterator<
     Input: IteratorProtocol,
     InputEncoding: UnicodeCodec
     where InputEncoding.CodeUnit == Input.Element>
     : IteratorProtocol {
     
-    var input: Input
-    var inputEncoding: InputEncoding
+    private var input: Input
+    private var inputEncoding: InputEncoding
     
-    init(input: Input, inputEncoding: InputEncoding.Type) {
+    internal init(input: Input, inputEncoding: InputEncoding.Type) {
         self.input = input
         self.inputEncoding = inputEncoding.init()
     }
     
-    mutating func next() -> UnicodeScalar? {
+    internal mutating func next() -> UnicodeScalar? {
         switch inputEncoding.decode(&input) {
         case .scalarValue(let c): return c
         case .emptyInput: return nil

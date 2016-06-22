@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum Endian {
+internal enum Endian {
     case big
     case little
     case unknown
@@ -16,7 +16,7 @@ enum Endian {
 
 extension String.Encoding {
     
-    var endian: Endian {
+    internal var endian: Endian {
         switch self {
         case String.Encoding.utf16: return .big
         case String.Encoding.utf16BigEndian: return .big
