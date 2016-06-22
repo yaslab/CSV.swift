@@ -11,7 +11,7 @@ import Foundation
 extension CSV {
 
     public init(
-        path: String,
+        fileAtPath path: String,
         encoding: String.Encoding = defaultEncoding,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         delimiter: UnicodeScalar = defaultDelimiter)
