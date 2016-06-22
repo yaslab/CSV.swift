@@ -27,7 +27,6 @@ public struct CSV: IteratorProtocol, Sequence {
     private var iterator: AnyIterator<UnicodeScalar>
     private var back: UnicodeScalar? = nil
     
-    private var innerStream: InputStream? = nil
     private let delimiter: UnicodeScalar
 
     internal var currentRow: [String]? = nil
@@ -54,7 +53,7 @@ public struct CSV: IteratorProtocol, Sequence {
             _headerRow = headerRow
         }
     }
-
+    
     /**
      Create CSV instance with `NSInputStream`.
      
@@ -76,25 +75,23 @@ public struct CSV: IteratorProtocol, Sequence {
         case String.Encoding.utf32,
              String.Encoding.utf32BigEndian,
              String.Encoding.utf32LittleEndian:
-            var iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncoding: UTF32.self)
+            var iterator = UTF32Iterator(reader: reader)
             try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
 
         case String.Encoding.utf16,
              String.Encoding.utf16BigEndian,
              String.Encoding.utf16LittleEndian:
-            var iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncoding: UTF16.self)
+            var iterator = UTF16Iterator(reader: reader)
             try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
         
         case String.Encoding.utf8,
              String.Encoding.ascii:
-            var iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncoding: UTF8.self)
+            var iterator = UTF8Iterator(reader: reader)
             try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
             
         default:
             throw CSVError.StringEncodingMismatch
         }
-        
-        innerStream = stream
     }
 
     // MARK: IteratorProtocol
