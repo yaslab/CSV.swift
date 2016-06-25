@@ -23,7 +23,8 @@ for row in try! CSV(string: "1,foo\n2,bar") {
 ```swift
 import CSV
 
-for row in try! CSV(path: "/path/to/file.csv") {
+let stream = InputStream(fileAtPath: "/path/to/file.csv")!
+for row in try! CSV(stream: stream) {
     print("\(row)")
 }
 ```
@@ -64,8 +65,9 @@ If you use a file path, you can provide the character encoding to initializer.
 
 ```swift
 let csv = try! CSV(
-    path: "/path/to/file.csv",
-    encoding: NSUTF8StringEncoding)
+    stream: InputStream(fileAtPath: "/path/to/file.csv")!,
+    codecType: UTF16.self,
+    endian: .big)
 ```
 
 ## Installation
@@ -73,13 +75,13 @@ let csv = try! CSV(
 ### CocoaPods
 
 ```ruby
-pod 'CSV.swift', '~> 0.2'
+pod 'CSV.swift', '~> 1.0'
 ```
 
 ### Carthage
 
 ```
-github "yaslab/CSV.swift" ~> 0.2
+github "yaslab/CSV.swift" ~> 1.0
 ```
 
 ### Swift Package Manager
@@ -90,7 +92,7 @@ import PackageDescription
 let package = Package(
     name: "PackageName",
     dependencies: [
-        .Package(url: "https://github.com/yaslab/CSV.swift", majorVersion: 0, minor: 2)
+        .Package(url: "https://github.com/yaslab/CSV.swift", majorVersion: 1, minor: 0)
     ]
 )
 ```
