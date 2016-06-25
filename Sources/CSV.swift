@@ -54,6 +54,18 @@ public struct CSV: IteratorProtocol, Sequence {
         }
     }
     
+    public init<T: UnicodeCodec where T.CodeUnit == UInt8>(
+        stream: InputStream,
+        codecType: T.Type,
+        hasHeaderRow: Bool = defaultHasHeaderRow,
+        delimiter: UnicodeScalar = defaultDelimiter)
+        throws
+    {
+        let reader = BinaryReader(stream: stream, encoding: .utf8, closeOnDeinit: true)
+        var iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncoding: codecType)
+        try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+    }
+
     /**
      Create CSV instance with `NSInputStream`.
      
@@ -75,18 +87,18 @@ public struct CSV: IteratorProtocol, Sequence {
         case String.Encoding.utf32,
              String.Encoding.utf32BigEndian,
              String.Encoding.utf32LittleEndian:
-            var iterator = UTF32Iterator(reader: reader)
+            var iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncoding: UTF32.self)
             try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
 
         case String.Encoding.utf16,
              String.Encoding.utf16BigEndian,
              String.Encoding.utf16LittleEndian:
-            var iterator = UTF16Iterator(reader: reader)
+            var iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncoding: UTF16.self)
             try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
         
         case String.Encoding.utf8,
              String.Encoding.ascii:
-            var iterator = UTF8Iterator(reader: reader)
+            var iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncoding: UTF8.self)
             try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
             
         default:
