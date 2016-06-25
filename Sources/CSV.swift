@@ -12,15 +12,8 @@ private let LF = "\n".unicodeScalars.first!
 private let CR = "\r".unicodeScalars.first!
 private let DQUOTE = "\"".unicodeScalars.first!
 
-internal let defaultEncoding: String.Encoding = .utf8
 internal let defaultHasHeaderRow = false
 internal let defaultDelimiter = ",".unicodeScalars.first!
-
-internal let utf8BOM: [UInt8] = [0xef, 0xbb, 0xbf]
-internal let utf16BigEndianBOM: [UInt8] = [0xfe, 0xff]
-internal let utf16LittleEndianBOM: [UInt8] = [0xff, 0xfe]
-internal let utf32BigEndianBOM: [UInt8] = [0x00, 0x00, 0xfe, 0xff]
-internal let utf32LittleEndianBOM: [UInt8] = [0xff, 0xfe, 0x00, 0x00]
 
 public struct CSV: IteratorProtocol, Sequence {
 
@@ -37,6 +30,14 @@ public struct CSV: IteratorProtocol, Sequence {
     public var headerRow: [String]? { return _headerRow }
     private var _headerRow: [String]? = nil
     
+    /**
+     Create CSV instance with `NSInputStream`.
+     
+     - parameter stream: An `NSInputStream` object. If the stream is not open, initializer opens automatically.
+     - parameter encoding: The character encoding for `stream`. Default: `NSUTF8StringEncoding`.
+     - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
+     - parameter delimiter: Default: `","`.
+     */
     internal init<T: IteratorProtocol where T.Element == UnicodeScalar>(
         iterator: T,
         hasHeaderRow: Bool,
@@ -48,12 +49,12 @@ public struct CSV: IteratorProtocol, Sequence {
 
         if hasHeaderRow {
             guard let headerRow = next() else  {
-                throw CSVError.HeaderReadError
+                throw CSVError.headerReadError
             }
             _headerRow = headerRow
         }
     }
-    
+
     public init<T: UnicodeCodec where T.CodeUnit == UInt8>(
         stream: InputStream,
         codecType: T.Type,
@@ -61,51 +62,37 @@ public struct CSV: IteratorProtocol, Sequence {
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
     {
-        let reader = BinaryReader(stream: stream, encoding: .utf8, closeOnDeinit: true)
+        let reader = BinaryReader(stream: stream, endian: .unknown, closeOnDeinit: true)
         let iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncoding: codecType)
         try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
     }
-
-    /**
-     Create CSV instance with `NSInputStream`.
-     
-     - parameter stream: An `NSInputStream` object. If the stream is not open, initializer opens automatically.
-     - parameter encoding: The character encoding for `stream`. Default: `NSUTF8StringEncoding`.
-     - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
-     - parameter delimiter: Default: `","`.
-     */
-    public init(
+    
+    public init<T: UnicodeCodec where T.CodeUnit == UInt16>(
         stream: InputStream,
-        encoding: String.Encoding = defaultEncoding,
+        codecType: T.Type,
+        endian: Endian = .big,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
     {
-        let reader = BinaryReader(stream: stream, encoding: encoding, closeOnDeinit: true)
-        
-        switch encoding {
-        case String.Encoding.utf32,
-             String.Encoding.utf32BigEndian,
-             String.Encoding.utf32LittleEndian:
-            let iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncoding: UTF32.self)
-            try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
-
-        case String.Encoding.utf16,
-             String.Encoding.utf16BigEndian,
-             String.Encoding.utf16LittleEndian:
-            let iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncoding: UTF16.self)
-            try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
-        
-        case String.Encoding.utf8,
-             String.Encoding.ascii:
-            let iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncoding: UTF8.self)
-            try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
-            
-        default:
-            throw CSVError.StringEncodingMismatch
-        }
+        let reader = BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
+        let iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncoding: codecType)
+        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
     }
-
+    
+    public init<T: UnicodeCodec where T.CodeUnit == UInt32>(
+        stream: InputStream,
+        codecType: T.Type,
+        endian: Endian = .big,
+        hasHeaderRow: Bool = defaultHasHeaderRow,
+        delimiter: UnicodeScalar = defaultDelimiter)
+        throws
+    {
+        let reader = BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
+        let iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncoding: codecType)
+        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+    }
+    
     // MARK: IteratorProtocol
 
     /// Advances and returns the next element of the underlying sequence, or

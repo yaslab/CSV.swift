@@ -9,9 +9,9 @@
 import Foundation
 
 public enum CSVError: ErrorProtocol {
-    case ParameterError
-    case StreamError
-    case HeaderReadError
-    case MemoryAllocationFailed
-    case StringEncodingMismatch
+//    case parameterError
+//    case streamError
+    case headerReadError
+//    case memoryAllocationFailed
+//    case stringEncodingMismatch
 }

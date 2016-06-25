@@ -8,26 +8,32 @@
 
 import Foundation
 
-internal func readBOM(buffer: UnsafePointer<UInt8>, length: Int) -> (String.Encoding, Int)? {
+internal let utf8BOM: [UInt8] = [0xef, 0xbb, 0xbf]
+internal let utf16BigEndianBOM: [UInt8] = [0xfe, 0xff]
+internal let utf16LittleEndianBOM: [UInt8] = [0xff, 0xfe]
+internal let utf32BigEndianBOM: [UInt8] = [0x00, 0x00, 0xfe, 0xff]
+internal let utf32LittleEndianBOM: [UInt8] = [0xff, 0xfe, 0x00, 0x00]
+
+internal func readBOM(buffer: UnsafePointer<UInt8>, length: Int) -> (Endian, Int)? {
     if length >= 4 {
         if memcmp(buffer, utf32BigEndianBOM, 4) == 0 {
-            return (String.Encoding.utf32BigEndian, 4)
+            return (.big, 4)
         }
         if memcmp(buffer, utf32LittleEndianBOM, 4) == 0 {
-            return (String.Encoding.utf32LittleEndian, 4)
+            return (.little, 4)
         }
     }
     if length >= 3 {
         if memcmp(buffer, utf8BOM, 3) == 0 {
-            return (String.Encoding.utf8, 3)
+            return (.unknown, 3)
         }
     }
     if length >= 2 {
         if memcmp(buffer, utf16BigEndianBOM, 2) == 0 {
-            return (String.Encoding.utf16BigEndian, 2)
+            return (.big, 2)
         }
         if memcmp(buffer, utf16LittleEndianBOM, 2) == 0 {
-            return (String.Encoding.utf16LittleEndian, 2)
+            return (.little, 2)
         }
     }
     return nil
@@ -36,15 +42,15 @@ internal func readBOM(buffer: UnsafePointer<UInt8>, length: Int) -> (String.Enco
 internal class BinaryReader {
 
     private let stream: InputStream
-    private let encoding: String.Encoding
+    private let endian: Endian
     private let closeOnDeinit: Bool
 
     private var buffer = [UInt8].init(repeating: 0, count: 4)
     private let bufferSize = 4
     private var bufferOffset = 0
     
-    internal init(stream: InputStream, encoding: String.Encoding = .utf8, closeOnDeinit: Bool = true) {
-        var encoding = encoding
+    internal init(stream: InputStream, endian: Endian = .unknown, closeOnDeinit: Bool = true) {
+        var endian = endian
 
         if stream.streamStatus == .notOpen {
             stream.open()
@@ -52,12 +58,12 @@ internal class BinaryReader {
 
         let readCount = stream.read(&buffer, maxLength: bufferSize)
         if let (e, l) = readBOM(buffer: &buffer, length: readCount) {
-            encoding = e
+            endian = e
             bufferOffset = l
         }
 
         self.stream = stream
-        self.encoding = encoding
+        self.endian = endian
         self.closeOnDeinit = closeOnDeinit
     }
     
@@ -116,7 +122,7 @@ internal class BinaryReader {
             throw NSError(domain: "", code: 0, userInfo: nil)
         }
         let tmp = UnsafeMutablePointer<UInt16>(buffer)
-        switch encoding.endian {
+        switch endian {
         case .big:
             return CFSwapInt16BigToHost(tmp[0])
         case .little:
@@ -139,7 +145,7 @@ internal class BinaryReader {
             throw NSError(domain: "", code: 0, userInfo: nil)
         }
         let tmp = UnsafeMutablePointer<UInt32>(buffer)
-        switch encoding.endian {
+        switch endian {
         case .big:
             return CFSwapInt32BigToHost(tmp[0])
         case .little:
