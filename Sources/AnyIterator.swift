@@ -12,7 +12,8 @@ internal struct AnyIterator<T>: IteratorProtocol {
     
     private var _base_next: (() -> T?)
     
-    internal init<U: IteratorProtocol where U.Element == T>(base: inout U) {
+    internal init<U: IteratorProtocol where U.Element == T>(base: U) {
+        var base = base
         _base_next = { base.next() }
     }
     

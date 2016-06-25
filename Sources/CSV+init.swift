@@ -42,8 +42,8 @@ extension CSV {
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
     {
-        var iterator = string.unicodeScalars.makeIterator()
-        try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+        let iterator = string.unicodeScalars.makeIterator()
+        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
     }
     
 }

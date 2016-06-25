@@ -38,12 +38,12 @@ public struct CSV: IteratorProtocol, Sequence {
     private var _headerRow: [String]? = nil
     
     internal init<T: IteratorProtocol where T.Element == UnicodeScalar>(
-        iterator: inout T,
+        iterator: T,
         hasHeaderRow: Bool,
         delimiter: UnicodeScalar)
         throws
     {
-        self.iterator = AnyIterator(base: &iterator)
+        self.iterator = AnyIterator(base: iterator)
         self.delimiter = delimiter
 
         if hasHeaderRow {
@@ -62,8 +62,8 @@ public struct CSV: IteratorProtocol, Sequence {
         throws
     {
         let reader = BinaryReader(stream: stream, encoding: .utf8, closeOnDeinit: true)
-        var iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncoding: codecType)
-        try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+        let iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncoding: codecType)
+        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
     }
 
     /**
@@ -87,19 +87,19 @@ public struct CSV: IteratorProtocol, Sequence {
         case String.Encoding.utf32,
              String.Encoding.utf32BigEndian,
              String.Encoding.utf32LittleEndian:
-            var iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncoding: UTF32.self)
-            try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+            let iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncoding: UTF32.self)
+            try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
 
         case String.Encoding.utf16,
              String.Encoding.utf16BigEndian,
              String.Encoding.utf16LittleEndian:
-            var iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncoding: UTF16.self)
-            try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+            let iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncoding: UTF16.self)
+            try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
         
         case String.Encoding.utf8,
              String.Encoding.ascii:
-            var iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncoding: UTF8.self)
-            try self.init(iterator: &iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+            let iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncoding: UTF8.self)
+            try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
             
         default:
             throw CSVError.StringEncodingMismatch

@@ -162,8 +162,8 @@ class CSVTests: XCTestCase {
     }
     
     func testCSVState1() {
-        var it = "あ,い1,\"う\",えお\n,,x,".unicodeScalars.makeIterator()
-        var csv = try! CSV(iterator: &it, hasHeaderRow: defaultHasHeaderRow, delimiter: defaultDelimiter)
+        let it = "あ,い1,\"う\",えお\n,,x,".unicodeScalars.makeIterator()
+        var csv = try! CSV(iterator: it, hasHeaderRow: defaultHasHeaderRow, delimiter: defaultDelimiter)
         
         var rows = [[String]]()
         
