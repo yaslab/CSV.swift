@@ -173,78 +173,78 @@ class CSVReaderTests: XCTestCase {
     }
 
     func testUTF16WithNativeEndianBOM() {
-        let csvString = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
+        let csvString = "abab,,cdcd,efef\r\nzxcv,😆asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf16
         var mutableData = Data()
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData)
-        let csv = try! CSV(stream: stream, codecType: UTF16.self)
+        let csv = try! CSV(stream: stream, codecType: UTF16.self, endian: .unknown)
         let records = getRecords(csv: csv)
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
-        XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
+        XCTAssertEqual(records[1], ["zxcv", "😆asdf", "qw\"er", ""])
     }
 
     func testUTF16WithBigEndianBOM() {
-        let csvString = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
+        let csvString = "abab,,cdcd,efef\r\n😆zxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf16BigEndian
         var mutableData = Data()
         mutableData.append(utf16BigEndianBOM, count: utf16BigEndianBOM.count)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData)
-        let csv = try! CSV(stream: stream, codecType: UTF16.self, endian: .unknown)
+        let csv = try! CSV(stream: stream, codecType: UTF16.self, endian: .big)
         let records = getRecords(csv: csv)
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
-        XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
+        XCTAssertEqual(records[1], ["😆zxcv", "asdf", "qw\"er", ""])
     }
 
     func testUTF16WithLittleEndianBOM() {
-        let csvString = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
+        let csvString = "abab,,cdcd,efef\r\nzxcv😆,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf16LittleEndian
         var mutableData = Data()
         mutableData.append(utf16LittleEndianBOM, count: utf16LittleEndianBOM.count)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData)
-        let csv = try! CSV(stream: stream, codecType: UTF16.self, endian: .unknown)
+        let csv = try! CSV(stream: stream, codecType: UTF16.self, endian: .little)
         let records = getRecords(csv: csv)
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
-        XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
+        XCTAssertEqual(records[1], ["zxcv😆", "asdf", "qw\"er", ""])
     }
 
     func testUTF32WithNativeEndianBOM() {
-        let csvString = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
+        let csvString = "😆abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf32
         var mutableData = Data()
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData)
-        let csv = try! CSV(stream: stream, codecType: UTF32.self)
+        let csv = try! CSV(stream: stream, codecType: UTF32.self, endian: .unknown)
         let records = getRecords(csv: csv)
-        XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
+        XCTAssertEqual(records[0], ["😆abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
 
     func testUTF32WithBigEndianBOM() {
-        let csvString = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
+        let csvString = "abab,,cd😆cd,efef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf32BigEndian
         var mutableData = Data()
         mutableData.append(utf32BigEndianBOM, count: utf32BigEndianBOM.count)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData)
-        let csv = try! CSV(stream: stream, codecType: UTF32.self, endian: .unknown)
+        let csv = try! CSV(stream: stream, codecType: UTF32.self, endian: .big)
         let records = getRecords(csv: csv)
-        XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
+        XCTAssertEqual(records[0], ["abab", "", "cd😆cd", "efef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
 
     func testUTF32WithLittleEndianBOM() {
-        let csvString = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
+        let csvString = "abab,,cdcd,ef😆ef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf32LittleEndian
         var mutableData = Data()
         mutableData.append(utf32LittleEndianBOM, count: utf32LittleEndianBOM.count)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData)
-        let csv = try! CSV(stream: stream, codecType: UTF32.self, endian: .unknown)
+        let csv = try! CSV(stream: stream, codecType: UTF32.self, endian: .little)
         let records = getRecords(csv: csv)
-        XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
+        XCTAssertEqual(records[0], ["abab", "", "cdcd", "ef😆ef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
 

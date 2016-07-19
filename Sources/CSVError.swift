@@ -9,9 +9,10 @@
 import Foundation
 
 public enum CSVError: ErrorProtocol {
-//    case parameterError
-//    case streamError
-    case headerReadError
-//    case memoryAllocationFailed
-//    case stringEncodingMismatch
+    case cannotOpenFile
+    case cannotReadFile
+    case streamErrorHasOccurred(error: NSError)
+    case cannotReadHeaderRow
+    case stringEncodingMismatch
+    case stringEndianMismatch
 }

@@ -18,26 +18,16 @@ internal let defaultDelimiter = ",".unicodeScalars.first!
 public struct CSV: IteratorProtocol, Sequence {
 
     private var iterator: AnyIterator<UnicodeScalar>
-    private var back: UnicodeScalar? = nil
-    
     private let delimiter: UnicodeScalar
 
+    private var back: UnicodeScalar? = nil
+
     internal var currentRow: [String]? = nil
-    
-    /**
-     CSV header row. To set a value for this property, you set `true` to `hasHeaerRow` in initializer.
-     */
+
+    /// CSV header row. To set a value for this property, you set `true` to `hasHeaerRow` in initializer.
     public var headerRow: [String]? { return _headerRow }
     private var _headerRow: [String]? = nil
-    
-    /**
-     Create CSV instance with `NSInputStream`.
-     
-     - parameter stream: An `NSInputStream` object. If the stream is not open, initializer opens automatically.
-     - parameter encoding: The character encoding for `stream`. Default: `NSUTF8StringEncoding`.
-     - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
-     - parameter delimiter: Default: `","`.
-     */
+
     internal init<T: IteratorProtocol where T.Element == UnicodeScalar>(
         iterator: T,
         hasHeaderRow: Bool,
@@ -48,13 +38,19 @@ public struct CSV: IteratorProtocol, Sequence {
         self.delimiter = delimiter
 
         if hasHeaderRow {
-            guard let headerRow = next() else  {
-                throw CSVError.headerReadError
+            guard let headerRow = next() else {
+                throw CSVError.cannotReadHeaderRow
             }
             _headerRow = headerRow
         }
     }
 
+    /// Create an instance with `InputStream`.
+    ///
+    /// - parameter stream: An `InputStream` object. If the stream is not open, initializer opens automatically.
+    /// - parameter codecType: A `UnicodeCodec` type for `stream`.
+    /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
+    /// - parameter delimiter: Default: `","`.
     public init<T: UnicodeCodec where T.CodeUnit == UInt8>(
         stream: InputStream,
         codecType: T.Type,
@@ -62,11 +58,18 @@ public struct CSV: IteratorProtocol, Sequence {
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
     {
-        let reader = BinaryReader(stream: stream, endian: .unknown, closeOnDeinit: true)
-        let iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncoding: codecType)
+        let reader = try BinaryReader(stream: stream, endian: .unknown, closeOnDeinit: true)
+        let iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncodingType: codecType)
         try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
     }
-    
+
+    /// Create an instance with `InputStream`.
+    ///
+    /// - parameter stream: An `InputStream` object. If the stream is not open, initializer opens automatically.
+    /// - parameter codecType: A `UnicodeCodec` type for `stream`.
+    /// - parameter endian: Endian to use when reading a stream. Default: `.big`.
+    /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
+    /// - parameter delimiter: Default: `","`.
     public init<T: UnicodeCodec where T.CodeUnit == UInt16>(
         stream: InputStream,
         codecType: T.Type,
@@ -75,11 +78,18 @@ public struct CSV: IteratorProtocol, Sequence {
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
     {
-        let reader = BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
-        let iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncoding: codecType)
+        let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
+        let iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncodingType: codecType)
         try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
     }
-    
+
+    /// Create an instance with `InputStream`.
+    ///
+    /// - parameter stream: An `InputStream` object. If the stream is not open, initializer opens automatically.
+    /// - parameter codecType: A `UnicodeCodec` type for `stream`.
+    /// - parameter endian: Endian to use when reading a stream. Default: `.big`.
+    /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
+    /// - parameter delimiter: Default: `","`.
     public init<T: UnicodeCodec where T.CodeUnit == UInt32>(
         stream: InputStream,
         codecType: T.Type,
@@ -88,8 +98,8 @@ public struct CSV: IteratorProtocol, Sequence {
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
     {
-        let reader = BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
-        let iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncoding: codecType)
+        let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
+        let iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncodingType: codecType)
         try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
     }
     
