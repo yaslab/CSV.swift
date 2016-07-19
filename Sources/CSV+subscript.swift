@@ -6,13 +6,11 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-import Foundation
-
 extension CSV {
     
     public subscript(key: String) -> String? {
         get {
-            guard let headerRow = headerRow, currentRow = currentRow else {
+            guard let headerRow = headerRow, let currentRow = currentRow else {
                 return nil
             }
             guard let index = headerRow.index(of: key) else {

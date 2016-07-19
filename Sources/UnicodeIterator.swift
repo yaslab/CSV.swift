@@ -3,10 +3,8 @@
 //  CSV
 //
 //  Created by Yasuhiro Hatta on 2016/06/20.
-//  Copyright © 2016年 yaslab. All rights reserved.
+//  Copyright © 2016 yaslab. All rights reserved.
 //
-
-import Foundation
 
 internal struct UnicodeIterator<
     Input: IteratorProtocol,
@@ -17,9 +15,9 @@ internal struct UnicodeIterator<
     private var input: Input
     private var inputEncoding: InputEncoding
     
-    internal init(input: Input, inputEncoding: InputEncoding.Type) {
+    internal init(input: Input, inputEncodingType: InputEncoding.Type) {
         self.input = input
-        self.inputEncoding = inputEncoding.init()
+        self.inputEncoding = inputEncodingType.init()
     }
     
     internal mutating func next() -> UnicodeScalar? {

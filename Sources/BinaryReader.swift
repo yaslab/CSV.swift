@@ -3,7 +3,7 @@
 //  CSV
 //
 //  Created by Yasuhiro Hatta on 2016/06/20.
-//  Copyright © 2016年 yaslab. All rights reserved.
+//  Copyright © 2016 yaslab. All rights reserved.
 //
 
 import Foundation
@@ -14,7 +14,7 @@ internal let utf16LittleEndianBOM: [UInt8] = [0xff, 0xfe]
 internal let utf32BigEndianBOM: [UInt8] = [0x00, 0x00, 0xfe, 0xff]
 internal let utf32LittleEndianBOM: [UInt8] = [0xff, 0xfe, 0x00, 0x00]
 
-internal func readBOM(buffer: UnsafePointer<UInt8>, length: Int) -> (Endian, Int)? {
+private func readBOM(buffer: UnsafePointer<UInt8>, length: Int) -> (Endian, Int)? {
     if length >= 4 {
         if memcmp(buffer, utf32BigEndianBOM, 4) == 0 {
             return (.big, 4)

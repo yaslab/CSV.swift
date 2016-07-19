@@ -3,10 +3,8 @@
 //  CSV
 //
 //  Created by Yasuhiro Hatta on 2016/06/21.
-//  Copyright © 2016年 yaslab. All rights reserved.
+//  Copyright © 2016 yaslab. All rights reserved.
 //
-
-import Foundation
 
 internal struct AnyIterator<T>: IteratorProtocol {
     
