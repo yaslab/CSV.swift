@@ -14,7 +14,7 @@ internal let utf16LittleEndianBOM: [UInt8] = [0xff, 0xfe]
 internal let utf32BigEndianBOM: [UInt8] = [0x00, 0x00, 0xfe, 0xff]
 internal let utf32LittleEndianBOM: [UInt8] = [0xff, 0xfe, 0x00, 0x00]
 
-private func readBOM(buffer: UnsafePointer<UInt8>, length: Int) -> (Endian, Int)? {
+private func readBOM(buffer buffer: UnsafePointer<UInt8>, length: Int) -> (Endian, Int)? {
     if length >= 4 {
         if memcmp(buffer, utf32BigEndianBOM, 4) == 0 {
             return (.big, 4)
@@ -41,23 +41,23 @@ private func readBOM(buffer: UnsafePointer<UInt8>, length: Int) -> (Endian, Int)
 
 internal class BinaryReader {
 
-    private let stream: InputStream
+    private let stream: NSInputStream
     private let endian: Endian
     private let closeOnDeinit: Bool
 
-    private var buffer = [UInt8](repeating: 0, count: 4)
+    private var buffer = [UInt8](count: 4, repeatedValue: 0)
 
-    private var tempBuffer = [UInt8](repeating: 0, count: 4)
+    private var tempBuffer = [UInt8](count: 4, repeatedValue: 0)
     private let tempBufferSize = 4
     private var tempBufferOffset = 0
     
-    internal init(stream: InputStream, endian: Endian = .unknown, closeOnDeinit: Bool = true) throws {
+    internal init(stream: NSInputStream, endian: Endian = .unknown, closeOnDeinit: Bool = true) throws {
         var endian = endian
 
-        if stream.streamStatus == .notOpen {
+        if stream.streamStatus == .NotOpen {
             stream.open()
         }
-        if stream.streamStatus != .open {
+        if stream.streamStatus != .Open {
             throw CSVError.cannotOpenFile
         }
 
@@ -76,7 +76,7 @@ internal class BinaryReader {
     }
     
     deinit {
-        if closeOnDeinit && stream.streamStatus != .closed {
+        if closeOnDeinit && stream.streamStatus != .Closed {
             stream.close()
         }
     }
@@ -86,7 +86,7 @@ internal class BinaryReader {
     }
 
     private func readStream(_ buffer: UnsafeMutablePointer<UInt8>, maxLength: Int) throws -> Int {
-        if stream.streamStatus != .open {
+        if stream.streamStatus != .Open {
             throw CSVError.cannotReadFile
         }
 
@@ -158,7 +158,7 @@ internal class BinaryReader {
 
 extension BinaryReader {
 
-    internal struct UInt8Iterator: Sequence, IteratorProtocol {
+    internal struct UInt8Iterator: SequenceType, GeneratorType {
         
         private let reader: BinaryReader
         
@@ -188,7 +188,7 @@ extension BinaryReader {
 
 extension BinaryReader {
     
-    internal struct UInt16Iterator: Sequence, IteratorProtocol {
+    internal struct UInt16Iterator: SequenceType, GeneratorType {
         
         private let reader: BinaryReader
         
@@ -218,7 +218,7 @@ extension BinaryReader {
 
 extension BinaryReader {
 
-    internal struct UInt32Iterator: Sequence, IteratorProtocol {
+    internal struct UInt32Iterator: SequenceType, GeneratorType {
 
         private let reader: BinaryReader
 

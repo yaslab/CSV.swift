@@ -15,7 +15,7 @@ private let DQUOTE = "\"".unicodeScalars.first!
 internal let defaultHasHeaderRow = false
 internal let defaultDelimiter = ",".unicodeScalars.first!
 
-public struct CSV: IteratorProtocol, Sequence {
+public struct CSV: GeneratorType, SequenceType {
 
     private var iterator: AnyIterator<UnicodeScalar>
     private let delimiter: UnicodeScalar
@@ -28,7 +28,7 @@ public struct CSV: IteratorProtocol, Sequence {
     public var headerRow: [String]? { return _headerRow }
     private var _headerRow: [String]? = nil
 
-    internal init<T: IteratorProtocol where T.Element == UnicodeScalar>(
+    internal init<T: GeneratorType where T.Element == UnicodeScalar>(
         iterator: T,
         hasHeaderRow: Bool,
         delimiter: UnicodeScalar)
@@ -51,8 +51,8 @@ public struct CSV: IteratorProtocol, Sequence {
     /// - parameter codecType: A `UnicodeCodec` type for `stream`.
     /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
     /// - parameter delimiter: Default: `","`.
-    public init<T: UnicodeCodec where T.CodeUnit == UInt8>(
-        stream: InputStream,
+    public init<T: UnicodeCodecType where T.CodeUnit == UInt8>(
+        stream: NSInputStream,
         codecType: T.Type,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         delimiter: UnicodeScalar = defaultDelimiter)
@@ -70,8 +70,8 @@ public struct CSV: IteratorProtocol, Sequence {
     /// - parameter endian: Endian to use when reading a stream. Default: `.big`.
     /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
     /// - parameter delimiter: Default: `","`.
-    public init<T: UnicodeCodec where T.CodeUnit == UInt16>(
-        stream: InputStream,
+    public init<T: UnicodeCodecType where T.CodeUnit == UInt16>(
+        stream: NSInputStream,
         codecType: T.Type,
         endian: Endian = .big,
         hasHeaderRow: Bool = defaultHasHeaderRow,
@@ -90,8 +90,8 @@ public struct CSV: IteratorProtocol, Sequence {
     /// - parameter endian: Endian to use when reading a stream. Default: `.big`.
     /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
     /// - parameter delimiter: Default: `","`.
-    public init<T: UnicodeCodec where T.CodeUnit == UInt32>(
-        stream: InputStream,
+    public init<T: UnicodeCodecType where T.CodeUnit == UInt32>(
+        stream: NSInputStream,
         codecType: T.Type,
         endian: Endian = .big,
         hasHeaderRow: Bool = defaultHasHeaderRow,
@@ -178,7 +178,7 @@ public struct CSV: IteratorProtocol, Sequence {
         return row
     }
     
-    internal mutating func readField(quoted: Bool) -> (String, Bool) {
+    internal mutating func readField(quoted quoted: Bool) -> (String, Bool) {
         var field = ""
 
         var next = moveNext()

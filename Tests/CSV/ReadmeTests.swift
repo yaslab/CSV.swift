@@ -20,7 +20,7 @@ class ReadmeTests: XCTestCase {
     }
     
     func testFromFilePath() {
-//        let stream = InputStream(fileAtPath: "/path/to/file.csv")!
+//        let stream = NSInputStream(fileAtPath: "/path/to/file.csv")!
 //        for row in try! CSV(stream: stream) {
 //            print("\(row)")
 //        }
@@ -54,7 +54,7 @@ class ReadmeTests: XCTestCase {
     
     func testProvideTheCharacterEncoding() {
 //        let csv = try! CSV(
-//            stream: InputStream(fileAtPath: "/path/to/file.csv")!,
+//            stream: NSInputStream(fileAtPath: "/path/to/file.csv")!,
 //            codecType: UTF16.self,
 //            endian: .big)
     }

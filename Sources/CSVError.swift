@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum CSVError: ErrorProtocol {
+public enum CSVError: ErrorType {
     case cannotOpenFile
     case cannotReadFile
     case streamErrorHasOccurred(error: NSError)

@@ -13,7 +13,7 @@ extension CSV {
             guard let headerRow = headerRow, let currentRow = currentRow else {
                 return nil
             }
-            guard let index = headerRow.index(of: key) else {
+            guard let index = headerRow.indexOf(key) else {
                 return nil
             }
             if index >= currentRow.count {

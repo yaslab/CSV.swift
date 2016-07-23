@@ -11,7 +11,7 @@ import Foundation
 extension CSV {
 
     public init(
-        stream: InputStream,
+        stream: NSInputStream,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
@@ -29,7 +29,7 @@ extension CSV {
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
     {
-        let iterator = string.unicodeScalars.makeIterator()
+        let iterator = string.unicodeScalars.generate()
         try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
     }
     
