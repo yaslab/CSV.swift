@@ -17,23 +17,23 @@ internal let utf32LittleEndianBOM: [UInt8] = [0xff, 0xfe, 0x00, 0x00]
 private func readBOM(buffer buffer: UnsafePointer<UInt8>, length: Int) -> (Endian, Int)? {
     if length >= 4 {
         if memcmp(buffer, utf32BigEndianBOM, 4) == 0 {
-            return (.big, 4)
+            return (.Big, 4)
         }
         if memcmp(buffer, utf32LittleEndianBOM, 4) == 0 {
-            return (.little, 4)
+            return (.Little, 4)
         }
     }
     if length >= 3 {
         if memcmp(buffer, utf8BOM, 3) == 0 {
-            return (.unknown, 3)
+            return (.Unknown, 3)
         }
     }
     if length >= 2 {
         if memcmp(buffer, utf16BigEndianBOM, 2) == 0 {
-            return (.big, 2)
+            return (.Big, 2)
         }
         if memcmp(buffer, utf16LittleEndianBOM, 2) == 0 {
-            return (.little, 2)
+            return (.Little, 2)
         }
     }
     return nil
@@ -51,20 +51,20 @@ internal class BinaryReader {
     private let tempBufferSize = 4
     private var tempBufferOffset = 0
     
-    internal init(stream: NSInputStream, endian: Endian = .unknown, closeOnDeinit: Bool = true) throws {
+    internal init(stream: NSInputStream, endian: Endian = .Unknown, closeOnDeinit: Bool = true) throws {
         var endian = endian
 
         if stream.streamStatus == .NotOpen {
             stream.open()
         }
         if stream.streamStatus != .Open {
-            throw CSVError.cannotOpenFile
+            throw CSVError.CannotOpenFile
         }
 
         let readCount = stream.read(&tempBuffer, maxLength: tempBufferSize)
         if let (e, l) = readBOM(buffer: &tempBuffer, length: readCount) {
-            if endian != .unknown && endian != e {
-                throw CSVError.stringEndianMismatch
+            if endian != .Unknown && endian != e {
+                throw CSVError.StringEndianMismatch
             }
             endian = e
             tempBufferOffset = l
@@ -87,7 +87,7 @@ internal class BinaryReader {
 
     private func readStream(_ buffer: UnsafeMutablePointer<UInt8>, maxLength: Int) throws -> Int {
         if stream.streamStatus != .Open {
-            throw CSVError.cannotReadFile
+            throw CSVError.CannotReadFile
         }
 
         var i = 0
@@ -106,10 +106,10 @@ internal class BinaryReader {
         let bufferSize = 1
         let length = try readStream(&buffer, maxLength: bufferSize)
         if length < 0 {
-            throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
+            throw CSVError.StreamErrorHasOccurred(error: stream.streamError!)
         }
         if length != bufferSize {
-            throw CSVError.cannotReadFile
+            throw CSVError.CannotReadFile
         }
         return buffer[0]
     }
@@ -118,19 +118,19 @@ internal class BinaryReader {
         let bufferSize = 2
         let length = try readStream(&buffer, maxLength: bufferSize)
         if length < 0 {
-            throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
+            throw CSVError.StreamErrorHasOccurred(error: stream.streamError!)
         }
         if length != bufferSize {
-            throw CSVError.stringEncodingMismatch
+            throw CSVError.StringEncodingMismatch
         }
         let tmp = UnsafeMutablePointer<UInt16>(buffer)
         switch endian {
-        case .big:
+        case .Big:
             return CFSwapInt16BigToHost(tmp[0])
-        case .little:
+        case .Little:
             return CFSwapInt16LittleToHost(tmp[0])
         default:
-            throw CSVError.stringEndianMismatch
+            throw CSVError.StringEndianMismatch
         }
     }
     
@@ -138,19 +138,19 @@ internal class BinaryReader {
         let bufferSize = 4
         let length = try readStream(&buffer, maxLength: bufferSize)
         if length < 0 {
-            throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
+            throw CSVError.StreamErrorHasOccurred(error: stream.streamError!)
         }
         if length != 4 {
-            throw CSVError.stringEncodingMismatch
+            throw CSVError.StringEncodingMismatch
         }
         let tmp = UnsafeMutablePointer<UInt32>(buffer)
         switch endian {
-        case .big:
+        case .Big:
             return CFSwapInt32BigToHost(tmp[0])
-        case .little:
+        case .Little:
             return CFSwapInt32LittleToHost(tmp[0])
         default:
-            throw CSVError.stringEndianMismatch
+            throw CSVError.StringEndianMismatch
         }
     }
     

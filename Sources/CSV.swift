@@ -39,7 +39,7 @@ public struct CSV: GeneratorType, SequenceType {
 
         if hasHeaderRow {
             guard let headerRow = next() else {
-                throw CSVError.cannotReadHeaderRow
+                throw CSVError.CannotReadHeaderRow
             }
             _headerRow = headerRow
         }
@@ -58,7 +58,7 @@ public struct CSV: GeneratorType, SequenceType {
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
     {
-        let reader = try BinaryReader(stream: stream, endian: .unknown, closeOnDeinit: true)
+        let reader = try BinaryReader(stream: stream, endian: .Unknown, closeOnDeinit: true)
         let iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncodingType: codecType)
         try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
     }
@@ -73,7 +73,7 @@ public struct CSV: GeneratorType, SequenceType {
     public init<T: UnicodeCodecType where T.CodeUnit == UInt16>(
         stream: NSInputStream,
         codecType: T.Type,
-        endian: Endian = .big,
+        endian: Endian = .Big,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
@@ -93,7 +93,7 @@ public struct CSV: GeneratorType, SequenceType {
     public init<T: UnicodeCodecType where T.CodeUnit == UInt32>(
         stream: NSInputStream,
         codecType: T.Type,
-        endian: Endian = .big,
+        endian: Endian = .Big,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws

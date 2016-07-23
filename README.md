@@ -67,7 +67,7 @@ If you use a file path, you can provide the character encoding to initializer.
 let csv = try! CSV(
     stream: NSInputStream(fileAtPath: "/path/to/file.csv")!,
     codecType: UTF16.self,
-    endian: .big)
+    endian: .Big)
 ```
 
 ## Installation

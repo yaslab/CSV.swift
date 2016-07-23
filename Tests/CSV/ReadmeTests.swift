@@ -56,7 +56,7 @@ class ReadmeTests: XCTestCase {
 //        let csv = try! CSV(
 //            stream: NSInputStream(fileAtPath: "/path/to/file.csv")!,
 //            codecType: UTF16.self,
-//            endian: .big)
+//            endian: .Big)
     }
     
 }

@@ -9,10 +9,10 @@
 import Foundation
 
 public enum CSVError: ErrorType {
-    case cannotOpenFile
-    case cannotReadFile
-    case streamErrorHasOccurred(error: NSError)
-    case cannotReadHeaderRow
-    case stringEncodingMismatch
-    case stringEndianMismatch
+    case CannotOpenFile
+    case CannotReadFile
+    case StreamErrorHasOccurred(error: NSError)
+    case CannotReadHeaderRow
+    case StringEncodingMismatch
+    case StringEndianMismatch
 }
