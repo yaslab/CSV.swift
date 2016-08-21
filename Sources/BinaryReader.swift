@@ -85,7 +85,7 @@ internal class BinaryReader {
         return stream.hasBytesAvailable
     }
 
-    private func readStream(_ buffer: UnsafeMutablePointer<UInt8>, maxLength: Int) throws -> Int {
+    private func readStream(buffer: UnsafeMutablePointer<UInt8>, maxLength: Int) throws -> Int {
         if stream.streamStatus != .Open {
             throw CSVError.CannotReadFile
         }
