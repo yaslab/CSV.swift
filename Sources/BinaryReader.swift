@@ -14,26 +14,26 @@ internal let utf16LittleEndianBOM: [UInt8] = [0xff, 0xfe]
 internal let utf32BigEndianBOM: [UInt8] = [0x00, 0x00, 0xfe, 0xff]
 internal let utf32LittleEndianBOM: [UInt8] = [0xff, 0xfe, 0x00, 0x00]
 
-private func readBOM(buffer buffer: UnsafePointer<UInt8>, length: Int) -> (Endian, Int)? {
+private func readBOM(buffer: UnsafePointer<UInt8>, length: Int) -> (Endian, Int)? {
     if length >= 4 {
         if memcmp(buffer, utf32BigEndianBOM, 4) == 0 {
-            return (.Big, 4)
+            return (.big, 4)
         }
         if memcmp(buffer, utf32LittleEndianBOM, 4) == 0 {
-            return (.Little, 4)
+            return (.little, 4)
         }
     }
     if length >= 3 {
         if memcmp(buffer, utf8BOM, 3) == 0 {
-            return (.Unknown, 3)
+            return (.unknown, 3)
         }
     }
     if length >= 2 {
         if memcmp(buffer, utf16BigEndianBOM, 2) == 0 {
-            return (.Big, 2)
+            return (.big, 2)
         }
         if memcmp(buffer, utf16LittleEndianBOM, 2) == 0 {
-            return (.Little, 2)
+            return (.little, 2)
         }
     }
     return nil
@@ -41,30 +41,30 @@ private func readBOM(buffer buffer: UnsafePointer<UInt8>, length: Int) -> (Endia
 
 internal class BinaryReader {
 
-    private let stream: NSInputStream
+    private let stream: InputStream
     private let endian: Endian
     private let closeOnDeinit: Bool
 
-    private var buffer = [UInt8](count: 4, repeatedValue: 0)
+    private var buffer = [UInt8](repeating: 0, count: 4)
 
-    private var tempBuffer = [UInt8](count: 4, repeatedValue: 0)
+    private var tempBuffer = [UInt8](repeating: 0, count: 4)
     private let tempBufferSize = 4
     private var tempBufferOffset = 0
     
-    internal init(stream: NSInputStream, endian: Endian = .Unknown, closeOnDeinit: Bool = true) throws {
+    internal init(stream: InputStream, endian: Endian = .unknown, closeOnDeinit: Bool = true) throws {
         var endian = endian
 
-        if stream.streamStatus == .NotOpen {
+        if stream.streamStatus == .notOpen {
             stream.open()
         }
-        if stream.streamStatus != .Open {
-            throw CSVError.CannotOpenFile
+        if stream.streamStatus != .open {
+            throw CSVError.cannotOpenFile
         }
 
         let readCount = stream.read(&tempBuffer, maxLength: tempBufferSize)
         if let (e, l) = readBOM(buffer: &tempBuffer, length: readCount) {
-            if endian != .Unknown && endian != e {
-                throw CSVError.StringEndianMismatch
+            if endian != .unknown && endian != e {
+                throw CSVError.stringEndianMismatch
             }
             endian = e
             tempBufferOffset = l
@@ -76,7 +76,7 @@ internal class BinaryReader {
     }
     
     deinit {
-        if closeOnDeinit && stream.streamStatus != .Closed {
+        if closeOnDeinit && stream.streamStatus != .closed {
             stream.close()
         }
     }
@@ -85,9 +85,9 @@ internal class BinaryReader {
         return stream.hasBytesAvailable
     }
 
-    private func readStream(buffer: UnsafeMutablePointer<UInt8>, maxLength: Int) throws -> Int {
-        if stream.streamStatus != .Open {
-            throw CSVError.CannotReadFile
+    private func readStream(_ buffer: UnsafeMutablePointer<UInt8>, maxLength: Int) throws -> Int {
+        if stream.streamStatus != .open {
+            throw CSVError.cannotReadFile
         }
 
         var i = 0
@@ -106,10 +106,10 @@ internal class BinaryReader {
         let bufferSize = 1
         let length = try readStream(&buffer, maxLength: bufferSize)
         if length < 0 {
-            throw CSVError.StreamErrorHasOccurred(error: stream.streamError!)
+            throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
         if length != bufferSize {
-            throw CSVError.CannotReadFile
+            throw CSVError.cannotReadFile
         }
         return buffer[0]
     }
@@ -118,19 +118,20 @@ internal class BinaryReader {
         let bufferSize = 2
         let length = try readStream(&buffer, maxLength: bufferSize)
         if length < 0 {
-            throw CSVError.StreamErrorHasOccurred(error: stream.streamError!)
+            throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
         if length != bufferSize {
-            throw CSVError.StringEncodingMismatch
+            throw CSVError.stringEncodingMismatch
         }
-        let tmp = UnsafeMutablePointer<UInt16>(buffer)
-        switch endian {
-        case .Big:
-            return CFSwapInt16BigToHost(tmp[0])
-        case .Little:
-            return CFSwapInt16LittleToHost(tmp[0])
-        default:
-            throw CSVError.StringEndianMismatch
+        return try UnsafePointer(buffer).withMemoryRebound(to: UInt16.self, capacity: 1) {
+            switch endian {
+            case .big:
+                return CFSwapInt16BigToHost($0[0])
+            case .little:
+                return CFSwapInt16LittleToHost($0[0])
+            default:
+                throw CSVError.stringEndianMismatch
+            }
         }
     }
     
@@ -138,19 +139,20 @@ internal class BinaryReader {
         let bufferSize = 4
         let length = try readStream(&buffer, maxLength: bufferSize)
         if length < 0 {
-            throw CSVError.StreamErrorHasOccurred(error: stream.streamError!)
+            throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
         if length != 4 {
-            throw CSVError.StringEncodingMismatch
+            throw CSVError.stringEncodingMismatch
         }
-        let tmp = UnsafeMutablePointer<UInt32>(buffer)
-        switch endian {
-        case .Big:
-            return CFSwapInt32BigToHost(tmp[0])
-        case .Little:
-            return CFSwapInt32LittleToHost(tmp[0])
-        default:
-            throw CSVError.StringEndianMismatch
+        return try UnsafePointer(buffer).withMemoryRebound(to: UInt32.self, capacity: 1) {
+            switch endian {
+            case .big:
+                return CFSwapInt32BigToHost($0[0])
+            case .little:
+                return CFSwapInt32LittleToHost($0[0])
+            default:
+                throw CSVError.stringEndianMismatch
+            }
         }
     }
     
@@ -158,11 +160,11 @@ internal class BinaryReader {
 
 extension BinaryReader {
 
-    internal struct UInt8Iterator: SequenceType, GeneratorType {
+    internal struct UInt8Iterator: Sequence, IteratorProtocol {
         
         private let reader: BinaryReader
         
-        private init(reader: BinaryReader) {
+        fileprivate init(reader: BinaryReader) {
             self.reader = reader
         }
         
@@ -188,11 +190,11 @@ extension BinaryReader {
 
 extension BinaryReader {
     
-    internal struct UInt16Iterator: SequenceType, GeneratorType {
+    internal struct UInt16Iterator: Sequence, IteratorProtocol {
         
         private let reader: BinaryReader
         
-        private init(reader: BinaryReader) {
+        fileprivate init(reader: BinaryReader) {
             self.reader = reader
         }
         
@@ -218,11 +220,11 @@ extension BinaryReader {
 
 extension BinaryReader {
 
-    internal struct UInt32Iterator: SequenceType, GeneratorType {
+    internal struct UInt32Iterator: Sequence, IteratorProtocol {
 
         private let reader: BinaryReader
 
-        private init(reader: BinaryReader) {
+        fileprivate init(reader: BinaryReader) {
             self.reader = reader
         }
 

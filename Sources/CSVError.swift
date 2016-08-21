@@ -8,11 +8,11 @@
 
 import Foundation
 
-public enum CSVError: ErrorType {
-    case CannotOpenFile
-    case CannotReadFile
-    case StreamErrorHasOccurred(error: NSError)
-    case CannotReadHeaderRow
-    case StringEncodingMismatch
-    case StringEndianMismatch
+public enum CSVError: Error {
+    case cannotOpenFile
+    case cannotReadFile
+    case streamErrorHasOccurred(error: Error)
+    case cannotReadHeaderRow
+    case stringEncodingMismatch
+    case stringEndianMismatch
 }

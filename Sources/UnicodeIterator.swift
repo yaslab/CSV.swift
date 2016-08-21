@@ -7,10 +7,10 @@
 //
 
 internal struct UnicodeIterator<
-    Input: GeneratorType,
-    InputEncoding: UnicodeCodecType
-    where InputEncoding.CodeUnit == Input.Element>
-    : GeneratorType {
+    Input: IteratorProtocol,
+    InputEncoding: UnicodeCodec>
+    : IteratorProtocol
+    where InputEncoding.CodeUnit == Input.Element {
     
     private var input: Input
     private var inputEncoding: InputEncoding
@@ -22,9 +22,9 @@ internal struct UnicodeIterator<
     
     internal mutating func next() -> UnicodeScalar? {
         switch inputEncoding.decode(&input) {
-        case .Result(let c): return c
-        case .EmptyInput: return nil
-        case .Error: return nil
+        case .scalarValue(let c): return c
+        case .emptyInput: return nil
+        case .error: return nil
         }
     }
     
