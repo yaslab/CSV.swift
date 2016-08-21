@@ -20,9 +20,10 @@ class ReadmeTests: XCTestCase {
     }
     
     func testFromFilePath() {
-        //for row in try! CSV(path: "/path/to/file.csv") {
-        //    print("\(row)")
-        //}
+//        let stream = NSInputStream(fileAtPath: "/path/to/file.csv")!
+//        for row in try! CSV(stream: stream) {
+//            print("\(row)")
+//        }
     }
     
     func testGettingTheHeaderRow() {
@@ -41,7 +42,7 @@ class ReadmeTests: XCTestCase {
     }
     
     func testGetTheFieldValueUsingSubscript() {
-        let csv = try! CSV(
+        var csv = try! CSV(
             string: "id,name\n1,foo",
             hasHeaderRow: true) // It must be true.
         
@@ -52,9 +53,10 @@ class ReadmeTests: XCTestCase {
     }
     
     func testProvideTheCharacterEncoding() {
-        //let csv = try! CSV(
-        //    path: "/path/to/file.csv",
-        //    encoding: NSUTF8StringEncoding)
+//        let csv = try! CSV(
+//            stream: NSInputStream(fileAtPath: "/path/to/file.csv")!,
+//            codecType: UTF16.self,
+//            endian: .Big)
     }
     
 }
