@@ -103,4 +103,4 @@ let package = Package(
 
 ## License
 
-CSV.swift is released under the MIT license. See the LICENSE file for more info.
+CSV.swift is released under the MIT license. See the [LICENSE](https://github.com/yaslab/CSV.swift/blob/master/LICENSE) file for more info.
