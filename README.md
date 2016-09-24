@@ -21,9 +21,10 @@ for row in try! CSV(string: "1,foo\n2,bar") {
 ### From file path
 
 ```swift
+import Foundation
 import CSV
 
-let stream = NSInputStream(fileAtPath: "/path/to/file.csv")!
+let stream = InputStream(fileAtPath: "/path/to/file.csv")!
 for row in try! CSV(stream: stream) {
     print("\(row)")
 }
@@ -32,6 +33,8 @@ for row in try! CSV(stream: stream) {
 ### Getting the header row
 
 ```swift
+import CSV
+
 let csv = try! CSV(
     string: "id,name\n1,foo\n2,bar",
     hasHeaderRow: true) // default: false
@@ -49,7 +52,9 @@ for row in csv {
 ### Get the field value using subscript
 
 ```swift
-let csv = try! CSV(
+import CSV
+
+var csv = try! CSV(
     string: "id,name\n1,foo",
     hasHeaderRow: true) // It must be true.
 
@@ -64,10 +69,13 @@ while csv.next() != nil {
 If you use a file path, you can provide the character encoding to initializer.
 
 ```swift
+import Foundation
+import CSV
+
 let csv = try! CSV(
-    stream: NSInputStream(fileAtPath: "/path/to/file.csv")!,
+    stream: InputStream(fileAtPath: "/path/to/file.csv")!,
     codecType: UTF16.self,
-    endian: .Big)
+    endian: .big)
 ```
 
 ## Installation
