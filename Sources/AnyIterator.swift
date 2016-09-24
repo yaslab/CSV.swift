@@ -6,11 +6,11 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-internal struct AnyIterator<T>: GeneratorType {
+internal struct AnyIterator<T>: IteratorProtocol {
     
     private var _base_next: (() -> T?)
     
-    internal init<U: GeneratorType where U.Element == T>(base: U) {
+    internal init<U: IteratorProtocol>(base: U) where U.Element == T {
         var base = base
         _base_next = { base.next() }
     }

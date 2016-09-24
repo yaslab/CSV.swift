@@ -7,7 +7,7 @@
 //
 
 public enum Endian {
-    case Big
-    case Little
-    case Unknown
+    case big
+    case little
+    case unknown
 }

@@ -8,14 +8,14 @@
 
 import Foundation
 
-private let LF = "\n".unicodeScalars.first!
-private let CR = "\r".unicodeScalars.first!
-private let DQUOTE = "\"".unicodeScalars.first!
+private let LF = UnicodeScalar("\n")!
+private let CR = UnicodeScalar("\r")!
+private let DQUOTE = UnicodeScalar("\"")!
 
 internal let defaultHasHeaderRow = false
-internal let defaultDelimiter = ",".unicodeScalars.first!
+internal let defaultDelimiter = UnicodeScalar(",")!
 
-public struct CSV: GeneratorType, SequenceType {
+public struct CSV: IteratorProtocol, Sequence {
 
     private var iterator: AnyIterator<UnicodeScalar>
     private let delimiter: UnicodeScalar
@@ -28,18 +28,18 @@ public struct CSV: GeneratorType, SequenceType {
     public var headerRow: [String]? { return _headerRow }
     private var _headerRow: [String]? = nil
 
-    internal init<T: GeneratorType where T.Element == UnicodeScalar>(
+    internal init<T: IteratorProtocol>(
         iterator: T,
         hasHeaderRow: Bool,
         delimiter: UnicodeScalar)
-        throws
+        throws where T.Element == UnicodeScalar
     {
         self.iterator = AnyIterator(base: iterator)
         self.delimiter = delimiter
 
         if hasHeaderRow {
             guard let headerRow = next() else {
-                throw CSVError.CannotReadHeaderRow
+                throw CSVError.cannotReadHeaderRow
             }
             _headerRow = headerRow
         }
@@ -51,14 +51,15 @@ public struct CSV: GeneratorType, SequenceType {
     /// - parameter codecType: A `UnicodeCodec` type for `stream`.
     /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
     /// - parameter delimiter: Default: `","`.
-    public init<T: UnicodeCodecType where T.CodeUnit == UInt8>(
-        stream: NSInputStream,
+    public init<T: UnicodeCodec>(
+        stream: InputStream,
         codecType: T.Type,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
+        where T.CodeUnit == UInt8
     {
-        let reader = try BinaryReader(stream: stream, endian: .Unknown, closeOnDeinit: true)
+        let reader = try BinaryReader(stream: stream, endian: .unknown, closeOnDeinit: true)
         let iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncodingType: codecType)
         try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
     }
@@ -70,13 +71,14 @@ public struct CSV: GeneratorType, SequenceType {
     /// - parameter endian: Endian to use when reading a stream. Default: `.big`.
     /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
     /// - parameter delimiter: Default: `","`.
-    public init<T: UnicodeCodecType where T.CodeUnit == UInt16>(
-        stream: NSInputStream,
+    public init<T: UnicodeCodec>(
+        stream: InputStream,
         codecType: T.Type,
-        endian: Endian = .Big,
+        endian: Endian = .big,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
+        where T.CodeUnit == UInt16
     {
         let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
         let iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncodingType: codecType)
@@ -90,13 +92,14 @@ public struct CSV: GeneratorType, SequenceType {
     /// - parameter endian: Endian to use when reading a stream. Default: `.big`.
     /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
     /// - parameter delimiter: Default: `","`.
-    public init<T: UnicodeCodecType where T.CodeUnit == UInt32>(
-        stream: NSInputStream,
+    public init<T: UnicodeCodec>(
+        stream: InputStream,
         codecType: T.Type,
-        endian: Endian = .Big,
+        endian: Endian = .big,
         hasHeaderRow: Bool = defaultHasHeaderRow,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
+        where T.CodeUnit == UInt32
     {
         let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
         let iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncodingType: codecType)
@@ -178,7 +181,7 @@ public struct CSV: GeneratorType, SequenceType {
         return row
     }
     
-    internal mutating func readField(quoted quoted: Bool) -> (String, Bool) {
+    internal mutating func readField(quoted: Bool) -> (String, Bool) {
         var field = ""
 
         var next = moveNext()
@@ -202,15 +205,15 @@ public struct CSV: GeneratorType, SequenceType {
                     }
                     else if cNext == DQUOTE {
                         // ESC
-                        field.append(DQUOTE)
+                        field.append(String(DQUOTE))
                     }
                     else {
                         // ERROR??
-                        field.append(c)
+                        field.append(String(c))
                     }
                 }
                 else {
-                    field.append(c)
+                    field.append(String(c))
                 }
             }
             else {
@@ -229,7 +232,7 @@ public struct CSV: GeneratorType, SequenceType {
                     return (field, false)
                 }
                 else {
-                    field.append(c)
+                    field.append(String(c))
                 }
             }
             
