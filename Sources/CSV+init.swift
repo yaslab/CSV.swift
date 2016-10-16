@@ -13,10 +13,11 @@ extension CSV {
     public init(
         stream: InputStream,
         hasHeaderRow: Bool = defaultHasHeaderRow,
+        trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
     {
-        try self.init(stream: stream, codecType: UTF8.self, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+        try self.init(stream: stream, codecType: UTF8.self, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter)
     }
 
 }
@@ -26,11 +27,12 @@ extension CSV {
     public init(
         string: String,
         hasHeaderRow: Bool = defaultHasHeaderRow,
+        trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
     {
         let iterator = string.unicodeScalars.makeIterator()
-        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter)
     }
     
 }

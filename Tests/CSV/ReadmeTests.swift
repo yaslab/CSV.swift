@@ -46,7 +46,7 @@ class ReadmeTests: XCTestCase {
             string: "id,name\n1,foo",
             hasHeaderRow: true) // It must be true.
         
-        while csv.next() != nil {
+        while let _ = csv.next() {
             print("\(csv["id"]!)")   // => "1"
             print("\(csv["name"]!)") // => "foo"
         }

@@ -13,11 +13,13 @@ private let CR = UnicodeScalar("\r")!
 private let DQUOTE = UnicodeScalar("\"")!
 
 internal let defaultHasHeaderRow = false
+internal let defaultTrimFields = false
 internal let defaultDelimiter = UnicodeScalar(",")!
 
 public struct CSV: IteratorProtocol, Sequence {
 
     private var iterator: AnyIterator<UnicodeScalar>
+    private let trimFields: Bool
     private let delimiter: UnicodeScalar
 
     private var back: UnicodeScalar? = nil
@@ -27,16 +29,24 @@ public struct CSV: IteratorProtocol, Sequence {
     /// CSV header row. To set a value for this property, you set `true` to `hasHeaerRow` in initializer.
     public var headerRow: [String]? { return _headerRow }
     private var _headerRow: [String]? = nil
+    
+    private let whitespaces: CharacterSet
 
     internal init<T: IteratorProtocol>(
         iterator: T,
         hasHeaderRow: Bool,
+        trimFields: Bool,
         delimiter: UnicodeScalar)
         throws where T.Element == UnicodeScalar
     {
         self.iterator = AnyIterator(base: iterator)
+        self.trimFields = trimFields
         self.delimiter = delimiter
 
+        var whitespaces = CharacterSet.whitespaces
+        whitespaces.remove(delimiter)
+        self.whitespaces = whitespaces
+        
         if hasHeaderRow {
             guard let headerRow = next() else {
                 throw CSVError.cannotReadHeaderRow
@@ -55,13 +65,14 @@ public struct CSV: IteratorProtocol, Sequence {
         stream: InputStream,
         codecType: T.Type,
         hasHeaderRow: Bool = defaultHasHeaderRow,
+        trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
         where T.CodeUnit == UInt8
     {
         let reader = try BinaryReader(stream: stream, endian: .unknown, closeOnDeinit: true)
         let iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncodingType: codecType)
-        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter)
     }
 
     /// Create an instance with `InputStream`.
@@ -76,13 +87,14 @@ public struct CSV: IteratorProtocol, Sequence {
         codecType: T.Type,
         endian: Endian = .big,
         hasHeaderRow: Bool = defaultHasHeaderRow,
+        trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
         where T.CodeUnit == UInt16
     {
         let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
         let iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncodingType: codecType)
-        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter)
     }
 
     /// Create an instance with `InputStream`.
@@ -97,13 +109,14 @@ public struct CSV: IteratorProtocol, Sequence {
         codecType: T.Type,
         endian: Endian = .big,
         hasHeaderRow: Bool = defaultHasHeaderRow,
+        trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter)
         throws
         where T.CodeUnit == UInt32
     {
         let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
         let iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncodingType: codecType)
-        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, delimiter: delimiter)
+        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter)
     }
     
     // MARK: IteratorProtocol
@@ -160,6 +173,13 @@ public struct CSV: IteratorProtocol, Sequence {
         var field: String
         var end: Bool
         while true {
+            if trimFields {
+                // Trim the leading spaces
+                while next != nil && whitespaces.contains(next!) {
+                    next = moveNext()
+                }
+            }
+            
             if next == nil {
                 (field, end) = ("", true)
             }
@@ -169,6 +189,11 @@ public struct CSV: IteratorProtocol, Sequence {
             else {
                 back = next
                 (field, end) = readField(quoted: false)
+                
+                if trimFields {
+                    // Trim the trailing spaces
+                    field = field.trimmingCharacters(in: whitespaces)
+                }
             }
             row.append(field)
             if end {
@@ -188,7 +213,15 @@ public struct CSV: IteratorProtocol, Sequence {
         while let c = next {
             if quoted {
                 if c == DQUOTE {
-                    let cNext = moveNext()
+                    var cNext = moveNext()
+                    
+                    if trimFields {
+                        // Trim the trailing spaces
+                        while cNext != nil && whitespaces.contains(cNext!) {
+                            cNext = moveNext()
+                        }
+                    }
+                    
                     if cNext == nil || cNext == CR || cNext == LF {
                         if cNext == CR {
                             let cNextNext = moveNext()
@@ -208,7 +241,7 @@ public struct CSV: IteratorProtocol, Sequence {
                         field.append(String(DQUOTE))
                     }
                     else {
-                        // ERROR??
+                        // ERROR?
                         field.append(String(c))
                     }
                 }
@@ -239,6 +272,7 @@ public struct CSV: IteratorProtocol, Sequence {
             next = moveNext()
         }
         
+        // END FILE
         return (field, true)
     }
     
