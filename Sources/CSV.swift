@@ -29,6 +29,8 @@ public struct CSV: IteratorProtocol, Sequence {
     /// CSV header row. To set a value for this property, you set `true` to `hasHeaerRow` in initializer.
     public var headerRow: [String]? { return _headerRow }
     private var _headerRow: [String]? = nil
+    
+    private let whitespaces: CharacterSet
 
     internal init<T: IteratorProtocol>(
         iterator: T,
@@ -41,6 +43,10 @@ public struct CSV: IteratorProtocol, Sequence {
         self.trimFields = trimFields
         self.delimiter = delimiter
 
+        var whitespaces = CharacterSet.whitespaces
+        whitespaces.remove(delimiter)
+        self.whitespaces = whitespaces
+        
         if hasHeaderRow {
             guard let headerRow = next() else {
                 throw CSVError.cannotReadHeaderRow
@@ -167,6 +173,13 @@ public struct CSV: IteratorProtocol, Sequence {
         var field: String
         var end: Bool
         while true {
+            if trimFields {
+                // Trim the leading spaces
+                while next != nil && whitespaces.contains(next!) {
+                    next = moveNext()
+                }
+            }
+            
             if next == nil {
                 (field, end) = ("", true)
             }
@@ -195,7 +208,15 @@ public struct CSV: IteratorProtocol, Sequence {
         while let c = next {
             if quoted {
                 if c == DQUOTE {
-                    let cNext = moveNext()
+                    var cNext = moveNext()
+                    
+                    if trimFields {
+                        // Trim the trailing spaces
+                        while cNext != nil && whitespaces.contains(cNext!) {
+                            cNext = moveNext()
+                        }
+                    }
+                    
                     if cNext == nil || cNext == CR || cNext == LF {
                         if cNext == CR {
                             let cNextNext = moveNext()
@@ -215,7 +236,7 @@ public struct CSV: IteratorProtocol, Sequence {
                         field.append(String(DQUOTE))
                     }
                     else {
-                        // ERROR??
+                        // ERROR?
                         field.append(String(c))
                     }
                 }
@@ -231,10 +252,21 @@ public struct CSV: IteratorProtocol, Sequence {
                             back = cNext
                         }
                     }
+                    
+                    if trimFields {
+                        // Trim the trailing spaces
+                        field = field.trimmingCharacters(in: whitespaces)
+                    }
+                    
                     // END ROW
                     return (field, true)
                 }
                 else if c == delimiter {
+                    if trimFields {
+                        // Trim the trailing spaces
+                        field = field.trimmingCharacters(in: whitespaces)
+                    }
+                    
                     // END FIELD
                     return (field, false)
                 }
@@ -245,7 +277,13 @@ public struct CSV: IteratorProtocol, Sequence {
             
             next = moveNext()
         }
+
+        if trimFields {
+            // Trim the trailing spaces
+            field = field.trimmingCharacters(in: whitespaces)
+        }
         
+        // END FILE
         return (field, true)
     }
     
