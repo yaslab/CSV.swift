@@ -189,6 +189,11 @@ public struct CSV: IteratorProtocol, Sequence {
             else {
                 back = next
                 (field, end) = readField(quoted: false)
+                
+                if trimFields {
+                    // Trim the trailing spaces
+                    field = field.trimmingCharacters(in: whitespaces)
+                }
             }
             row.append(field)
             if end {
@@ -252,21 +257,10 @@ public struct CSV: IteratorProtocol, Sequence {
                             back = cNext
                         }
                     }
-                    
-                    if trimFields {
-                        // Trim the trailing spaces
-                        field = field.trimmingCharacters(in: whitespaces)
-                    }
-                    
                     // END ROW
                     return (field, true)
                 }
                 else if c == delimiter {
-                    if trimFields {
-                        // Trim the trailing spaces
-                        field = field.trimmingCharacters(in: whitespaces)
-                    }
-                    
                     // END FIELD
                     return (field, false)
                 }
@@ -276,11 +270,6 @@ public struct CSV: IteratorProtocol, Sequence {
             }
             
             next = moveNext()
-        }
-
-        if trimFields {
-            // Trim the trailing spaces
-            field = field.trimmingCharacters(in: whitespaces)
         }
         
         // END FILE
