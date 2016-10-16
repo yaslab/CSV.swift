@@ -275,4 +275,12 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(row2, ["def"])
     }
     
+    func testTrimFields13() {
+        let csvString = " abc \t\tdef\t ghi "
+        let csv = try! CSV(string: csvString, trimFields: true, delimiter: UnicodeScalar("\t")!)
+        for row in csv {
+            XCTAssertEqual(row, ["abc", "", "def", "ghi"])
+        }
+    }
+    
 }
