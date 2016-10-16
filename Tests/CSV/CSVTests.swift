@@ -266,13 +266,13 @@ class CSVTests: XCTestCase {
     }
     
     func testTrimFields12() {
-        let csvString = " \"abc\" \n \"def\" "
+        let csvString = " \"abc \" \n \" def\" "
         var csv = try! CSV(string: csvString, trimFields: true)
         
         let row1 = csv.next()!
-        XCTAssertEqual(row1, ["abc"])
+        XCTAssertEqual(row1, ["abc "])
         let row2 = csv.next()!
-        XCTAssertEqual(row2, ["def"])
+        XCTAssertEqual(row2, [" def"])
     }
     
     func testTrimFields13() {
