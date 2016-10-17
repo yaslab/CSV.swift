@@ -9,7 +9,9 @@
 import Foundation
 
 extension CSV {
-
+    
+    // TODO: Documentation
+    /// No overview available.
     public init(
         stream: InputStream,
         hasHeaderRow: Bool = defaultHasHeaderRow,
@@ -19,11 +21,13 @@ extension CSV {
     {
         try self.init(stream: stream, codecType: UTF8.self, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter)
     }
-
+    
 }
 
 extension CSV {
     
+    // TODO: Documentation
+    /// No overview available.
     public init(
         string: String,
         hasHeaderRow: Bool = defaultHasHeaderRow,

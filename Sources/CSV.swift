@@ -16,7 +16,21 @@ internal let defaultHasHeaderRow = false
 internal let defaultTrimFields = false
 internal let defaultDelimiter = UnicodeScalar(",")!
 
-public struct CSV: IteratorProtocol, Sequence {
+extension CSV: Sequence { }
+
+extension CSV: IteratorProtocol {
+
+    // TODO: Documentation
+    /// No overview available.
+    public mutating func next() -> [String]? {
+        return readRow()
+    }
+
+}
+
+// TODO: Documentation
+/// No overview available.
+public struct CSV {
 
     private var iterator: AnyIterator<UnicodeScalar>
     private let trimFields: Bool
@@ -37,9 +51,10 @@ public struct CSV: IteratorProtocol, Sequence {
         hasHeaderRow: Bool,
         trimFields: Bool,
         delimiter: UnicodeScalar)
-        throws where T.Element == UnicodeScalar
+        throws
+        where T.Element == UnicodeScalar
     {
-        self.iterator = AnyIterator(base: iterator)
+        self.iterator = AnyIterator(iterator)
         self.trimFields = trimFields
         self.delimiter = delimiter
 
@@ -119,49 +134,7 @@ public struct CSV: IteratorProtocol, Sequence {
         try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter)
     }
     
-    // MARK: IteratorProtocol
-
-    /// Advances and returns the next element of the underlying sequence, or
-    /// `nil` if no next element exists.
-    ///
-    /// Repeatedly calling this method returns, in order, all the elements of the
-    /// underlying sequence. After the sequence has run out of elements, the
-    /// `next()` method returns `nil`.
-    ///
-    /// You must not call this method if it has previously returned `nil` or if
-    /// any other copy of this iterator has been advanced with a call to its
-    /// `next()` method.
-    ///
-    /// The following example shows how an iterator can be used explicitly to
-    /// emulate a `for`-`in` loop. First, retrieve a sequence's iterator, and
-    /// then call the iterator's `next()` method until it returns `nil`.
-    ///
-    ///     let numbers = [2, 3, 5, 7]
-    ///     var numbersIterator = numbers.makeIterator()
-    ///
-    ///     while let num = numbersIterator.next() {
-    ///         print(num)
-    ///     }
-    ///     // Prints "2"
-    ///     // Prints "3"
-    ///     // Prints "5"
-    ///     // Prints "7"
-    ///
-    /// - Returns: The next element in the underlying sequence if a next element
-    ///   exists; otherwise, `nil`.
-    public mutating func next() -> [String]? {
-        return readRow()
-    }
-    
-    internal mutating func moveNext() -> UnicodeScalar? {
-        if back != nil {
-            defer { back = nil }
-            return back
-        }
-        return iterator.next()
-    }
-    
-    internal mutating func readRow() -> [String]? {
+    fileprivate mutating func readRow() -> [String]? {
         currentRow = nil
 
         var next = moveNext()
@@ -206,7 +179,7 @@ public struct CSV: IteratorProtocol, Sequence {
         return row
     }
     
-    internal mutating func readField(quoted: Bool) -> (String, Bool) {
+    private mutating func readField(quoted: Bool) -> (String, Bool) {
         var field = ""
 
         var next = moveNext()
@@ -274,6 +247,14 @@ public struct CSV: IteratorProtocol, Sequence {
         
         // END FILE
         return (field, true)
+    }
+    
+    private mutating func moveNext() -> UnicodeScalar? {
+        if back != nil {
+            defer { back = nil }
+            return back
+        }
+        return iterator.next()
     }
     
 }
