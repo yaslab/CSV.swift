@@ -16,14 +16,12 @@ extension CSV: Sequence { }
 
 extension CSV: IteratorProtocol {
 
-    // TODO: Documentation
     /// No overview available.
     public mutating func next() -> Row? {
         guard let row = readRow() else {
             return nil
         }
-        currentRow = Row(data: row, headerRow: headerRow)
-        return currentRow
+        return Row(data: row, headerRow: headerRow)
     }
 
 }
@@ -104,9 +102,6 @@ public struct CSV {
     private let config: CSVConfiguration
 
     private var back: UnicodeScalar? = nil
-
-    // TODO: deprecated
-    internal var currentRow: Row? = nil
 
     /// CSV header row. To set a value for this property,
     /// you set `true` to `hasHeaerRow` in initializer.
@@ -266,8 +261,8 @@ public struct CSV {
     // MARK: - Parse CSV
 
     fileprivate mutating func readRow() -> [String]? {
-        var next = moveNext()
-        if next == nil {
+        var c = moveNext()
+        if c == nil {
             return nil
         }
 
@@ -277,17 +272,17 @@ public struct CSV {
         while true {
             if config.trimFields {
                 // Trim the leading spaces
-                while next != nil && config.whitespaces.contains(next!) {
-                    next = moveNext()
+                while c != nil && config.whitespaces.contains(c!) {
+                    c = moveNext()
                 }
             }
 
-            if next == nil {
+            if c == nil {
                 (field, end) = ("", true)
-            } else if next == DQUOTE {
+            } else if c == DQUOTE {
                 (field, end) = readField(quoted: true)
             } else {
-                back = next
+                back = c
                 (field, end) = readField(quoted: false)
 
                 if config.trimFields {
@@ -299,7 +294,7 @@ public struct CSV {
             if end {
                 break
             }
-            next = moveNext()
+            c = moveNext()
         }
 
         return row
@@ -308,8 +303,7 @@ public struct CSV {
     private mutating func readField(quoted: Bool) -> (String, Bool) {
         var field = ""
 
-        var next = moveNext()
-        while let c = next {
+        while let c = moveNext() {
             if quoted {
                 if c == DQUOTE {
                     var cNext = moveNext()
@@ -360,8 +354,6 @@ public struct CSV {
                     field.append(String(c))
                 }
             }
-
-            next = moveNext()
         }
 
         // END FILE
@@ -370,7 +362,9 @@ public struct CSV {
 
     private mutating func moveNext() -> UnicodeScalar? {
         if back != nil {
-            defer { back = nil }
+            defer {
+                back = nil
+            }
             return back
         }
         return iterator.next()

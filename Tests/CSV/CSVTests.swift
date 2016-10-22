@@ -131,27 +131,6 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(i, 3)
     }
 
-    func testSubscript() {
-        let csvString = "id,name\n001,hoge\n002,fuga"
-        let config = CSVConfiguration(hasHeaderRow: true)
-        var csv = try! CSV(string: csvString, config: config)
-        var i = 0
-        while csv.next() != nil {
-            switch i {
-            case 0:
-                XCTAssertEqual(csv["id"], "001")
-                XCTAssertEqual(csv["name"], "hoge")
-            case 1:
-                XCTAssertEqual(csv["id"], "002")
-                XCTAssertEqual(csv["name"], "fuga")
-            default:
-                break
-            }
-            i += 1
-        }
-        XCTAssertEqual(i, 2)
-    }
-
     func testCSVState1() {
         let it = "あ,い1,\"う\",えお\n,,x,".unicodeScalars.makeIterator()
         var csv = try! CSV(iterator: it, config: CSVConfiguration())
