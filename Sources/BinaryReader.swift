@@ -145,7 +145,7 @@ internal class BinaryReader {
         if length < 0 {
             throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
-        if length != 4 {
+        if length != bufferSize {
             throw CSVError.stringEncodingMismatch
         }
         return try UnsafePointer(buffer).withMemoryRebound(to: UInt32.self, capacity: 1) {
