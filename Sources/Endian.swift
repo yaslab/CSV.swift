@@ -9,7 +9,12 @@
 // TODO: Documentation
 /// No overview available.
 public enum Endian {
+
+    /// No overview available.
     case big
+    /// No overview available.
     case little
+    /// No overview available.
     case unknown
+
 }
