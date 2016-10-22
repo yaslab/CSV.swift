@@ -3,15 +3,15 @@
 //  CSV
 //
 //  Created by Yasuhiro Hatta on 2016/06/11.
-//
+//  Copyright © 2016 yaslab. All rights reserved.
 //
 
 import XCTest
 @testable import CSV
 
 class CSVTests: XCTestCase {
-
-    func test1Line() {
+    
+    func testOneLine() {
         let csv = "\"abc\",1,2"
         var i = 0
         for row in try! CSV(string: csv) {
@@ -24,7 +24,7 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(i, 1)
     }
     
-    func test2Lines() {
+    func testTwoLines() {
         let csv = "\"abc\",1,2\n\"cde\",3,4"
         var i = 0
         for row in try! CSV(string: csv) {
@@ -67,7 +67,7 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(i, 3)
     }
 
-    func testMiddleLineEmpty() {
+    func testMiddleLineIsEmpty() {
         let csv = "\"abc\",1,2\n\n\"cde\",3,4"
         var i = 0
         for row in try! CSV(string: csv) {
@@ -80,6 +80,40 @@ class CSVTests: XCTestCase {
             i += 1
         }
         XCTAssertEqual(i, 3)
+    }
+    
+    func testCommaInQuotationMarks() {
+        let csvString = "abab,\"cd,cd\",efef"
+        var csv = try! CSV(string: csvString)
+        let row = csv.next()!
+        XCTAssertEqual(row, ["abab", "cd,cd", "efef"])
+    }
+    
+    func testEscapedQuotationMark1() {
+        let csvString = "abab,\"\"\"cdcd\",efef\r\nzxcv,asdf,qwer"
+        var csv = try! CSV(string: csvString)
+        var row = csv.next()!
+        XCTAssertEqual(row, ["abab", "\"cdcd", "efef"])
+        row = csv.next()!
+        XCTAssertEqual(row, ["zxcv", "asdf", "qwer"])
+    }
+    
+    func testEscapedQuotationMark2() {
+        let csvString = "abab,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\""
+        var csv = try! CSV(string: csvString)
+        var row = csv.next()!
+        XCTAssertEqual(row, ["abab", "cdcd", "efef"])
+        row = csv.next()!
+        XCTAssertEqual(row, ["zxcv", "asdf", "qw\"er"])
+    }
+    
+    func testEmptyField() {
+        let csvString = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
+        var csv = try! CSV(string: csvString)
+        var row = csv.next()!
+        XCTAssertEqual(row, ["abab", "", "cdcd", "efef"])
+        row = csv.next()!
+        XCTAssertEqual(row, ["zxcv", "asdf", "qw\"er", ""])
     }
     
     func testDoubleQuoteBeforeLineBreak() {
@@ -96,50 +130,6 @@ class CSVTests: XCTestCase {
         }
         XCTAssertEqual(i, 3)
     }
-    
-//    func testBufferSizeMod0() {
-//        let csvString = "0,1,2,3,4,5,6,7,8,9\n"
-//        let csv = try! CSV(string: csvString, bufferSize: 12)
-//        XCTAssertEqual(csv.bufferSize, 12)
-//    }
-//    
-//    func testBufferSizeMod1() {
-//        let csvString = "0,1,2,3,4,5,6,7,8,9\n"
-//        let csv = try! CSV(string: csvString, bufferSize: 13)
-//        XCTAssertEqual(csv.bufferSize, 16)
-//    }
-//    
-//    func testBufferSizeMod2() {
-//        let csvString = "0,1,2,3,4,5,6,7,8,9\n"
-//        let csv = try! CSV(string: csvString, bufferSize: 14)
-//        XCTAssertEqual(csv.bufferSize, 16)
-//    }
-//    
-//    func testBufferSizeMod3() {
-//        let csvString = "0,1,2,3,4,5,6,7,8,9\n"
-//        let csv = try! CSV(string: csvString, bufferSize: 15)
-//        XCTAssertEqual(csv.bufferSize, 16)
-//    }
-//    
-//    func testBufferSizeMod4() {
-//        let csvString = "0,1,2,3,4,5,6,7,8,9\n"
-//        let csv = try! CSV(string: csvString, bufferSize: 16)
-//        XCTAssertEqual(csv.bufferSize, 16)
-//    }
-//    
-//    func testBigDataAndSmallBufferSize() {
-//        let line = "0,1,2,3,4,5,6,7,8,9\n"
-//        var csv = ""
-//        for _ in 0..<10000 {
-//            csv += line
-//        }
-//        var i = 0
-//        for row in try! CSV(string: csv, bufferSize: 10) {
-//            XCTAssertEqual(row, ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
-//            i += 1
-//        }
-//        XCTAssertEqual(i, 10000)
-//    }
 
     func testSubscript() {
         let csvString = "id,name\n001,hoge\n002,fuga"
@@ -174,113 +164,5 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(rows[0], ["あ", "い1", "う", "えお"])
         XCTAssertEqual(rows[1], ["", "", "x", ""])
     }
-    
-    func testTrimFields1() {
-        let csvString = "abc,def,ghi"
-        let csv = try! CSV(string: csvString, trimFields: true)
-        for row in csv {
-            XCTAssertEqual(row, ["abc", "def", "ghi"])
-        }
-    }
-    
-    func testTrimFields2() {
-        let csvString = " abc,  def,   ghi"
-        let csv = try! CSV(string: csvString, trimFields: true)
-        for row in csv {
-            XCTAssertEqual(row, ["abc", "def", "ghi"])
-        }
-    }
-    
-    func testTrimFields3() {
-        let csvString = "abc ,def  ,ghi   "
-        let csv = try! CSV(string: csvString, trimFields: true)
-        for row in csv {
-            XCTAssertEqual(row, ["abc", "def", "ghi"])
-        }
-    }
-    
-    func testTrimFields4() {
-        let csvString = " abc ,  def  ,   ghi   "
-        let csv = try! CSV(string: csvString, trimFields: true)
-        for row in csv {
-            XCTAssertEqual(row, ["abc", "def", "ghi"])
-        }
-    }
-    
-    func testTrimFields5() {
-        let csvString = "\"abc\",\"def\",\"ghi\""
-        let csv = try! CSV(string: csvString, trimFields: true)
-        for row in csv {
-            XCTAssertEqual(row, ["abc", "def", "ghi"])
-        }
-    }
 
-    func testTrimFields6() {
-        let csvString = " \"abc\",  \"def\",   \"ghi\""
-        let csv = try! CSV(string: csvString, trimFields: true)
-        for row in csv {
-            XCTAssertEqual(row, ["abc", "def", "ghi"])
-        }
-    }
-    
-    func testTrimFields7() {
-        let csvString = "\"abc\" ,\"def\"  ,\"ghi\"   "
-        let csv = try! CSV(string: csvString, trimFields: true)
-        for row in csv {
-            XCTAssertEqual(row, ["abc", "def", "ghi"])
-        }
-    }
-    
-    func testTrimFields8() {
-        let csvString = " \"abc\" ,  \"def\"  ,   \"ghi\"   "
-        let csv = try! CSV(string: csvString, trimFields: true)
-        for row in csv {
-            XCTAssertEqual(row, ["abc", "def", "ghi"])
-        }
-    }
-    
-    func testTrimFields9() {
-        let csvString = "\" abc \",\" def \",\" ghi \""
-        let csv = try! CSV(string: csvString, trimFields: true)
-        for row in csv {
-            XCTAssertEqual(row, [" abc ", " def ", " ghi "])
-        }
-    }
-
-    func testTrimFields10() {
-        let csvString = "\tabc,\t\tdef\t,ghi\t"
-        let csv = try! CSV(string: csvString, trimFields: true)
-        for row in csv {
-            XCTAssertEqual(row, ["abc", "def", "ghi"])
-        }
-    }
-    
-    func testTrimFields11() {
-        let csvString = " abc \n def "
-        var csv = try! CSV(string: csvString, trimFields: true)
-        
-        let row1 = csv.next()!
-        XCTAssertEqual(row1, ["abc"])
-        let row2 = csv.next()!
-        XCTAssertEqual(row2, ["def"])
-    }
-    
-    func testTrimFields12() {
-        let csvString = " \"abc \" \n \" def\" "
-        var csv = try! CSV(string: csvString, trimFields: true)
-        
-        let row1 = csv.next()!
-        XCTAssertEqual(row1, ["abc "])
-        let row2 = csv.next()!
-        XCTAssertEqual(row2, [" def"])
-    }
-    
-    func testTrimFields13() {
-        let csvString = " abc \t\tdef\t ghi "
-        let csv = try! CSV(string: csvString, trimFields: true, delimiter: UnicodeScalar("\t")!)
-        for row in csv {
-            XCTAssertEqual(row, ["abc", "", "def", "ghi"])
-        }
-    }
-    
 }
