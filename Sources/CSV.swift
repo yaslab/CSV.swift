@@ -28,7 +28,6 @@ extension CSV: IteratorProtocol {
 
 }
 
-// TODO: Documentation
 /// No overview available.
 public struct CSV {
 
@@ -153,7 +152,7 @@ public struct CSV {
     }
 
     /// Unavailable.
-    @available(*, unavailable, message: "Use init(stream:codecType:config:) instead")
+    @available(*, unavailable, message: "Use init(stream:codecType:endian:config:) instead")
     public init<T: UnicodeCodec>(
         stream: InputStream,
         codecType: T.Type,
@@ -177,7 +176,7 @@ public struct CSV {
     }
 
     /// Unavailable.
-    @available(*, unavailable, message: "Use init(stream:codecType:config:) instead")
+    @available(*, unavailable, message: "Use init(stream:codecType:endian:config:) instead")
     public init<T: UnicodeCodec>(
         stream: InputStream,
         codecType: T.Type,
@@ -205,7 +204,6 @@ public struct CSV {
     /// - parameter stream: An `InputStream` object. If the stream is not open,
     ///                     initializer opens automatically.
     /// - parameter codecType: A `UnicodeCodec` type for `stream`.
-    /// - parameter endian: Endian to use when reading a stream. Default: `.big`.
     /// - parameter config: CSV configuration.
     public init<T: UnicodeCodec>(
         stream: InputStream,

@@ -6,7 +6,6 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-// TODO: Documentation
 /// No overview available.
 public enum Endian {
 

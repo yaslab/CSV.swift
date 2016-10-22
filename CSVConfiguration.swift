@@ -13,7 +13,6 @@ internal let defaultTrimFields = false
 internal let defaultDelimiter = UnicodeScalar(UInt8(0x2c)) // ","
 internal let defaultWhitespaces = CharacterSet.whitespaces
 
-// TODO: Documentation
 /// No overview available.
 public struct CSVConfiguration {
 
