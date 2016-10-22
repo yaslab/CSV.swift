@@ -23,7 +23,7 @@ class UnicodeTests: XCTestCase {
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
-    
+
     func testUTF16WithNativeEndianBOM() {
         let csvString = "abab,,cdcd,efef\r\nzxcv,😆asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf16
@@ -35,7 +35,7 @@ class UnicodeTests: XCTestCase {
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["zxcv", "😆asdf", "qw\"er", ""])
     }
-    
+
     func testUTF16WithBigEndianBOM() {
         let csvString = "abab,,cdcd,efef\r\n😆zxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf16BigEndian
@@ -48,7 +48,7 @@ class UnicodeTests: XCTestCase {
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["😆zxcv", "asdf", "qw\"er", ""])
     }
-    
+
     func testUTF16WithLittleEndianBOM() {
         let csvString = "abab,,cdcd,efef\r\nzxcv😆,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf16LittleEndian
@@ -61,7 +61,7 @@ class UnicodeTests: XCTestCase {
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["zxcv😆", "asdf", "qw\"er", ""])
     }
-    
+
     func testUTF32WithNativeEndianBOM() {
         let csvString = "😆abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf32
@@ -73,7 +73,7 @@ class UnicodeTests: XCTestCase {
         XCTAssertEqual(records[0], ["😆abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
-    
+
     func testUTF32WithBigEndianBOM() {
         let csvString = "abab,,cd😆cd,efef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf32BigEndian
@@ -86,7 +86,7 @@ class UnicodeTests: XCTestCase {
         XCTAssertEqual(records[0], ["abab", "", "cd😆cd", "efef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
-    
+
     func testUTF32WithLittleEndianBOM() {
         let csvString = "abab,,cdcd,ef😆ef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf32LittleEndian
@@ -99,7 +99,7 @@ class UnicodeTests: XCTestCase {
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "ef😆ef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
-    
+
     private func getRecords(csv: CSV) -> [[String]] {
         var records = [[String]]()
         for row in csv {
@@ -107,5 +107,5 @@ class UnicodeTests: XCTestCase {
         }
         return records
     }
-    
+
 }

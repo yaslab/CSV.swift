@@ -64,7 +64,7 @@ class LineBreakTests: XCTestCase {
         XCTAssertEqual(records[0], ["qwe", "asd"])
         XCTAssertEqual(records[1], ["zxc", "rty"])
     }
-    
+
     func testLineBreakCR() {
         let csv = "qwe,asd\rzxc,rty"
         let records = parse(csv: csv)
@@ -72,7 +72,7 @@ class LineBreakTests: XCTestCase {
         XCTAssertEqual(records[0], ["qwe", "asd"])
         XCTAssertEqual(records[1], ["zxc", "rty"])
     }
-    
+
     func testLineBreakCRLF() {
         let csv = "qwe,asd\r\nzxc,rty"
         let records = parse(csv: csv)
@@ -80,7 +80,7 @@ class LineBreakTests: XCTestCase {
         XCTAssertEqual(records[0], ["qwe", "asd"])
         XCTAssertEqual(records[1], ["zxc", "rty"])
     }
-    
+
     func testLineBreakLFLF() {
         let csv = "qwe,asd\n\nzxc,rty"
         let records = parse(csv: csv)

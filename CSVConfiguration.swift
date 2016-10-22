@@ -31,8 +31,8 @@ public struct CSVConfiguration {
         hasHeaderRow: Bool = defaultHasHeaderRow,
         trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter,
-        whitespaces: CharacterSet = defaultWhitespaces)
-    {
+        whitespaces: CharacterSet = defaultWhitespaces) {
+
         self.hasHeaderRow = hasHeaderRow
         self.trimFields = trimFields
         self.delimiter = delimiter
@@ -41,5 +41,5 @@ public struct CSVConfiguration {
         _ = whitespaces.remove(delimiter)
         self.whitespaces = whitespaces
     }
-    
+
 }
