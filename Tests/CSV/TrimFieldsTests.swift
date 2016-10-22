@@ -132,4 +132,54 @@ class TrimFieldsTests: XCTestCase {
         }
     }
 
+    func testTrimFields14() {
+        let csvString = ""
+        let config = CSVConfiguration(trimFields: true)
+        let csv = try! CSV(string: csvString, config: config)
+        let rows = csv.map { $0.toArray() }
+
+        XCTAssertEqual(rows.count, 0)
+    }
+
+    func testTrimFields15() {
+        let csvString = " "
+        let config = CSVConfiguration(trimFields: true)
+        let csv = try! CSV(string: csvString, config: config)
+        let rows = csv.map { $0.toArray() }
+
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows[0], [""])
+    }
+
+    func testTrimFields16() {
+        let csvString = " , "
+        let config = CSVConfiguration(trimFields: true)
+        let csv = try! CSV(string: csvString, config: config)
+        let rows = csv.map { $0.toArray() }
+
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows[0], ["", ""])
+    }
+
+    func testTrimFields17() {
+        let csvString = " , \n"
+        let config = CSVConfiguration(trimFields: true)
+        let csv = try! CSV(string: csvString, config: config)
+        let rows = csv.map { $0.toArray() }
+
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows[0], ["", ""])
+    }
+
+    func testTrimFields18() {
+        let csvString = " , \n "
+        let config = CSVConfiguration(trimFields: true)
+        let csv = try! CSV(string: csvString, config: config)
+        let rows = csv.map { $0.toArray() }
+
+        XCTAssertEqual(rows.count, 2)
+        XCTAssertEqual(rows[0], ["", ""])
+        XCTAssertEqual(rows[1], [""])
+    }
+
 }
