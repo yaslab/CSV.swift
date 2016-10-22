@@ -10,19 +10,9 @@ extension CSV {
     
     // TODO: Documentation
     /// No overview available.
+    @available(*, deprecated, message: "Use CSV.Row.subscript(String) instead")
     public subscript(key: String) -> String? {
-        get {
-            guard let headerRow = headerRow, let currentRow = currentRow else {
-                return nil
-            }
-            guard let index = headerRow.index(of: key) else {
-                return nil
-            }
-            if index >= currentRow.count {
-                return nil
-            }
-            return currentRow[index]
-        }
+        return currentRow?[key]
     }
     
 }

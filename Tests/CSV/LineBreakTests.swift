@@ -112,7 +112,7 @@ class LineBreakTests: XCTestCase {
         let reader = try! CSV(string: csv)
         var records = [[String]]()
         for row in reader {
-            records.append(row)
+            records.append(row.toArray())
         }
         return records
     }
