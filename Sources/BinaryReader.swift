@@ -175,7 +175,7 @@ extension BinaryReader {
             do {
                 return try reader.readUInt8()
             }
-            catch /*let error*/ {
+            catch {
                 return nil
             }
         }
@@ -205,7 +205,7 @@ extension BinaryReader {
             do {
                 return try reader.readUInt16()
             }
-            catch /*let error*/ {
+            catch {
                 return nil
             }
         }
@@ -235,7 +235,7 @@ extension BinaryReader {
             do {
                 return try reader.readUInt32()
             }
-            catch /*let error*/ {
+            catch {
                 return nil
             }
         }
