@@ -9,7 +9,7 @@
 extension CSV: IteratorProtocol, Sequence {
 
     /// No overview available.
-    public mutating func next() -> Row? {
+    public func next() -> Row? {
         guard let row = readRow() else {
             return nil
         }

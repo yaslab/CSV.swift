@@ -164,21 +164,23 @@ internal class BinaryReader {
 
 extension BinaryReader {
 
-    internal struct UInt8Iterator: Sequence, IteratorProtocol {
+    internal class UInt8Iterator: Sequence, IteratorProtocol {
 
         private let reader: BinaryReader
+        internal var errorHandler: ((Error) -> Void)? = nil
 
         fileprivate init(reader: BinaryReader) {
             self.reader = reader
         }
 
-        internal mutating func next() -> UInt8? {
+        internal func next() -> UInt8? {
             if !reader.hasBytesAvailable {
                 return nil
             }
             do {
                 return try reader.readUInt8()
             } catch {
+                errorHandler?(error)
                 return nil
             }
         }
@@ -193,21 +195,23 @@ extension BinaryReader {
 
 extension BinaryReader {
 
-    internal struct UInt16Iterator: Sequence, IteratorProtocol {
+    internal class UInt16Iterator: Sequence, IteratorProtocol {
 
         private let reader: BinaryReader
+        internal var errorHandler: ((Error) -> Void)? = nil
 
         fileprivate init(reader: BinaryReader) {
             self.reader = reader
         }
 
-        internal mutating func next() -> UInt16? {
+        internal func next() -> UInt16? {
             if !reader.hasBytesAvailable {
                 return nil
             }
             do {
                 return try reader.readUInt16()
             } catch {
+                errorHandler?(error)
                 return nil
             }
         }
@@ -222,21 +226,23 @@ extension BinaryReader {
 
 extension BinaryReader {
 
-    internal struct UInt32Iterator: Sequence, IteratorProtocol {
+    internal class UInt32Iterator: Sequence, IteratorProtocol {
 
         private let reader: BinaryReader
+        internal var errorHandler: ((Error) -> Void)? = nil
 
         fileprivate init(reader: BinaryReader) {
             self.reader = reader
         }
 
-        internal mutating func next() -> UInt32? {
+        internal func next() -> UInt32? {
             if !reader.hasBytesAvailable {
                 return nil
             }
             do {
                 return try reader.readUInt32()
             } catch {
+                errorHandler?(error)
                 return nil
             }
         }

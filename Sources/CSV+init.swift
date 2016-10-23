@@ -15,7 +15,7 @@ extension CSV {
     /// - parameter stream: An `InputStream` object. If the stream is not open,
     ///                     initializer opens automatically.
     /// - parameter config: CSV configuration.
-    public init(
+    public convenience init(
         stream: InputStream,
         config: CSVConfiguration = CSVConfiguration()) throws {
 
@@ -30,7 +30,7 @@ extension CSV {
     ///
     /// - parameter string: An CSV string.
     /// - parameter config: CSV configuration.
-    public init(
+    public convenience init(
         string: String,
         config: CSVConfiguration = CSVConfiguration()) throws {
 
