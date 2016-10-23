@@ -22,24 +22,6 @@ extension CSV {
         try self.init(stream: stream, codecType: UTF8.self, config: config)
     }
 
-    // MARK: - deprecated
-
-    /// Unavailable.
-    @available(*, unavailable, message: "Use init(stream:config:) instead")
-    public init(
-        stream: InputStream,
-        hasHeaderRow: Bool = defaultHasHeaderRow,
-        trimFields: Bool = defaultTrimFields,
-        delimiter: UnicodeScalar = defaultDelimiter) throws {
-
-        let config = CSVConfiguration(
-            hasHeaderRow: hasHeaderRow,
-            trimFields: trimFields,
-            delimiter: delimiter
-        )
-        try self.init(stream: stream, codecType: UTF8.self, config: config)
-    }
-
 }
 
 extension CSV {
@@ -53,25 +35,6 @@ extension CSV {
         config: CSVConfiguration = CSVConfiguration()) throws {
 
         let iterator = string.unicodeScalars.makeIterator()
-        try self.init(iterator: iterator, config: config)
-    }
-
-    // MARK: - deprecated
-
-    /// Unavailable.
-    @available(*, unavailable, message: "Use init(string:config:) instead")
-    public init(
-        string: String,
-        hasHeaderRow: Bool = defaultHasHeaderRow,
-        trimFields: Bool = defaultTrimFields,
-        delimiter: UnicodeScalar = defaultDelimiter) throws {
-
-        let iterator = string.unicodeScalars.makeIterator()
-        let config = CSVConfiguration(
-            hasHeaderRow: hasHeaderRow,
-            trimFields: trimFields,
-            delimiter: delimiter
-        )
         try self.init(iterator: iterator, config: config)
     }
 
