@@ -100,7 +100,7 @@ import PackageDescription
 let package = Package(
     name: "PackageName",
     dependencies: [
-        .Package(url: "https://github.com/yaslab/CSV.swift", majorVersion: 1, minor: 1)
+        .Package(url: "https://github.com/yaslab/CSV.swift.git", majorVersion: 1, minor: 1)
     ]
 )
 ```
