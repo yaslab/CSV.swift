@@ -66,6 +66,9 @@ extension CSV {
             guard let index = headerRow!.index(of: key) else {
                 return nil
             }
+            guard (data.startIndex ..< data.endIndex).contains(index) else {
+                return nil
+            }
             return data[index]
         }
 
@@ -79,7 +82,9 @@ extension CSV {
             assert(headerRow != nil, "CSVConfiguration.hasHeaderRow must be true")
             var dictionary: [String : String] = [:]
             for (key, value) in zip(headerRow!, data) {
-                dictionary[key] = value
+                if !dictionary.keys.contains(key) {
+                    dictionary[key] = value
+                }
             }
             return dictionary
         }

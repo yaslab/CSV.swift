@@ -155,13 +155,24 @@ class CSVTests: XCTestCase {
         }
     }
 
-    func testSubscriptString() {
+    func testSubscriptString1() {
         let csvString = "key1,key2\nvalue1,value2"
         let config = CSVConfiguration(hasHeaderRow: true)
         let csv = try! CSV(string: csvString, config: config)
         for row in csv {
             XCTAssertEqual(row["key1"], "value1")
             XCTAssertEqual(row["key2"], "value2")
+            XCTAssertNil(row["key9"])
+        }
+    }
+
+    func testSubscriptString2() {
+        let csvString = "key1,key2\nvalue1"
+        let config = CSVConfiguration(hasHeaderRow: true)
+        let csv = try! CSV(string: csvString, config: config)
+        for row in csv {
+            XCTAssertEqual(row["key1"], "value1")
+            XCTAssertNil(row["key2"])
             XCTAssertNil(row["key9"])
         }
     }
@@ -174,8 +185,21 @@ class CSVTests: XCTestCase {
         XCTAssertEqual(rows[1], ["6", "7", "8", "9", "0"])
     }
 
-    func testToDictionary() {
+    func testToDictionary1() {
         let csvString = "id,name\n1,name1\n2,name2"
+        let config = CSVConfiguration(hasHeaderRow: true)
+        let csv = try! CSV(string: csvString, config: config)
+        let rows = csv.map { $0.toDictionary() }
+        XCTAssertEqual(rows[0]["id"], "1")
+        XCTAssertEqual(rows[0]["name"], "name1")
+        XCTAssertNil(rows[0]["xxx"])
+        XCTAssertEqual(rows[1]["id"], "2")
+        XCTAssertEqual(rows[1]["name"], "name2")
+        XCTAssertNil(rows[1]["yyy"])
+    }
+
+    func testToDictionary2() {
+        let csvString = "id,name,id\n1,name1,11\n2,name2,22"
         let config = CSVConfiguration(hasHeaderRow: true)
         let csv = try! CSV(string: csvString, config: config)
         let rows = csv.map { $0.toDictionary() }
