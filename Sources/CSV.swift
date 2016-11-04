@@ -8,193 +8,159 @@
 
 import Foundation
 
-private let LF = UnicodeScalar("\n")!
-private let CR = UnicodeScalar("\r")!
-private let DQUOTE = UnicodeScalar("\"")!
+private let LF = UnicodeScalar(UInt8(0x0a))     // "\n"
+private let CR = UnicodeScalar(UInt8(0x0d))     // "\r"
+private let DQUOTE = UnicodeScalar(UInt8(0x22)) // "\""
 
-internal let defaultHasHeaderRow = false
-internal let defaultTrimFields = false
-internal let defaultDelimiter = UnicodeScalar(",")!
-
-extension CSV: Sequence { }
-
-extension CSV: IteratorProtocol {
-
-    // TODO: Documentation
-    /// No overview available.
-    public mutating func next() -> [String]? {
-        return readRow()
-    }
-
-}
-
-// TODO: Documentation
 /// No overview available.
 public struct CSV {
 
     private var iterator: AnyIterator<UnicodeScalar>
-    private let trimFields: Bool
-    private let delimiter: UnicodeScalar
+    private let config: CSVConfiguration
 
     private var back: UnicodeScalar? = nil
 
-    internal var currentRow: [String]? = nil
-
-    /// CSV header row. To set a value for this property, you set `true` to `hasHeaerRow` in initializer.
-    public var headerRow: [String]? { return _headerRow }
-    private var _headerRow: [String]? = nil
-    
-    private let whitespaces: CharacterSet
+    /// CSV header row. To set a value for this property,
+    /// you set `true` to `hasHeaerRow` in initializer.
+    public private(set) var headerRow: [String]? = nil
 
     internal init<T: IteratorProtocol>(
         iterator: T,
-        hasHeaderRow: Bool,
-        trimFields: Bool,
-        delimiter: UnicodeScalar)
-        throws
-        where T.Element == UnicodeScalar
-    {
-        self.iterator = AnyIterator(iterator)
-        self.trimFields = trimFields
-        self.delimiter = delimiter
+        config: CSVConfiguration
+        ) throws where T.Element == UnicodeScalar {
 
-        var whitespaces = CharacterSet.whitespaces
-        whitespaces.remove(delimiter)
-        self.whitespaces = whitespaces
-        
-        if hasHeaderRow {
-            guard let headerRow = next() else {
+        self.iterator = AnyIterator(iterator)
+        self.config = config
+
+        if config.hasHeaderRow {
+            guard let headerRow = readRow() else {
                 throw CSVError.cannotReadHeaderRow
             }
-            _headerRow = headerRow
+            self.headerRow = headerRow
         }
     }
 
     /// Create an instance with `InputStream`.
     ///
-    /// - parameter stream: An `InputStream` object. If the stream is not open, initializer opens automatically.
+    /// - parameter stream: An `InputStream` object. If the stream is not open,
+    ///                     initializer opens automatically.
     /// - parameter codecType: A `UnicodeCodec` type for `stream`.
-    /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
-    /// - parameter delimiter: Default: `","`.
+    /// - parameter config: CSV configuration.
     public init<T: UnicodeCodec>(
         stream: InputStream,
         codecType: T.Type,
-        hasHeaderRow: Bool = defaultHasHeaderRow,
-        trimFields: Bool = defaultTrimFields,
-        delimiter: UnicodeScalar = defaultDelimiter)
-        throws
-        where T.CodeUnit == UInt8
-    {
+        config: CSVConfiguration = CSVConfiguration()
+        ) throws where T.CodeUnit == UInt8 {
+
         let reader = try BinaryReader(stream: stream, endian: .unknown, closeOnDeinit: true)
-        let iterator = UnicodeIterator(input: reader.makeUInt8Iterator(), inputEncodingType: codecType)
-        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter)
+        let iterator = UnicodeIterator(
+            input: reader.makeUInt8Iterator(),
+            inputEncodingType: codecType
+        )
+        try self.init(iterator: iterator, config: config)
     }
 
     /// Create an instance with `InputStream`.
     ///
-    /// - parameter stream: An `InputStream` object. If the stream is not open, initializer opens automatically.
+    /// - parameter stream: An `InputStream` object. If the stream is not open,
+    ///                     initializer opens automatically.
     /// - parameter codecType: A `UnicodeCodec` type for `stream`.
     /// - parameter endian: Endian to use when reading a stream. Default: `.big`.
-    /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
-    /// - parameter delimiter: Default: `","`.
+    /// - parameter config: CSV configuration.
     public init<T: UnicodeCodec>(
         stream: InputStream,
         codecType: T.Type,
         endian: Endian = .big,
-        hasHeaderRow: Bool = defaultHasHeaderRow,
-        trimFields: Bool = defaultTrimFields,
-        delimiter: UnicodeScalar = defaultDelimiter)
-        throws
-        where T.CodeUnit == UInt16
-    {
+        config: CSVConfiguration = CSVConfiguration()
+        ) throws where T.CodeUnit == UInt16 {
+
         let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
-        let iterator = UnicodeIterator(input: reader.makeUInt16Iterator(), inputEncodingType: codecType)
-        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter)
+        let iterator = UnicodeIterator(
+            input: reader.makeUInt16Iterator(),
+            inputEncodingType: codecType
+        )
+        try self.init(iterator: iterator, config: config)
     }
 
     /// Create an instance with `InputStream`.
     ///
-    /// - parameter stream: An `InputStream` object. If the stream is not open, initializer opens automatically.
+    /// - parameter stream: An `InputStream` object. If the stream is not open,
+    ///                     initializer opens automatically.
     /// - parameter codecType: A `UnicodeCodec` type for `stream`.
     /// - parameter endian: Endian to use when reading a stream. Default: `.big`.
-    /// - parameter hasHeaderRow: `true` if the CSV has a header row, otherwise `false`. Default: `false`.
-    /// - parameter delimiter: Default: `","`.
+    /// - parameter config: CSV configuration.
     public init<T: UnicodeCodec>(
         stream: InputStream,
         codecType: T.Type,
         endian: Endian = .big,
-        hasHeaderRow: Bool = defaultHasHeaderRow,
-        trimFields: Bool = defaultTrimFields,
-        delimiter: UnicodeScalar = defaultDelimiter)
-        throws
-        where T.CodeUnit == UInt32
-    {
-        let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
-        let iterator = UnicodeIterator(input: reader.makeUInt32Iterator(), inputEncodingType: codecType)
-        try self.init(iterator: iterator, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter)
-    }
-    
-    fileprivate mutating func readRow() -> [String]? {
-        currentRow = nil
+        config: CSVConfiguration = CSVConfiguration()
+        ) throws where T.CodeUnit == UInt32 {
 
-        var next = moveNext()
-        if next == nil {
+        let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
+        let iterator = UnicodeIterator(
+            input: reader.makeUInt32Iterator(),
+            inputEncodingType: codecType
+        )
+        try self.init(iterator: iterator, config: config)
+    }
+
+    // MARK: - Parse CSV
+
+    internal mutating func readRow() -> [String]? {
+        var c = moveNext()
+        if c == nil {
             return nil
         }
-        
+
         var row = [String]()
         var field: String
         var end: Bool
         while true {
-            if trimFields {
+            if config.trimFields {
                 // Trim the leading spaces
-                while next != nil && whitespaces.contains(next!) {
-                    next = moveNext()
+                while c != nil && config.whitespaces.contains(c!) {
+                    c = moveNext()
                 }
             }
-            
-            if next == nil {
+
+            if c == nil {
                 (field, end) = ("", true)
-            }
-            else if next == DQUOTE {
+            } else if c == DQUOTE {
                 (field, end) = readField(quoted: true)
-            }
-            else {
-                back = next
+            } else {
+                back = c
                 (field, end) = readField(quoted: false)
-                
-                if trimFields {
+
+                if config.trimFields {
                     // Trim the trailing spaces
-                    field = field.trimmingCharacters(in: whitespaces)
+                    field = field.trimmingCharacters(in: config.whitespaces)
                 }
             }
             row.append(field)
             if end {
                 break
             }
-            next = moveNext()
+            c = moveNext()
         }
 
-        currentRow = row
         return row
     }
-    
+
     private mutating func readField(quoted: Bool) -> (String, Bool) {
         var field = ""
 
-        var next = moveNext()
-        while let c = next {
+        while let c = moveNext() {
             if quoted {
                 if c == DQUOTE {
                     var cNext = moveNext()
-                    
-                    if trimFields {
+
+                    if config.trimFields {
                         // Trim the trailing spaces
-                        while cNext != nil && whitespaces.contains(cNext!) {
+                        while cNext != nil && config.whitespaces.contains(cNext!) {
                             cNext = moveNext()
                         }
                     }
-                    
+
                     if cNext == nil || cNext == CR || cNext == LF {
                         if cNext == CR {
                             let cNextNext = moveNext()
@@ -204,25 +170,20 @@ public struct CSV {
                         }
                         // END ROW
                         return (field, true)
-                    }
-                    else if cNext == delimiter {
+                    } else if cNext == config.delimiter {
                         // END FIELD
                         return (field, false)
-                    }
-                    else if cNext == DQUOTE {
+                    } else if cNext == DQUOTE {
                         // ESC
                         field.append(String(DQUOTE))
-                    }
-                    else {
+                    } else {
                         // ERROR?
                         field.append(String(c))
                     }
-                }
-                else {
+                } else {
                     field.append(String(c))
                 }
-            }
-            else {
+            } else {
                 if c == CR || c == LF {
                     if c == CR {
                         let cNext = moveNext()
@@ -232,29 +193,141 @@ public struct CSV {
                     }
                     // END ROW
                     return (field, true)
-                }
-                else if c == delimiter {
+                } else if c == config.delimiter {
                     // END FIELD
                     return (field, false)
-                }
-                else {
+                } else {
                     field.append(String(c))
                 }
             }
-            
-            next = moveNext()
         }
-        
+
         // END FILE
         return (field, true)
     }
-    
+
     private mutating func moveNext() -> UnicodeScalar? {
         if back != nil {
-            defer { back = nil }
+            defer {
+                back = nil
+            }
             return back
         }
         return iterator.next()
     }
-    
+
+}
+
+extension CSV {
+
+    /// Unavailable.
+    @available(*, unavailable, message: "Use init(stream:codecType:config:) instead")
+    public init<T: UnicodeCodec>(
+        stream: InputStream,
+        codecType: T.Type,
+        hasHeaderRow: Bool = defaultHasHeaderRow,
+        trimFields: Bool = defaultTrimFields,
+        delimiter: UnicodeScalar = defaultDelimiter
+        ) throws where T.CodeUnit == UInt8 {
+
+        let reader = try BinaryReader(stream: stream, endian: .unknown, closeOnDeinit: true)
+        let iterator = UnicodeIterator(
+            input: reader.makeUInt8Iterator(),
+            inputEncodingType: codecType
+        )
+        let config = CSVConfiguration(
+            hasHeaderRow: hasHeaderRow,
+            trimFields: trimFields,
+            delimiter: delimiter
+        )
+        try self.init(iterator: iterator, config: config)
+    }
+
+    /// Unavailable.
+    @available(*, unavailable, message: "Use init(stream:codecType:endian:config:) instead")
+    public init<T: UnicodeCodec>(
+        stream: InputStream,
+        codecType: T.Type,
+        endian: Endian = .big,
+        hasHeaderRow: Bool = defaultHasHeaderRow,
+        trimFields: Bool = defaultTrimFields,
+        delimiter: UnicodeScalar = defaultDelimiter
+        ) throws where T.CodeUnit == UInt16 {
+
+        let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
+        let iterator = UnicodeIterator(
+            input: reader.makeUInt16Iterator(),
+            inputEncodingType: codecType
+        )
+        let config = CSVConfiguration(
+            hasHeaderRow: hasHeaderRow,
+            trimFields: trimFields,
+            delimiter: delimiter
+        )
+        try self.init(iterator: iterator, config: config)
+    }
+
+    /// Unavailable.
+    @available(*, unavailable, message: "Use init(stream:codecType:endian:config:) instead")
+    public init<T: UnicodeCodec>(
+        stream: InputStream,
+        codecType: T.Type,
+        endian: Endian = .big,
+        hasHeaderRow: Bool = defaultHasHeaderRow,
+        trimFields: Bool = defaultTrimFields,
+        delimiter: UnicodeScalar = defaultDelimiter
+        ) throws where T.CodeUnit == UInt32 {
+
+        let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
+        let iterator = UnicodeIterator(
+            input: reader.makeUInt32Iterator(),
+            inputEncodingType: codecType
+        )
+        let config = CSVConfiguration(
+            hasHeaderRow: hasHeaderRow,
+            trimFields: trimFields,
+            delimiter: delimiter
+        )
+        try self.init(iterator: iterator, config: config)
+    }
+
+    /// Unavailable.
+    @available(*, unavailable, message: "Use init(stream:config:) instead")
+    public init(
+        stream: InputStream,
+        hasHeaderRow: Bool = defaultHasHeaderRow,
+        trimFields: Bool = defaultTrimFields,
+        delimiter: UnicodeScalar = defaultDelimiter) throws {
+
+        let config = CSVConfiguration(
+            hasHeaderRow: hasHeaderRow,
+            trimFields: trimFields,
+            delimiter: delimiter
+        )
+        try self.init(stream: stream, codecType: UTF8.self, config: config)
+    }
+
+    /// Unavailable.
+    @available(*, unavailable, message: "Use init(string:config:) instead")
+    public init(
+        string: String,
+        hasHeaderRow: Bool = defaultHasHeaderRow,
+        trimFields: Bool = defaultTrimFields,
+        delimiter: UnicodeScalar = defaultDelimiter) throws {
+
+        let iterator = string.unicodeScalars.makeIterator()
+        let config = CSVConfiguration(
+            hasHeaderRow: hasHeaderRow,
+            trimFields: trimFields,
+            delimiter: delimiter
+        )
+        try self.init(iterator: iterator, config: config)
+    }
+
+    /// Unavailable
+    @available(*, unavailable, message: "Use CSV.Row.subscript(String) instead")
+    public subscript(key: String) -> String? {
+        return nil
+    }
+
 }

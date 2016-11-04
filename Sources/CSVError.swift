@@ -6,10 +6,9 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-// TODO: Documentation
 /// No overview available.
 public enum CSVError: Error {
-    
+
     /// No overview available.
     case cannotOpenFile
     /// No overview available.
@@ -22,5 +21,5 @@ public enum CSVError: Error {
     case stringEncodingMismatch
     /// No overview available.
     case stringEndianMismatch
-    
+
 }
