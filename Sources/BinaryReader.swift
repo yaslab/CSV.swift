@@ -45,9 +45,9 @@ internal class BinaryReader {
     private let endian: Endian
     private let closeOnDeinit: Bool
 
-    private var buffer = [UInt8](repeating: 0, count: 4)
+    private var buffer = malloc(4).assumingMemoryBound(to: UInt8.self)
 
-    private var tempBuffer = [UInt8](repeating: 0, count: 4)
+    private var tempBuffer = malloc(4).assumingMemoryBound(to: UInt8.self)
     private let tempBufferSize = 4
     private var tempBufferOffset = 0
 
@@ -65,8 +65,8 @@ internal class BinaryReader {
             throw CSVError.cannotOpenFile
         }
 
-        let readCount = stream.read(&tempBuffer, maxLength: tempBufferSize)
-        if let (e, l) = readBOM(buffer: &tempBuffer, length: readCount) {
+        let readCount = stream.read(tempBuffer, maxLength: tempBufferSize)
+        if let (e, l) = readBOM(buffer: tempBuffer, length: readCount) {
             if endian != .unknown && endian != e {
                 throw CSVError.stringEndianMismatch
             }
@@ -83,6 +83,8 @@ internal class BinaryReader {
         if closeOnDeinit && stream.streamStatus != .closed {
             stream.close()
         }
+        free(buffer)
+        free(tempBuffer)
     }
 
     internal var hasBytesAvailable: Bool {
@@ -108,7 +110,7 @@ internal class BinaryReader {
 
     internal func readUInt8() throws -> UInt8 {
         let bufferSize = 1
-        let length = try readStream(&buffer, maxLength: bufferSize)
+        let length = try readStream(buffer, maxLength: bufferSize)
         if length < 0 {
             throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
@@ -120,14 +122,14 @@ internal class BinaryReader {
 
     internal func readUInt16() throws -> UInt16 {
         let bufferSize = 2
-        let length = try readStream(&buffer, maxLength: bufferSize)
+        let length = try readStream(buffer, maxLength: bufferSize)
         if length < 0 {
             throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
         if length != bufferSize {
             throw CSVError.stringEncodingMismatch
         }
-        return try UnsafePointer(buffer).withMemoryRebound(to: UInt16.self, capacity: 1) {
+        return try buffer.withMemoryRebound(to: UInt16.self, capacity: 1) {
             switch endian {
             case .big:
                 return CFSwapInt16BigToHost($0[0])
@@ -141,14 +143,14 @@ internal class BinaryReader {
 
     internal func readUInt32() throws -> UInt32 {
         let bufferSize = 4
-        let length = try readStream(&buffer, maxLength: bufferSize)
+        let length = try readStream(buffer, maxLength: bufferSize)
         if length < 0 {
             throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
         if length != bufferSize {
             throw CSVError.stringEncodingMismatch
         }
-        return try UnsafePointer(buffer).withMemoryRebound(to: UInt32.self, capacity: 1) {
+        return try buffer.withMemoryRebound(to: UInt32.self, capacity: 1) {
             switch endian {
             case .big:
                 return CFSwapInt32BigToHost($0[0])
