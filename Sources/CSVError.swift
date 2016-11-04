@@ -16,6 +16,8 @@ public enum CSVError: Error {
     /// No overview available.
     case streamErrorHasOccurred(error: Error)
     /// No overview available.
+    case unicodeDecoding
+    /// No overview available.
     case cannotReadHeaderRow
     /// No overview available.
     case stringEncodingMismatch

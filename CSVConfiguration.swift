@@ -16,6 +16,8 @@ internal let defaultWhitespaces = CharacterSet.whitespaces
 /// No overview available.
 public struct CSVConfiguration {
 
+    public var errorHandler: ((Error, Int, Int) -> Void)? = nil
+
     /// `true` if the CSV has a header row, otherwise `false`. Default: `false`.
     public let hasHeaderRow: Bool
     /// No overview available.
