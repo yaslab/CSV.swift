@@ -19,6 +19,7 @@ public class CSV {
     private let config: CSVConfiguration
 
     private var back: UnicodeScalar? = nil
+    private var fieldBuffer = String.UnicodeScalarView()
 
     private var currentRowIndex: Int = 0
     private var currentFieldIndex: Int = 0
@@ -157,7 +158,7 @@ public class CSV {
     }
 
     private func readField(quoted: Bool) -> (String, Bool) {
-        var field = ""
+        fieldBuffer.removeAll(keepingCapacity: true)
 
         while let c = moveNext() {
             if quoted {
@@ -179,19 +180,19 @@ public class CSV {
                             }
                         }
                         // END ROW
-                        return (field, true)
+                        return (String(fieldBuffer), true)
                     } else if cNext == config.delimiter {
                         // END FIELD
-                        return (field, false)
+                        return (String(fieldBuffer), false)
                     } else if cNext == DQUOTE {
                         // ESC
-                        field.append(String(DQUOTE))
+                        fieldBuffer.append(DQUOTE)
                     } else {
                         // ERROR?
-                        field.append(String(c))
+                        fieldBuffer.append(c)
                     }
                 } else {
-                    field.append(String(c))
+                    fieldBuffer.append(c)
                 }
             } else {
                 if c == CR || c == LF {
@@ -202,18 +203,18 @@ public class CSV {
                         }
                     }
                     // END ROW
-                    return (field, true)
+                    return (String(fieldBuffer), true)
                 } else if c == config.delimiter {
                     // END FIELD
-                    return (field, false)
+                    return (String(fieldBuffer), false)
                 } else {
-                    field.append(String(c))
+                    fieldBuffer.append(c)
                 }
             }
         }
 
         // END FILE
-        return (field, true)
+        return (String(fieldBuffer), true)
     }
 
     private func moveNext() -> UnicodeScalar? {
