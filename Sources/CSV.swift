@@ -60,8 +60,8 @@ public class CSV {
         let input = reader.makeUInt8Iterator()
         let iterator = UnicodeIterator(input: input, inputEncodingType: codecType)
         try self.init(iterator: iterator, config: config)
-        input.errorHandler = self.errorHandler
-        iterator.errorHandler = self.errorHandler
+        input.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
+        iterator.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
     }
 
     /// Create an instance with `InputStream`.
@@ -82,8 +82,8 @@ public class CSV {
         let input = reader.makeUInt16Iterator()
         let iterator = UnicodeIterator(input: input, inputEncodingType: codecType)
         try self.init(iterator: iterator, config: config)
-        input.errorHandler = self.errorHandler
-        iterator.errorHandler = self.errorHandler
+        input.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
+        iterator.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
     }
 
     /// Create an instance with `InputStream`.
@@ -104,8 +104,8 @@ public class CSV {
         let input = reader.makeUInt32Iterator()
         let iterator = UnicodeIterator(input: input, inputEncodingType: codecType)
         try self.init(iterator: iterator, config: config)
-        input.errorHandler = self.errorHandler
-        iterator.errorHandler = self.errorHandler
+        input.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
+        iterator.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
     }
 
     // MARK: - Parse CSV
