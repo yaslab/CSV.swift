@@ -14,7 +14,7 @@ internal let defaultDelimiter = UnicodeScalar(UInt8(0x2c)) // ","
 internal let defaultWhitespaces = CharacterSet.whitespaces
 
 /// No overview available.
-public struct CSVConfiguration {
+public class CSVConfiguration {
 
     public var errorHandler: ((Error, Int, Int) -> Void)? = nil
 

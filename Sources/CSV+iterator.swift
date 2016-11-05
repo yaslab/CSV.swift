@@ -21,7 +21,7 @@ extension CSV: IteratorProtocol, Sequence {
 extension CSV {
 
     /// No overview available.
-    public struct Row: RandomAccessCollection {
+    public class Row: RandomAccessCollection {
 
         private let data: [String]
         private let headerRow: [String]?
