@@ -84,14 +84,14 @@ class CSVTests: XCTestCase {
 
     func testCommaInQuotationMarks() {
         let csvString = "abab,\"cd,cd\",efef"
-        var csv = try! CSV(string: csvString)
+        let csv = try! CSV(string: csvString)
         let row = csv.next()!
         XCTAssertEqual(row.toArray(), ["abab", "cd,cd", "efef"])
     }
 
     func testEscapedQuotationMark1() {
         let csvString = "abab,\"\"\"cdcd\",efef\r\nzxcv,asdf,qwer"
-        var csv = try! CSV(string: csvString)
+        let csv = try! CSV(string: csvString)
         var row = csv.next()!
         XCTAssertEqual(row.toArray(), ["abab", "\"cdcd", "efef"])
         row = csv.next()!
@@ -100,7 +100,7 @@ class CSVTests: XCTestCase {
 
     func testEscapedQuotationMark2() {
         let csvString = "abab,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\""
-        var csv = try! CSV(string: csvString)
+        let csv = try! CSV(string: csvString)
         var row = csv.next()!
         XCTAssertEqual(row.toArray(), ["abab", "cdcd", "efef"])
         row = csv.next()!
@@ -109,7 +109,7 @@ class CSVTests: XCTestCase {
 
     func testEmptyField() {
         let csvString = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
-        var csv = try! CSV(string: csvString)
+        let csv = try! CSV(string: csvString)
         var row = csv.next()!
         XCTAssertEqual(row.toArray(), ["abab", "", "cdcd", "efef"])
         row = csv.next()!
@@ -133,7 +133,7 @@ class CSVTests: XCTestCase {
 
     func testCSVState1() {
         let it = "あ,い1,\"う\",えお\n,,x,".unicodeScalars.makeIterator()
-        var csv = try! CSV(iterator: it, config: CSVConfiguration())
+        let csv = try! CSV(iterator: it, config: CSVConfiguration())
 
         var rows = [[String]]()
 

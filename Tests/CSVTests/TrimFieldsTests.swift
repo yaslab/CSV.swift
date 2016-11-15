@@ -104,7 +104,7 @@ class TrimFieldsTests: XCTestCase {
     func testTrimFields11() {
         let csvString = " abc \n def "
         let config = CSVConfiguration(trimFields: true)
-        var csv = try! CSV(string: csvString, config: config)
+        let csv = try! CSV(string: csvString, config: config)
 
         let row1 = csv.next()!
         XCTAssertEqual(row1.toArray(), ["abc"])
@@ -115,7 +115,7 @@ class TrimFieldsTests: XCTestCase {
     func testTrimFields12() {
         let csvString = " \"abc \" \n \" def\" "
         let config = CSVConfiguration(trimFields: true)
-        var csv = try! CSV(string: csvString, config: config)
+        let csv = try! CSV(string: csvString, config: config)
 
         let row1 = csv.next()!
         XCTAssertEqual(row1.toArray(), ["abc "])
