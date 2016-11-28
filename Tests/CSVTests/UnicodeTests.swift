@@ -6,6 +6,7 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
+import Foundation
 import XCTest
 @testable import CSV
 
