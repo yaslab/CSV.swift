@@ -126,9 +126,9 @@ internal class BinaryReader {
         return try UnsafePointer(buffer).withMemoryRebound(to: UInt16.self, capacity: 1) {
             switch endian {
             case .big:
-                return CFSwapInt16BigToHost($0[0])
+                return UInt16(bigEndian: $0[0])
             case .little:
-                return CFSwapInt16LittleToHost($0[0])
+                return UInt16(littleEndian: $0[0])
             default:
                 throw CSVError.stringEndianMismatch
             }
@@ -147,9 +147,9 @@ internal class BinaryReader {
         return try UnsafePointer(buffer).withMemoryRebound(to: UInt32.self, capacity: 1) {
             switch endian {
             case .big:
-                return CFSwapInt32BigToHost($0[0])
+                return UInt32(bigEndian: $0[0])
             case .little:
-                return CFSwapInt32LittleToHost($0[0])
+                return UInt32(littleEndian: $0[0])
             default:
                 throw CSVError.stringEndianMismatch
             }
