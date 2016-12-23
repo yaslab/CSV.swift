@@ -11,6 +11,15 @@ import XCTest
 
 class ReadmeTests: XCTestCase {
 
+    static let allTests = [
+        ("testFromCSVString", testFromCSVString),
+        ("testFromFile", testFromFile),
+        ("testGettingTheHeaderRow", testGettingTheHeaderRow),
+        ("testGetTheFieldValueUsingIndex", testGetTheFieldValueUsingIndex),
+        ("testGetTheFieldValueUsingKey", testGetTheFieldValueUsingKey),
+        ("testProvideTheCharacterEncoding", testProvideTheCharacterEncoding)
+    ]
+
     func testFromCSVString() {
         let csv = try! CSV(string: "1,foo\n2,bar")
         for row in csv {

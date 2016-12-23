@@ -7,8 +7,12 @@
 //
 
 import XCTest
-@testable import CSVTestSuite
+@testable import CSVTests
 
 XCTMain([
-     testCase(CSVReaderTests.allTests),
+     testCase(CSVTests.allTests),
+     testCase(LineBreakTests.allTests),
+     testCase(ReadmeTests.allTests),
+     testCase(TrimFieldsTests.allTests),
+     testCase(UnicodeTests.allTests)
 ])

@@ -11,6 +11,21 @@ import XCTest
 
 class LineBreakTests: XCTestCase {
 
+    static let allTests = [
+        ("testLF", testLF),
+        ("testCRLF", testCRLF),
+        ("testLastCR", testLastCR),
+        ("testLastCRLF", testLastCRLF),
+        ("testLastLF", testLastLF),
+        ("testLFInQuotationMarks", testLFInQuotationMarks),
+        ("testLineBreakLF", testLineBreakLF),
+        ("testLineBreakCR", testLineBreakCR),
+        ("testLineBreakCRLF", testLineBreakCRLF),
+        ("testLineBreakLFLF", testLineBreakLFLF),
+        ("testLineBreakCRCR", testLineBreakCRCR),
+        ("testLineBreakCRLFCRLF", testLineBreakCRLFCRLF)
+    ]
+
     func testLF() {
         let csv = "abab,cdcd,efef\nzxcv,asdf,qwer"
         let records = parse(csv: csv)

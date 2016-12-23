@@ -11,6 +11,26 @@ import XCTest
 
 class CSVTests: XCTestCase {
 
+    static let allTests = [
+        ("testOneLine", testOneLine),
+        ("testTwoLines", testTwoLines),
+        ("testLastLineIsEmpty", testLastLineIsEmpty),
+        ("testLastLineIsWhiteSpace", testLastLineIsWhiteSpace),
+        ("testMiddleLineIsEmpty", testMiddleLineIsEmpty),
+        ("testCommaInQuotationMarks", testCommaInQuotationMarks),
+        ("testEscapedQuotationMark1", testEscapedQuotationMark1),
+        ("testEscapedQuotationMark2", testEscapedQuotationMark2),
+        ("testEmptyField", testEmptyField),
+        ("testDoubleQuoteBeforeLineBreak", testDoubleQuoteBeforeLineBreak),
+        ("testCSVState1", testCSVState1),
+        ("testSubscriptInt", testSubscriptInt),
+        ("testSubscriptString1", testSubscriptString1),
+        ("testSubscriptString2", testSubscriptString2),
+        ("testToArray", testToArray),
+        ("testToDictionary1", testToDictionary1),
+        ("testToDictionary2", testToDictionary2)
+    ]
+
     func testOneLine() {
         let csv = "\"abc\",1,2"
         var i = 0
