@@ -10,13 +10,13 @@ import Foundation
 
 internal let defaultHasHeaderRow = false
 internal let defaultTrimFields = false
-internal let defaultDelimiter = UnicodeScalar(UInt8(0x2c)) // ","
+internal let defaultDelimiter: UnicodeScalar = ","
 internal let defaultWhitespaces = CharacterSet.whitespaces
 
 /// No overview available.
 public class CSVConfiguration {
 
-    public var errorHandler: ((Error, Int, Int) -> Void)? = nil
+    public var fileInputErrorHandler: ((Error, Int, Int) -> Void)? = nil
 
     /// `true` if the CSV has a header row, otherwise `false`. Default: `false`.
     public let hasHeaderRow: Bool

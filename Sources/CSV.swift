@@ -8,9 +8,9 @@
 
 import Foundation
 
-private let LF = UnicodeScalar(UInt8(0x0a))     // "\n"
-private let CR = UnicodeScalar(UInt8(0x0d))     // "\r"
-private let DQUOTE = UnicodeScalar(UInt8(0x22)) // "\""
+private let LF: UnicodeScalar = "\n"
+private let CR: UnicodeScalar = "\r"
+private let DQUOTE: UnicodeScalar = "\""
 
 /// No overview available.
 public class CSV {
@@ -228,7 +228,7 @@ public class CSV {
     }
 
     private func errorHandler(error: Error) {
-        config.errorHandler?(error, currentRowIndex, currentFieldIndex)
+        config.fileInputErrorHandler?(error, currentRowIndex, currentFieldIndex)
     }
 
     // MARK: - deprecated
