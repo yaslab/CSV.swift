@@ -8,9 +8,12 @@
 
 import Foundation
 
-private let LF: UnicodeScalar = "\n"
-private let CR: UnicodeScalar = "\r"
-private let DQUOTE: UnicodeScalar = "\""
+internal let LF: UnicodeScalar = "\n"
+internal let CR: UnicodeScalar = "\r"
+internal let DQUOTE: UnicodeScalar = "\""
+
+internal let DQUOTE_STR: String = "\""
+internal let DQUOTE2_STR: String = "\"\""
 
 /// No overview available.
 public class CSV {
