@@ -15,13 +15,13 @@
 		0E47EEC21DBCDB1800EBF783 /* CSV+iterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E47EEC01DBCDB1800EBF783 /* CSV+iterator.swift */; };
 		0E47EEC31DBCDB1800EBF783 /* CSV+iterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E47EEC01DBCDB1800EBF783 /* CSV+iterator.swift */; };
 		0E47EEC41DBCDB1800EBF783 /* CSV+iterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E47EEC01DBCDB1800EBF783 /* CSV+iterator.swift */; };
-		0E5402161ED9DC960019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5402151ED9DC960019C3ED /* CSVWriter.swift */; };
-		0E5402171ED9DC960019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5402151ED9DC960019C3ED /* CSVWriter.swift */; };
-		0E5402181ED9DC960019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5402151ED9DC960019C3ED /* CSVWriter.swift */; };
-		0E5402191ED9DC960019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5402151ED9DC960019C3ED /* CSVWriter.swift */; };
 		0E54021B1ED9DDF40019C3ED /* CSVWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021A1ED9DDF40019C3ED /* CSVWriterTests.swift */; };
 		0E54021C1ED9DDF40019C3ED /* CSVWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021A1ED9DDF40019C3ED /* CSVWriterTests.swift */; };
 		0E54021D1ED9DDF40019C3ED /* CSVWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021A1ED9DDF40019C3ED /* CSVWriterTests.swift */; };
+		0E5402221EDA82220019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021E1EDA81E80019C3ED /* CSVWriter.swift */; };
+		0E5402231EDA82220019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021E1EDA81E80019C3ED /* CSVWriter.swift */; };
+		0E5402241EDA82220019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021E1EDA81E80019C3ED /* CSVWriter.swift */; };
+		0E5402251EDA82230019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021E1EDA81E80019C3ED /* CSVWriter.swift */; };
 		0E7E8C8C1D0BC7BB0057A1C1 /* CSV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E7E8C811D0BC7BB0057A1C1 /* CSV.framework */; };
 		0E7E8CA11D0BC7F10057A1C1 /* CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7E8C9D1D0BC7F10057A1C1 /* CSV.swift */; };
 		0E7E8CA21D0BC7F10057A1C1 /* CSVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7E8C9E1D0BC7F10057A1C1 /* CSVError.swift */; };
@@ -97,8 +97,8 @@
 /* Begin PBXFileReference section */
 		0E0F160D1D197DB800C92580 /* Endian.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Endian.swift; sourceTree = "<group>"; };
 		0E47EEC01DBCDB1800EBF783 /* CSV+iterator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CSV+iterator.swift"; sourceTree = "<group>"; };
-		0E5402151ED9DC960019C3ED /* CSVWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVWriter.swift; sourceTree = SOURCE_ROOT; };
 		0E54021A1ED9DDF40019C3ED /* CSVWriterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVWriterTests.swift; sourceTree = "<group>"; };
+		0E54021E1EDA81E80019C3ED /* CSVWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVWriter.swift; sourceTree = "<group>"; };
 		0E7E8C811D0BC7BB0057A1C1 /* CSV.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CSV.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E7E8C8B1D0BC7BB0057A1C1 /* CSVTests-iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CSVTests-iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E7E8C9D1D0BC7F10057A1C1 /* CSV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSV.swift; sourceTree = "<group>"; };
@@ -212,10 +212,10 @@
 				0EDF8EAE1DDB6D620068056A /* CSVConfiguration.swift */,
 				0E7E8C9E1D0BC7F10057A1C1 /* CSVError.swift */,
 				0E7E8C9F1D0BC7F10057A1C1 /* CSVVersion.h */,
+				0E54021E1EDA81E80019C3ED /* CSVWriter.swift */,
 				0E0F160D1D197DB800C92580 /* Endian.swift */,
 				0E7E8CAC1D0BC8610057A1C1 /* Info.plist */,
 				0EA2AB801D183BA9003EC967 /* UnicodeIterator.swift */,
-				0E5402151ED9DC960019C3ED /* CSVWriter.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -233,11 +233,11 @@
 			isa = PBXGroup;
 			children = (
 				0EDF8ECD1DDB73370068056A /* CSVTests.swift */,
+				0E54021A1ED9DDF40019C3ED /* CSVWriterTests.swift */,
 				0EDF8ECE1DDB73370068056A /* LineBreakTests.swift */,
 				0EDF8ECF1DDB73370068056A /* ReadmeTests.swift */,
 				0EDF8ED01DDB73370068056A /* TrimFieldsTests.swift */,
 				0EDF8ED11DDB73370068056A /* UnicodeTests.swift */,
-				0E54021A1ED9DDF40019C3ED /* CSVWriterTests.swift */,
 			);
 			path = CSVTests;
 			sourceTree = "<group>";
@@ -547,7 +547,7 @@
 				0E9317D51D0DB2F200AC20A0 /* CSV+init.swift in Sources */,
 				0EA2AB821D183BA9003EC967 /* UnicodeIterator.swift in Sources */,
 				0E47EEC21DBCDB1800EBF783 /* CSV+iterator.swift in Sources */,
-				0E5402171ED9DC960019C3ED /* CSVWriter.swift in Sources */,
+				0E5402241EDA82220019C3ED /* CSVWriter.swift in Sources */,
 				0E7E8CA11D0BC7F10057A1C1 /* CSV.swift in Sources */,
 				0E0F160F1D197DB800C92580 /* Endian.swift in Sources */,
 				0EDF8EB01DDB6DAC0068056A /* CSVConfiguration.swift in Sources */,
@@ -576,7 +576,7 @@
 				0E9317D71D0DB2F200AC20A0 /* CSV+init.swift in Sources */,
 				0EA2AB841D183BA9003EC967 /* UnicodeIterator.swift in Sources */,
 				0E47EEC41DBCDB1800EBF783 /* CSV+iterator.swift in Sources */,
-				0E5402191ED9DC960019C3ED /* CSVWriter.swift in Sources */,
+				0E5402221EDA82220019C3ED /* CSVWriter.swift in Sources */,
 				0E7E8CBE1D0BC9D70057A1C1 /* CSV.swift in Sources */,
 				0E0F16111D197DB800C92580 /* Endian.swift in Sources */,
 				0EDF8EB21DDB6DAD0068056A /* CSVConfiguration.swift in Sources */,
@@ -592,7 +592,7 @@
 				0E9317D41D0DB2F200AC20A0 /* CSV+init.swift in Sources */,
 				0EA2AB811D183BA9003EC967 /* UnicodeIterator.swift in Sources */,
 				0E47EEC11DBCDB1800EBF783 /* CSV+iterator.swift in Sources */,
-				0E5402161ED9DC960019C3ED /* CSVWriter.swift in Sources */,
+				0E5402251EDA82230019C3ED /* CSVWriter.swift in Sources */,
 				0E7E8CE01D0BCA8E0057A1C1 /* CSV.swift in Sources */,
 				0E0F160E1D197DB800C92580 /* Endian.swift in Sources */,
 				0EDF8EAF1DDB6D620068056A /* CSVConfiguration.swift in Sources */,
@@ -621,7 +621,7 @@
 				0E9317D61D0DB2F200AC20A0 /* CSV+init.swift in Sources */,
 				0EA2AB831D183BA9003EC967 /* UnicodeIterator.swift in Sources */,
 				0E47EEC31DBCDB1800EBF783 /* CSV+iterator.swift in Sources */,
-				0E5402181ED9DC960019C3ED /* CSVWriter.swift in Sources */,
+				0E5402231EDA82220019C3ED /* CSVWriter.swift in Sources */,
 				0E7E8D001D0BCDCF0057A1C1 /* CSV.swift in Sources */,
 				0E0F16101D197DB800C92580 /* Endian.swift in Sources */,
 				0EDF8EB11DDB6DAC0068056A /* CSVConfiguration.swift in Sources */,
