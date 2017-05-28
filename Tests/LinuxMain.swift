@@ -11,6 +11,7 @@ import XCTest
 
 XCTMain([
      testCase(CSVTests.allTests),
+     testCase(CSVWriterTests.allTests),
      testCase(LineBreakTests.allTests),
      testCase(ReadmeTests.allTests),
      testCase(TrimFieldsTests.allTests),
