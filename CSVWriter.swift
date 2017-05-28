@@ -24,7 +24,7 @@ public class CSVWriter {
     
     public let stream: OutputStream
     public let configuration: Configuration
-    fileprivate let writeScalar: ((Unicode.Scalar) -> Void)
+    fileprivate let writeScalar: ((UnicodeScalar) -> Void)
 
     fileprivate var isFirstRecord: Bool = true
     fileprivate var isFirstField: Bool = true
@@ -32,7 +32,7 @@ public class CSVWriter {
     fileprivate init(
         stream: OutputStream,
         configuration: Configuration,
-        writeScalar: @escaping ((Unicode.Scalar) -> Void)) {
+        writeScalar: @escaping ((UnicodeScalar) -> Void)) {
         
         self.stream = stream
         self.configuration = configuration
@@ -60,7 +60,7 @@ extension CSVWriter {
         configuration: Configuration = Configuration()
         ) where T.CodeUnit == UInt8 {
         
-        self.init(stream: stream, configuration: configuration) { (scalar: Unicode.Scalar) in
+        self.init(stream: stream, configuration: configuration) { (scalar: UnicodeScalar) in
             codecType.encode(scalar) { (code: UInt8) in
                 var code = code
                 let count = stream.write(&code, maxLength: 1)
@@ -79,7 +79,7 @@ extension CSVWriter {
         configuration: Configuration = Configuration()
         ) where T.CodeUnit == UInt16 {
         
-        self.init(stream: stream, configuration: configuration) { (scalar: Unicode.Scalar) in
+        self.init(stream: stream, configuration: configuration) { (scalar: UnicodeScalar) in
             codecType.encode(scalar) { (code: UInt16) in
                 var code = (endian == .big) ? code.bigEndian : code.littleEndian
                 let count = withUnsafeBytes(of: &code) { (buffer) -> Int in
@@ -100,7 +100,7 @@ extension CSVWriter {
         configuration: Configuration = Configuration()
         ) where T.CodeUnit == UInt32 {
         
-        self.init(stream: stream, configuration: configuration) { (scalar: Unicode.Scalar) in
+        self.init(stream: stream, configuration: configuration) { (scalar: UnicodeScalar) in
             codecType.encode(scalar) { (code: UInt32) in
                 var code = (endian == .big) ? code.bigEndian : code.littleEndian
                 let count = withUnsafeBytes(of: &code) { (buffer) -> Int in
