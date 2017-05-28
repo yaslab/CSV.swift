@@ -24,7 +24,7 @@ public class CSVWriter {
     
     public let stream: OutputStream
     public let configuration: Configuration
-    fileprivate let writeScalar: ((UnicodeScalar) -> Void)
+    fileprivate let writeScalar: ((UnicodeScalar) throws -> Void)
 
     fileprivate var isFirstRecord: Bool = true
     fileprivate var isFirstField: Bool = true
@@ -32,7 +32,7 @@ public class CSVWriter {
     fileprivate init(
         stream: OutputStream,
         configuration: Configuration,
-        writeScalar: @escaping ((UnicodeScalar) -> Void)) {
+        writeScalar: @escaping ((UnicodeScalar) throws -> Void)) throws {
         
         self.stream = stream
         self.configuration = configuration
@@ -40,6 +40,9 @@ public class CSVWriter {
         
         if stream.streamStatus == .notOpen {
             stream.open()
+        }
+        if stream.streamStatus != .open {
+            throw CSVError.cannotOpenStream
         }
     }
     
@@ -49,25 +52,28 @@ extension CSVWriter {
 
     public convenience init(
         stream: OutputStream,
-        configuration: Configuration = Configuration()) {
+        configuration: Configuration = Configuration()) throws {
 
-        self.init(stream: stream, codecType: UTF8.self, configuration: configuration)
+        try self.init(stream: stream, codecType: UTF8.self, configuration: configuration)
     }
     
     public convenience init<T: UnicodeCodec>(
         stream: OutputStream,
         codecType: T.Type,
         configuration: Configuration = Configuration()
-        ) where T.CodeUnit == UInt8 {
+        ) throws where T.CodeUnit == UInt8 {
         
-        self.init(stream: stream, configuration: configuration) { (scalar: UnicodeScalar) in
+        try self.init(stream: stream, configuration: configuration) { (scalar: UnicodeScalar) throws in
+            var error: CSVError? = nil
             codecType.encode(scalar) { (code: UInt8) in
                 var code = code
                 let count = stream.write(&code, maxLength: 1)
                 if count != 1 {
-                    // FIXME: Error
-                    print("ERROR: count != 1")
+                    error = CSVError.cannotWriteStream
                 }
+            }
+            if let error = error {
+                throw error
             }
         }
     }
@@ -77,18 +83,21 @@ extension CSVWriter {
         codecType: T.Type,
         endian: Endian = .big,
         configuration: Configuration = Configuration()
-        ) where T.CodeUnit == UInt16 {
+        ) throws where T.CodeUnit == UInt16 {
         
-        self.init(stream: stream, configuration: configuration) { (scalar: UnicodeScalar) in
+        try self.init(stream: stream, configuration: configuration) { (scalar: UnicodeScalar) throws in
+            var error: CSVError? = nil
             codecType.encode(scalar) { (code: UInt16) in
                 var code = (endian == .big) ? code.bigEndian : code.littleEndian
-                let count = withUnsafeBytes(of: &code) { (buffer) -> Int in
-                    return stream.write(buffer.baseAddress!.assumingMemoryBound(to: UInt8.self), maxLength: buffer.count)
+                withUnsafeBytes(of: &code) { (buffer) -> Void in
+                    let count = stream.write(buffer.baseAddress!.assumingMemoryBound(to: UInt8.self), maxLength: buffer.count)
+                    if count != buffer.count {
+                        error = CSVError.cannotWriteStream
+                    }
                 }
-                if count != 2 {
-                    // FIXME: Error
-                    print("ERROR: count != 2")
-                }
+            }
+            if let error = error {
+                throw error
             }
         }
     }
@@ -98,22 +107,25 @@ extension CSVWriter {
         codecType: T.Type,
         endian: Endian = .big,
         configuration: Configuration = Configuration()
-        ) where T.CodeUnit == UInt32 {
+        ) throws where T.CodeUnit == UInt32 {
         
-        self.init(stream: stream, configuration: configuration) { (scalar: UnicodeScalar) in
+        try self.init(stream: stream, configuration: configuration) { (scalar: UnicodeScalar) throws in
+            var error: CSVError? = nil
             codecType.encode(scalar) { (code: UInt32) in
                 var code = (endian == .big) ? code.bigEndian : code.littleEndian
-                let count = withUnsafeBytes(of: &code) { (buffer) -> Int in
-                    return stream.write(buffer.baseAddress!.assumingMemoryBound(to: UInt8.self), maxLength: buffer.count)
+                withUnsafeBytes(of: &code) { (buffer) -> Void in
+                    let count = stream.write(buffer.baseAddress!.assumingMemoryBound(to: UInt8.self), maxLength: buffer.count)
+                    if count != buffer.count {
+                        error = CSVError.cannotWriteStream
+                    }
                 }
-                if count != 4 {
-                    // FIXME: Error
-                    print("ERROR: count != 4")
-                }
+            }
+            if let error = error {
+                throw error
             }
         }
     }
-    
+
 }
 
 extension CSVWriter {
@@ -122,38 +134,39 @@ extension CSVWriter {
         isFirstField = true
     }
     
-    public func write(field value: String, quoted: Bool = false) {
+    public func write(field value: String, quoted: Bool = false) throws {
         if isFirstRecord {
             isFirstRecord = false
         } else {
             if isFirstField {
-                configuration.newline.unicodeScalars.forEach(writeScalar)
+                try configuration.newline.unicodeScalars.forEach(writeScalar)
             }
         }
         
         if isFirstField {
             isFirstField = false
         } else {
-            configuration.delimiter.unicodeScalars.forEach(writeScalar)
+            try configuration.delimiter.unicodeScalars.forEach(writeScalar)
         }
         
         var value = value
         
         if quoted {            
             value = value.replacingOccurrences(of: DQUOTE_STR, with: DQUOTE2_STR)
-            writeScalar(DQUOTE)
+            try writeScalar(DQUOTE)
         }
         
-        value.unicodeScalars.forEach(writeScalar)
+        try value.unicodeScalars.forEach(writeScalar)
         
         if quoted {
-            writeScalar(DQUOTE)
+            try writeScalar(DQUOTE)
         }
     }
     
-    public func write(row values: [String], quotedAtIndex: ((Int) -> Bool) = { _ in false }) {
+    public func write(record values: [String], quotedAtIndex: ((Int) -> Bool) = { _ in false }) throws {
+        beginNewRecord()
         for (i, value) in values.enumerated() {
-            write(field: value, quoted: quotedAtIndex(i))
+            try write(field: value, quoted: quotedAtIndex(i))
         }
     }
     

@@ -38,9 +38,9 @@ class CSVWriterTests: XCTestCase {
         let stream = OutputStream(toMemory: ())
         stream.open()
         
-        let csv = CSVWriter(stream: stream)
+        let csv = try! CSVWriter(stream: stream)
         csv.beginNewRecord()
-        csv.write(field: str)
+        try! csv.write(field: str)
         
         stream.close()
         let data = stream.data!
@@ -57,11 +57,11 @@ class CSVWriterTests: XCTestCase {
         let stream = OutputStream(toMemory: ())
         stream.open()
         
-        let csv = CSVWriter(stream: stream)
+        let csv = try! CSVWriter(stream: stream)
         csv.beginNewRecord()
-        csv.write(field: str + "-1")
+        try! csv.write(field: str + "-1")
         csv.beginNewRecord()
-        csv.write(field: str + "-2")
+        try! csv.write(field: str + "-2")
         
         stream.close()
         let data = stream.data!
@@ -77,10 +77,10 @@ class CSVWriterTests: XCTestCase {
         let stream = OutputStream(toMemory: ())
         stream.open()
         
-        let csv = CSVWriter(stream: stream)
+        let csv = try! CSVWriter(stream: stream)
         csv.beginNewRecord()
-        csv.write(field: str + "-1")
-        csv.write(field: str + "-2")
+        try! csv.write(field: str + "-1")
+        try! csv.write(field: str + "-2")
 
         stream.close()
         let data = stream.data!
@@ -97,13 +97,13 @@ class CSVWriterTests: XCTestCase {
         let stream = OutputStream(toMemory: ())
         stream.open()
         
-        let csv = CSVWriter(stream: stream)
+        let csv = try! CSVWriter(stream: stream)
         csv.beginNewRecord()
-        csv.write(field: str + "-1-1")
-        csv.write(field: str + "-1-2")
+        try! csv.write(field: str + "-1-1")
+        try! csv.write(field: str + "-1-2")
         csv.beginNewRecord()
-        csv.write(field: str + "-2-1")
-        csv.write(field: str + "-2-2")
+        try! csv.write(field: str + "-2-1")
+        try! csv.write(field: str + "-2-2")
         
         stream.close()
         let data = stream.data!
@@ -119,10 +119,10 @@ class CSVWriterTests: XCTestCase {
         let stream = OutputStream(toMemory: ())
         stream.open()
         
-        let csv = CSVWriter(stream: stream)
+        let csv = try! CSVWriter(stream: stream)
         csv.beginNewRecord()
-        csv.write(field: str + "-1", quoted: true)
-        csv.write(field: str + "-2") // quoted: false
+        try! csv.write(field: str + "-1", quoted: true)
+        try! csv.write(field: str + "-2") // quoted: false
         
         stream.close()
         let data = stream.data!
@@ -138,10 +138,10 @@ class CSVWriterTests: XCTestCase {
         let stream = OutputStream(toMemory: ())
         stream.open()
         
-        let csv = CSVWriter(stream: stream)
+        let csv = try! CSVWriter(stream: stream)
         csv.beginNewRecord()
-        csv.write(field: str + "-1") // quoted: false
-        csv.write(field: str + "-\n-2", quoted: true)
+        try! csv.write(field: str + "-1") // quoted: false
+        try! csv.write(field: str + "-\n-2", quoted: true)
         
         stream.close()
         let data = stream.data!
@@ -157,10 +157,10 @@ class CSVWriterTests: XCTestCase {
         let stream = OutputStream(toMemory: ())
         stream.open()
         
-        let csv = CSVWriter(stream: stream)
+        let csv = try! CSVWriter(stream: stream)
         csv.beginNewRecord()
-        csv.write(field: str + "-1") // quoted: false
-        csv.write(field: str + "-\"-2", quoted: true)
+        try! csv.write(field: str + "-1") // quoted: false
+        try! csv.write(field: str + "-\"-2", quoted: true)
         
         stream.close()
         let data = stream.data!
