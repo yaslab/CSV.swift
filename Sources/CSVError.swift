@@ -10,9 +10,11 @@
 public enum CSVError: Error {
 
     /// No overview available.
-    case cannotOpenFile
+    case cannotOpenStream
     /// No overview available.
-    case cannotReadFile
+    case cannotReadStream
+    /// No overview available.
+    case cannotWriteStream
     /// No overview available.
     case streamErrorHasOccurred(error: Error)
     /// No overview available.

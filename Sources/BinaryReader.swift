@@ -62,7 +62,7 @@ internal class BinaryReader {
             stream.open()
         }
         if stream.streamStatus != .open {
-            throw CSVError.cannotOpenFile
+            throw CSVError.cannotOpenStream
         }
 
         let readCount = stream.read(tempBuffer, maxLength: tempBufferSize)
@@ -93,7 +93,7 @@ internal class BinaryReader {
 
     private func readStream(_ buffer: UnsafeMutablePointer<UInt8>, maxLength: Int) throws -> Int {
         if stream.streamStatus != .open {
-            throw CSVError.cannotReadFile
+            throw CSVError.cannotReadStream
         }
 
         var i = 0
@@ -115,7 +115,7 @@ internal class BinaryReader {
             throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
         if length != bufferSize {
-            throw CSVError.cannotReadFile
+            throw CSVError.cannotReadStream
         }
         return buffer[0]
     }
