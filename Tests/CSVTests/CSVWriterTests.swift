@@ -14,7 +14,10 @@ import CSV
 extension OutputStream {
     
     var data: Data? {
-        return property(forKey: .dataWrittenToMemoryStreamKey) as? Data
+        guard let nsData = property(forKey: .dataWrittenToMemoryStreamKey) as? NSData else {
+            return nil
+        }
+        return Data(referencing: nsData)
     }
     
 }
