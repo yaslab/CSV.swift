@@ -21,9 +21,9 @@ class ReadmeTests: XCTestCase {
     ]
 
     func testFromCSVString() {
-        let csv = try! CSV(string: "1,foo\n2,bar")
-        for row in csv {
-            print("\(row)")
+        let csv = try! CSVReader(string: "1,foo\n2,bar")
+        csv.enumerateRecords { (record, _, _) in
+            print("\(record)")
             // => ["1", "foo"]
             // => ["2", "bar"]
         }
@@ -39,14 +39,14 @@ class ReadmeTests: XCTestCase {
 
     func testGettingTheHeaderRow() {
         let csvString = "id,name\n1,foo\n2,bar"
-        let config = CSVConfiguration(hasHeaderRow: true) // It must be true.
-        let csv = try! CSV(string: csvString, config: config)
+        let config = CSVReader.Configuration(hasHeaderRecord: true) // It must be true.
+        let csv = try! CSVReader(string: csvString, configuration: config)
 
-        let headerRow = csv.headerRow!
+        let headerRow = csv.headerRecord!
         print("\(headerRow)") // => ["id", "name"]
 
-        for row in csv {
-            print("\(row)")
+        csv.enumerateRecords { (record, _, _) in
+            print("\(record)")
             // => ["1", "foo"]
             // => ["2", "bar"]
         }
@@ -54,23 +54,23 @@ class ReadmeTests: XCTestCase {
 
     func testGetTheFieldValueUsingIndex() {
         let csvString = "1,foo"
-        let csv = try! CSV(string: csvString)
+        let csv = try! CSVReader(string: csvString)
 
-        for row in csv {
-            print("\(row[0])") // => "1"
-            print("\(row[1])") // => "foo"
+        csv.enumerateRecords { (record, _, _) in
+            print("\(record[0])") // => "1"
+            print("\(record[1])") // => "foo"
         }
     }
 
     func testGetTheFieldValueUsingKey() {
-        let csvString = "id,name\n1,foo"
-        let config = CSVConfiguration(hasHeaderRow: true) // It must be true.
-        let csv = try! CSV(string: csvString, config: config)
-
-        for row in csv {
-            print("\(row["id"]!)")   // => "1"
-            print("\(row["name"]!)") // => "foo"
-        }
+//        let csvString = "id,name\n1,foo"
+//        let config = CSVReader.Configuration(hasHeaderRow: true) // It must be true.
+//        let csv = try! CSVReader(string: csvString, configuration: config)
+//
+//        csv.enumerateRecords { (record, _, _) in
+//            print("\(record["id"]!)")   // => "1"
+//            print("\(record["name"]!)") // => "foo"
+//        }
     }
 
     func testProvideTheCharacterEncoding() {

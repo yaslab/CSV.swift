@@ -20,7 +20,7 @@ public enum CSVError: Error {
     /// No overview available.
     case unicodeDecoding
     /// No overview available.
-    case cannotReadHeaderRow
+    case cannotReadHeaderRecord
     /// No overview available.
     case stringEncodingMismatch
     /// No overview available.
