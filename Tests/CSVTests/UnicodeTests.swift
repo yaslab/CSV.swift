@@ -29,7 +29,7 @@ class UnicodeTests: XCTestCase {
         mutableData.append(utf8BOM, count: utf8BOM.count)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData)
-        let csv = try! CSV(stream: stream, codecType: UTF8.self)
+        let csv = try! CSVReader(stream: stream, codecType: UTF8.self)
         let records = getRecords(csv: csv)
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
@@ -41,7 +41,7 @@ class UnicodeTests: XCTestCase {
         var mutableData = Data()
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData as Data)
-        let csv = try! CSV(stream: stream, codecType: UTF16.self, endian: .unknown)
+        let csv = try! CSVReader(stream: stream, codecType: UTF16.self, endian: .unknown)
         let records = getRecords(csv: csv)
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["zxcv", "😆asdf", "qw\"er", ""])
@@ -54,7 +54,7 @@ class UnicodeTests: XCTestCase {
         mutableData.append(utf16BigEndianBOM, count: utf16BigEndianBOM.count)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData as Data)
-        let csv = try! CSV(stream: stream, codecType: UTF16.self, endian: .big)
+        let csv = try! CSVReader(stream: stream, codecType: UTF16.self, endian: .big)
         let records = getRecords(csv: csv)
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["😆zxcv", "asdf", "qw\"er", ""])
@@ -67,7 +67,7 @@ class UnicodeTests: XCTestCase {
         mutableData.append(utf16LittleEndianBOM, count: utf16LittleEndianBOM.count)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData as Data)
-        let csv = try! CSV(stream: stream, codecType: UTF16.self, endian: .little)
+        let csv = try! CSVReader(stream: stream, codecType: UTF16.self, endian: .little)
         let records = getRecords(csv: csv)
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["zxcv😆", "asdf", "qw\"er", ""])
@@ -79,7 +79,7 @@ class UnicodeTests: XCTestCase {
         var mutableData = Data()
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData as Data)
-        let csv = try! CSV(stream: stream, codecType: UTF32.self, endian: .unknown)
+        let csv = try! CSVReader(stream: stream, codecType: UTF32.self, endian: .unknown)
         let records = getRecords(csv: csv)
         XCTAssertEqual(records[0], ["😆abab", "", "cdcd", "efef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
@@ -92,7 +92,7 @@ class UnicodeTests: XCTestCase {
         mutableData.append(utf32BigEndianBOM, count: utf32BigEndianBOM.count)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData as Data)
-        let csv = try! CSV(stream: stream, codecType: UTF32.self, endian: .big)
+        let csv = try! CSVReader(stream: stream, codecType: UTF32.self, endian: .big)
         let records = getRecords(csv: csv)
         XCTAssertEqual(records[0], ["abab", "", "cd😆cd", "efef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
@@ -105,16 +105,16 @@ class UnicodeTests: XCTestCase {
         mutableData.append(utf32LittleEndianBOM, count: utf32LittleEndianBOM.count)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData as Data)
-        let csv = try! CSV(stream: stream, codecType: UTF32.self, endian: .little)
+        let csv = try! CSVReader(stream: stream, codecType: UTF32.self, endian: .little)
         let records = getRecords(csv: csv)
         XCTAssertEqual(records[0], ["abab", "", "cdcd", "ef😆ef"])
         XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    private func getRecords(csv: CSV) -> [[String]] {
+    private func getRecords(csv: CSVReader) -> [[String]] {
         var records = [[String]]()
-        for row in csv {
-            records.append(row.toArray())
+        csv.enumerateRecords { (record, _, _) in
+            records.append(record)
         }
         return records
     }

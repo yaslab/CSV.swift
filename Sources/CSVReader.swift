@@ -1,5 +1,5 @@
 //
-//  CSV.swift
+//  CSVReader.swift
 //  CSV
 //
 //  Created by Yasuhiro Hatta on 2016/06/11.
@@ -15,38 +15,82 @@ internal let DQUOTE: UnicodeScalar = "\""
 internal let DQUOTE_STR: String = "\""
 internal let DQUOTE2_STR: String = "\"\""
 
+internal let defaultHasHeaderRecord = false
+internal let defaultTrimFields = false
+internal let defaultDelimiter: UnicodeScalar = ","
+internal let defaultWhitespaces = CharacterSet.whitespaces
+
 /// No overview available.
-public class CSV {
+public class CSVReader {
+    
+    /// No overview available.
+    public struct Configuration {
+        
+        public var fileInputErrorHandler: ((Error, Int, Int) -> Void)? = nil
+        
+        /// `true` if the CSV has a header record, otherwise `false`. Default: `false`.
+        public var hasHeaderRecord: Bool
+        /// No overview available.
+        public var trimFields: Bool
+        /// Default: `","`.
+        public var delimiter: UnicodeScalar
+        /// No overview available.
+        public var whitespaces: CharacterSet
+        
+        /// No overview available.
+        public init(
+            hasHeaderRecord: Bool = defaultHasHeaderRecord,
+            trimFields: Bool = defaultTrimFields,
+            delimiter: UnicodeScalar = defaultDelimiter,
+            whitespaces: CharacterSet = defaultWhitespaces) {
+            
+            self.hasHeaderRecord = hasHeaderRecord
+            self.trimFields = trimFields
+            self.delimiter = delimiter
+            
+            var whitespaces = whitespaces
+            _ = whitespaces.remove(delimiter)
+            self.whitespaces = whitespaces
+        }
+        
+    }
 
-    private var iterator: AnyIterator<UnicodeScalar>
-    private let config: CSVConfiguration
+    fileprivate var iterator: AnyIterator<UnicodeScalar>
+    //public let stream: InputStream?
+    public let configuration: Configuration
 
-    private var back: UnicodeScalar? = nil
-    private var fieldBuffer = String.UnicodeScalarView()
+    fileprivate var back: UnicodeScalar? = nil
+    fileprivate var fieldBuffer = String.UnicodeScalarView()
 
-    private var currentRowIndex: Int = 0
-    private var currentFieldIndex: Int = 0
+    fileprivate var currentRecordIndex: Int = 0
+    fileprivate var currentFieldIndex: Int = 0
 
-    /// CSV header row. To set a value for this property,
-    /// you set `true` to `hasHeaerRow` in initializer.
-    public private(set) var headerRow: [String]? = nil
+    /// CSV header record. To set a value for this property,
+    /// you set `true` to `headerRecord` in initializer.
+    public private (set) var headerRecord: [String]? = nil
 
+    public fileprivate (set) var currentRecord: [String]? = nil
+    
     internal init<T: IteratorProtocol>(
         iterator: T,
-        config: CSVConfiguration
+        configuration: Configuration
         ) throws where T.Element == UnicodeScalar {
 
         self.iterator = AnyIterator(iterator)
-        self.config = config
+        self.configuration = configuration
 
-        if config.hasHeaderRow {
-            guard let headerRow = readRow() else {
-                throw CSVError.cannotReadHeaderRow
+        if configuration.hasHeaderRecord {
+            guard let headerRecord = readRecord() else {
+                throw CSVError.cannotReadHeaderRecord
             }
-            self.headerRow = headerRow
+            self.headerRecord = headerRecord
         }
     }
 
+}
+
+extension CSVReader {
+    
     /// Create an instance with `InputStream`.
     ///
     /// - parameter stream: An `InputStream` object. If the stream is not open,
@@ -56,13 +100,13 @@ public class CSV {
     public convenience init<T: UnicodeCodec>(
         stream: InputStream,
         codecType: T.Type,
-        config: CSVConfiguration = CSVConfiguration()
+        configuration: Configuration = Configuration()
         ) throws where T.CodeUnit == UInt8 {
 
         let reader = try BinaryReader(stream: stream, endian: .unknown, closeOnDeinit: true)
         let input = reader.makeUInt8Iterator()
         let iterator = UnicodeIterator(input: input, inputEncodingType: codecType)
-        try self.init(iterator: iterator, config: config)
+        try self.init(iterator: iterator, configuration: configuration)
         input.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
         iterator.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
     }
@@ -78,13 +122,13 @@ public class CSV {
         stream: InputStream,
         codecType: T.Type,
         endian: Endian = .big,
-        config: CSVConfiguration = CSVConfiguration()
+        configuration: Configuration = Configuration()
         ) throws where T.CodeUnit == UInt16 {
 
         let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
         let input = reader.makeUInt16Iterator()
         let iterator = UnicodeIterator(input: input, inputEncodingType: codecType)
-        try self.init(iterator: iterator, config: config)
+        try self.init(iterator: iterator, configuration: configuration)
         input.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
         iterator.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
     }
@@ -100,20 +144,52 @@ public class CSV {
         stream: InputStream,
         codecType: T.Type,
         endian: Endian = .big,
-        config: CSVConfiguration = CSVConfiguration()
+        configuration: Configuration = Configuration()
         ) throws where T.CodeUnit == UInt32 {
 
         let reader = try BinaryReader(stream: stream, endian: endian, closeOnDeinit: true)
         let input = reader.makeUInt32Iterator()
         let iterator = UnicodeIterator(input: input, inputEncodingType: codecType)
-        try self.init(iterator: iterator, config: config)
+        try self.init(iterator: iterator, configuration: configuration)
         input.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
         iterator.errorHandler = { [unowned self] in self.errorHandler(error: $0) }
     }
+    
+    /// Create an instance with `InputStream`.
+    ///
+    /// - parameter stream: An `InputStream` object. If the stream is not open,
+    ///                     initializer opens automatically.
+    /// - parameter config: CSV configuration.
+    public convenience init(
+        stream: InputStream,
+        configuration: Configuration = Configuration()) throws {
+        
+        try self.init(stream: stream, codecType: UTF8.self, configuration: configuration)
+    }
+    
+    /// Create an instance with CSV string.
+    ///
+    /// - parameter string: An CSV string.
+    /// - parameter config: CSV configuration.
+    public convenience init(
+        string: String,
+        configuration: Configuration = Configuration()) throws {
+        
+        let iterator = string.unicodeScalars.makeIterator()
+        try self.init(iterator: iterator, configuration: configuration)
+    }
 
-    // MARK: - Parse CSV
+    private func errorHandler(error: Error) {
+        configuration.fileInputErrorHandler?(error, currentRecordIndex, currentFieldIndex)
+    }
+    
+}
 
-    internal func readRow() -> [String]? {
+// MARK: - Parse CSV
+
+extension CSVReader {
+    
+    fileprivate func readRecord() -> [String]? {
         currentFieldIndex = 0
 
         var c = moveNext()
@@ -121,13 +197,13 @@ public class CSV {
             return nil
         }
 
-        var row = [String]()
+        var record = [String]()
         var field: String
         var end: Bool
         while true {
-            if config.trimFields {
+            if configuration.trimFields {
                 // Trim the leading spaces
-                while c != nil && config.whitespaces.contains(c!) {
+                while c != nil && configuration.whitespaces.contains(c!) {
                     c = moveNext()
                 }
             }
@@ -140,12 +216,12 @@ public class CSV {
                 back = c
                 (field, end) = readField(quoted: false)
 
-                if config.trimFields {
+                if configuration.trimFields {
                     // Trim the trailing spaces
-                    field = field.trimmingCharacters(in: config.whitespaces)
+                    field = field.trimmingCharacters(in: configuration.whitespaces)
                 }
             }
-            row.append(field)
+            record.append(field)
             if end {
                 break
             }
@@ -155,9 +231,10 @@ public class CSV {
             c = moveNext()
         }
 
-        currentRowIndex += 1
+        currentRecordIndex += 1
 
-        return row
+        currentRecord = record
+        return record
     }
 
     private func readField(quoted: Bool) -> (String, Bool) {
@@ -168,9 +245,9 @@ public class CSV {
                 if c == DQUOTE {
                     var cNext = moveNext()
 
-                    if config.trimFields {
+                    if configuration.trimFields {
                         // Trim the trailing spaces
-                        while cNext != nil && config.whitespaces.contains(cNext!) {
+                        while cNext != nil && configuration.whitespaces.contains(cNext!) {
                             cNext = moveNext()
                         }
                     }
@@ -182,9 +259,9 @@ public class CSV {
                                 back = cNextNext
                             }
                         }
-                        // END ROW
+                        // END RECORD
                         return (String(fieldBuffer), true)
-                    } else if cNext == config.delimiter {
+                    } else if cNext == configuration.delimiter {
                         // END FIELD
                         return (String(fieldBuffer), false)
                     } else if cNext == DQUOTE {
@@ -205,9 +282,9 @@ public class CSV {
                             back = cNext
                         }
                     }
-                    // END ROW
+                    // END RECORD
                     return (String(fieldBuffer), true)
-                } else if c == config.delimiter {
+                } else if c == configuration.delimiter {
                     // END FIELD
                     return (String(fieldBuffer), false)
                 } else {
@@ -230,18 +307,61 @@ public class CSV {
         return iterator.next()
     }
 
-    private func errorHandler(error: Error) {
-        config.fileInputErrorHandler?(error, currentRowIndex, currentFieldIndex)
+}
+
+extension CSVReader {
+    
+    public func enumerateRecords(_ block: (([String], [String]?, inout Bool) throws -> Void)) rethrows {
+        var stop = false
+        while let record = readRecord() {
+            try block(record, headerRecord, &stop)
+            if stop {
+                break
+            }
+        }
     }
+    
+}
 
-    // MARK: - deprecated
+extension CSVReader: IteratorProtocol {
+    
+    @discardableResult
+    public func next() -> [String]? {
+        return readRecord()
+    }
+    
+}
 
+extension CSVReader {
+
+    public subscript(key: String) -> String? {
+        guard let header = headerRecord else {
+            fatalError("CSVReader.headerRecord must not be nil")
+        }
+        guard let index = header.index(of: key) else {
+            return nil
+        }
+        guard let record = currentRecord else {
+            fatalError("CSVReader.currentRecord must not be nil")
+        }
+        if index >= record.count {
+            return nil
+        }
+        return record[index]
+    }
+    
+}
+
+// MARK: - deprecated
+
+extension CSVReader {
+    
     /// Unavailable.
     @available(*, unavailable, message: "Use init(stream:codecType:config:) instead")
     public convenience init<T: UnicodeCodec>(
         stream: InputStream,
         codecType: T.Type,
-        hasHeaderRow: Bool = defaultHasHeaderRow,
+        hasHeaderRow: Bool = defaultHasHeaderRecord,
         trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter
         ) throws where T.CodeUnit == UInt8 {
@@ -251,12 +371,12 @@ public class CSV {
             input: reader.makeUInt8Iterator(),
             inputEncodingType: codecType
         )
-        let config = CSVConfiguration(
-            hasHeaderRow: hasHeaderRow,
+        let config = Configuration(
+            hasHeaderRecord: hasHeaderRow,
             trimFields: trimFields,
             delimiter: delimiter
         )
-        try self.init(iterator: iterator, config: config)
+        try self.init(iterator: iterator, configuration: config)
     }
 
     /// Unavailable.
@@ -265,7 +385,7 @@ public class CSV {
         stream: InputStream,
         codecType: T.Type,
         endian: Endian = .big,
-        hasHeaderRow: Bool = defaultHasHeaderRow,
+        hasHeaderRow: Bool = defaultHasHeaderRecord,
         trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter
         ) throws where T.CodeUnit == UInt16 {
@@ -275,12 +395,12 @@ public class CSV {
             input: reader.makeUInt16Iterator(),
             inputEncodingType: codecType
         )
-        let config = CSVConfiguration(
-            hasHeaderRow: hasHeaderRow,
+        let config = Configuration(
+            hasHeaderRecord: hasHeaderRow,
             trimFields: trimFields,
             delimiter: delimiter
         )
-        try self.init(iterator: iterator, config: config)
+        try self.init(iterator: iterator, configuration: config)
     }
 
     /// Unavailable.
@@ -289,7 +409,7 @@ public class CSV {
         stream: InputStream,
         codecType: T.Type,
         endian: Endian = .big,
-        hasHeaderRow: Bool = defaultHasHeaderRow,
+        hasHeaderRow: Bool = defaultHasHeaderRecord,
         trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter
         ) throws where T.CodeUnit == UInt32 {
@@ -299,51 +419,52 @@ public class CSV {
             input: reader.makeUInt32Iterator(),
             inputEncodingType: codecType
         )
-        let config = CSVConfiguration(
-            hasHeaderRow: hasHeaderRow,
+        let config = Configuration(
+            hasHeaderRecord: hasHeaderRow,
             trimFields: trimFields,
             delimiter: delimiter
         )
-        try self.init(iterator: iterator, config: config)
+        try self.init(iterator: iterator, configuration: config)
     }
 
     /// Unavailable.
     @available(*, unavailable, message: "Use init(stream:config:) instead")
     public convenience init(
         stream: InputStream,
-        hasHeaderRow: Bool = defaultHasHeaderRow,
+        hasHeaderRow: Bool = defaultHasHeaderRecord,
         trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter) throws {
 
-        let config = CSVConfiguration(
-            hasHeaderRow: hasHeaderRow,
+        let config = Configuration(
+            hasHeaderRecord: hasHeaderRow,
             trimFields: trimFields,
             delimiter: delimiter
         )
-        try self.init(stream: stream, codecType: UTF8.self, config: config)
+        try self.init(stream: stream, codecType: UTF8.self, configuration: config)
     }
 
     /// Unavailable.
     @available(*, unavailable, message: "Use init(string:config:) instead")
     public convenience init(
         string: String,
-        hasHeaderRow: Bool = defaultHasHeaderRow,
+        hasHeaderRow: Bool = defaultHasHeaderRecord,
         trimFields: Bool = defaultTrimFields,
         delimiter: UnicodeScalar = defaultDelimiter) throws {
 
         let iterator = string.unicodeScalars.makeIterator()
-        let config = CSVConfiguration(
-            hasHeaderRow: hasHeaderRow,
+        let config = Configuration(
+            hasHeaderRecord: hasHeaderRow,
             trimFields: trimFields,
             delimiter: delimiter
         )
-        try self.init(iterator: iterator, config: config)
+        try self.init(iterator: iterator, configuration: config)
     }
 
     /// Unavailable
-    @available(*, unavailable, message: "Use CSV.Row.subscript(String) instead")
-    public subscript(key: String) -> String? {
-        return nil
-    }
+//    @available(*, unavailable, message: "Use CSV.Row.subscript(String) instead")
+//    public subscript(key: String) -> String? {
+//        // FIXME: 
+//        return nil
+//    }
 
 }

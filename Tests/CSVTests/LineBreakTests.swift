@@ -124,10 +124,10 @@ class LineBreakTests: XCTestCase {
     }
 
     private func parse(csv: String) -> [[String]] {
-        let reader = try! CSV(string: csv)
+        let reader = try! CSVReader(string: csv)
         var records = [[String]]()
-        for row in reader {
-            records.append(row.toArray())
+        reader.enumerateRecords { (record, _, _) in
+            records.append(record)
         }
         return records
     }
