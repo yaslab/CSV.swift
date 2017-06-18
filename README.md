@@ -86,6 +86,9 @@ let csv = try! CSV(stream: stream,
 ### Write to memory and get a CSV String
 
 ```swift
+import Foundation
+import CSV
+
 let stream = OutputStream(toMemory: ())
 let csv = try! CSVWriter(stream: stream)
 
@@ -112,6 +115,9 @@ print(csvString)
 ### Write to file
 
 ```swift
+import Foundation
+import CSV
+
 let stream = OutputStream(toFileAtPath: "/path/to/file.csv", append: false)!
 let csv = try! CSVWriter(stream: stream)
 
