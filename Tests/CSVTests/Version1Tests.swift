@@ -8,9 +8,14 @@
 
 import Foundation
 import XCTest
-@testable import CSV
+
+import CSV
 
 class Version1Tests: XCTestCase {
+
+    static let allTests = [
+        ("testV1", testV1)
+    ]
 
     func testV1() {
         let str = "a,b,c\n1,2,3"
@@ -92,7 +97,7 @@ class Version1Tests: XCTestCase {
 
         _ = CSVError.cannotOpenFile
         _ = CSVError.cannotReadFile
-        _ = CSVError.streamErrorHasOccurred(error: NSError())
+        _ = CSVError.streamErrorHasOccurred(error: NSError(domain: "", code: 0, userInfo: nil))
         _ = CSVError.cannotReadHeaderRow
         _ = CSVError.stringEncodingMismatch
         _ = CSVError.stringEndianMismatch
