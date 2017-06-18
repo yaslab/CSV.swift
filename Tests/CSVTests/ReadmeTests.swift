@@ -10,61 +10,105 @@ import XCTest
 @testable import CSV
 
 class ReadmeTests: XCTestCase {
-    
+
     static let allTests = [
         ("testFromCSVString", testFromCSVString),
-        ("testFromFilePath", testFromFilePath),
+        ("testFromFile", testFromFile),
         ("testGettingTheHeaderRow", testGettingTheHeaderRow),
-        ("testGetTheFieldValueUsingSubscript", testGetTheFieldValueUsingSubscript),
-        ("testProvideTheCharacterEncoding", testProvideTheCharacterEncoding)
+        ("testGetTheFieldValueUsingKey", testGetTheFieldValueUsingKey),
+        ("testProvideTheCharacterEncoding", testProvideTheCharacterEncoding),
+        ("testWriteToMemory", testWriteToMemory),
+        ("testWriteToFile", testWriteToFile)
     ]
     
+    // MARK: - Reading
+
     func testFromCSVString() {
-        for row in try! CSV(string: "1,foo\n2,bar") {
+        let csvString = "1,foo\n2,bar"
+        let csv = try! CSVReader(string: csvString)
+        while let row = csv.next() {
             print("\(row)")
-            // => ["1", "foo"]
-            // => ["2", "bar"]
         }
+        // => ["1", "foo"]
+        // => ["2", "bar"]
     }
-    
-    func testFromFilePath() {
+
+    func testFromFile() {
 //        let stream = InputStream(fileAtPath: "/path/to/file.csv")!
-//        for row in try! CSV(stream: stream) {
+//        let csv = try! CSVReader(stream: stream)
+//        while let row = csv.next() {
 //            print("\(row)")
 //        }
     }
-    
+
     func testGettingTheHeaderRow() {
-        let csv = try! CSV(
-            string: "id,name\n1,foo\n2,bar",
-            hasHeaderRow: true) // default: false
-        
+        let csvString = "id,name\n1,foo\n2,bar"
+        let csv = try! CSVReader(string: csvString,
+                                 hasHeaderRow: true) // It must be true.
+
         let headerRow = csv.headerRow!
         print("\(headerRow)") // => ["id", "name"]
-        
-        for row in csv {
+
+        while let row = csv.next() {
             print("\(row)")
-            // => ["1", "foo"]
-            // => ["2", "bar"]
         }
+        // => ["1", "foo"]
+        // => ["2", "bar"]
     }
-    
-    func testGetTheFieldValueUsingSubscript() {
-        var csv = try! CSV(
-            string: "id,name\n1,foo",
-            hasHeaderRow: true) // It must be true.
+
+    func testGetTheFieldValueUsingKey() {
+        let csvString = "id,name\n1,foo"
+        let csv = try! CSVReader(string: csvString,
+                                 hasHeaderRow: true) // It must be true.
         
-        while let _ = csv.next() {
+        while csv.next() != nil {
             print("\(csv["id"]!)")   // => "1"
             print("\(csv["name"]!)") // => "foo"
         }
     }
-    
+
     func testProvideTheCharacterEncoding() {
-//        let csv = try! CSV(
-//            stream: InputStream(fileAtPath: "/path/to/file.csv")!,
-//            codecType: UTF16.self,
-//            endian: .big)
+//        let stream = InputStream(fileAtPath: "/path/to/file.csv")!
+//        let csv = try! CSV(stream: stream,
+//                           codecType: UTF16.self,
+//                           endian: .big)
+    }
+
+    // MARK: - Writing
+
+    func testWriteToMemory() {
+        let stream = OutputStream(toMemory: ())
+        let csv = try! CSVWriter(stream: stream)
+
+        // Write a row
+        try! csv.write(row: ["id", "name"])
+        
+        // Write fields separately
+        csv.beginNewRow()
+        try! csv.write(field: "1")
+        try! csv.write(field: "foo")
+        csv.beginNewRow()
+        try! csv.write(field: "2")
+        try! csv.write(field: "bar")
+        
+        csv.stream.close()
+        
+        // Get a String
+        let csvData = stream.property(forKey: .dataWrittenToMemoryStreamKey) as! NSData
+        let csvString = String(data: Data(referencing: csvData), encoding: .utf8)!
+        print(csvString)
+        // => "id,name\n1,foo\n2,bar"
+    }
+
+    func testWriteToFile() {
+//        let stream = OutputStream(toFileAtPath: "/path/to/file.csv", append: false)!
+//        let csv = try! CSVWriter(stream: stream)
+//        
+//        try! csv.write(row: ["id", "name"])
+//        try! csv.write(row: ["1", "foo"])
+//        try! csv.write(row: ["1", "bar"])
+//        
+//        csv.stream.close()
     }
     
 }

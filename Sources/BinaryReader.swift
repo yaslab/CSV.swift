@@ -45,13 +45,17 @@ internal class BinaryReader {
     private let endian: Endian
     private let closeOnDeinit: Bool
 
-    private var buffer = [UInt8](repeating: 0, count: 4)
+    private var buffer = malloc(4).assumingMemoryBound(to: UInt8.self)
 
-    private var tempBuffer = [UInt8](repeating: 0, count: 4)
+    private var tempBuffer = malloc(4).assumingMemoryBound(to: UInt8.self)
     private let tempBufferSize = 4
     private var tempBufferOffset = 0
-    
-    internal init(stream: InputStream, endian: Endian = .unknown, closeOnDeinit: Bool = true) throws {
+
+    internal init(
+        stream: InputStream,
+        endian: Endian,
+        closeOnDeinit: Bool) throws {
+
         var endian = endian
 
         if stream.streamStatus == .notOpen {
@@ -61,8 +65,8 @@ internal class BinaryReader {
             throw CSVError.cannotOpenFile
         }
 
-        let readCount = stream.read(&tempBuffer, maxLength: tempBufferSize)
-        if let (e, l) = readBOM(buffer: &tempBuffer, length: readCount) {
+        let readCount = stream.read(tempBuffer, maxLength: tempBufferSize)
+        if let (e, l) = readBOM(buffer: tempBuffer, length: readCount) {
             if endian != .unknown && endian != e {
                 throw CSVError.stringEndianMismatch
             }
@@ -74,11 +78,13 @@ internal class BinaryReader {
         self.endian = endian
         self.closeOnDeinit = closeOnDeinit
     }
-    
+
     deinit {
         if closeOnDeinit && stream.streamStatus != .closed {
             stream.close()
         }
+        free(buffer)
+        free(tempBuffer)
     }
 
     internal var hasBytesAvailable: Bool {
@@ -101,10 +107,10 @@ internal class BinaryReader {
         }
         return stream.read(buffer + i, maxLength: maxLength - i)
     }
-    
+
     internal func readUInt8() throws -> UInt8 {
         let bufferSize = 1
-        let length = try readStream(&buffer, maxLength: bufferSize)
+        let length = try readStream(buffer, maxLength: bufferSize)
         if length < 0 {
             throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
@@ -113,17 +119,17 @@ internal class BinaryReader {
         }
         return buffer[0]
     }
-    
+
     internal func readUInt16() throws -> UInt16 {
         let bufferSize = 2
-        let length = try readStream(&buffer, maxLength: bufferSize)
+        let length = try readStream(buffer, maxLength: bufferSize)
         if length < 0 {
             throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
         if length != bufferSize {
             throw CSVError.stringEncodingMismatch
         }
-        return try UnsafePointer(buffer).withMemoryRebound(to: UInt16.self, capacity: 1) {
+        return try buffer.withMemoryRebound(to: UInt16.self, capacity: 1) {
             switch endian {
             case .big:
                 return UInt16(bigEndian: $0[0])
@@ -134,17 +140,17 @@ internal class BinaryReader {
             }
         }
     }
-    
+
     internal func readUInt32() throws -> UInt32 {
         let bufferSize = 4
-        let length = try readStream(&buffer, maxLength: bufferSize)
+        let length = try readStream(buffer, maxLength: bufferSize)
         if length < 0 {
             throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
-        if length != 4 {
+        if length != bufferSize {
             throw CSVError.stringEncodingMismatch
         }
-        return try UnsafePointer(buffer).withMemoryRebound(to: UInt32.self, capacity: 1) {
+        return try buffer.withMemoryRebound(to: UInt32.self, capacity: 1) {
             switch endian {
             case .big:
                 return UInt32(bigEndian: $0[0])
@@ -155,33 +161,34 @@ internal class BinaryReader {
             }
         }
     }
-    
+
 }
 
 extension BinaryReader {
 
-    internal struct UInt8Iterator: Sequence, IteratorProtocol {
-        
+    internal class UInt8Iterator: Sequence, IteratorProtocol {
+
         private let reader: BinaryReader
-        
+        internal var errorHandler: ((Error) -> Void)?
+
         fileprivate init(reader: BinaryReader) {
             self.reader = reader
         }
-        
-        internal mutating func next() -> UInt8? {
+
+        internal func next() -> UInt8? {
             if !reader.hasBytesAvailable {
                 return nil
             }
             do {
                 return try reader.readUInt8()
-            }
-            catch {
+            } catch {
+                errorHandler?(error)
                 return nil
             }
         }
-        
+
     }
-    
+
     internal func makeUInt8Iterator() -> UInt8Iterator {
         return UInt8Iterator(reader: self)
     }
@@ -189,53 +196,55 @@ extension BinaryReader {
 }
 
 extension BinaryReader {
-    
-    internal struct UInt16Iterator: Sequence, IteratorProtocol {
-        
+
+    internal class UInt16Iterator: Sequence, IteratorProtocol {
+
         private let reader: BinaryReader
-        
+        internal var errorHandler: ((Error) -> Void)?
+
         fileprivate init(reader: BinaryReader) {
             self.reader = reader
         }
-        
-        internal mutating func next() -> UInt16? {
+
+        internal func next() -> UInt16? {
             if !reader.hasBytesAvailable {
                 return nil
             }
             do {
                 return try reader.readUInt16()
-            }
-            catch {
+            } catch {
+                errorHandler?(error)
                 return nil
             }
         }
 
     }
-    
+
     internal func makeUInt16Iterator() -> UInt16Iterator {
         return UInt16Iterator(reader: self)
     }
-    
+
 }
 
 extension BinaryReader {
 
-    internal struct UInt32Iterator: Sequence, IteratorProtocol {
+    internal class UInt32Iterator: Sequence, IteratorProtocol {
 
         private let reader: BinaryReader
+        internal var errorHandler: ((Error) -> Void)?
 
         fileprivate init(reader: BinaryReader) {
             self.reader = reader
         }
 
-        internal mutating func next() -> UInt32? {
+        internal func next() -> UInt32? {
             if !reader.hasBytesAvailable {
                 return nil
             }
             do {
                 return try reader.readUInt32()
-            }
-            catch {
+            } catch {
+                errorHandler?(error)
                 return nil
             }
         }

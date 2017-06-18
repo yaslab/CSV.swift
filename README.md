@@ -2,30 +2,33 @@
 
 [![Build Status](https://travis-ci.org/yaslab/CSV.swift.svg?branch=master)](https://travis-ci.org/yaslab/CSV.swift)
 
-CSV reading library written in Swift.
+CSV reading and writing library written in Swift.
 
-## Usage
+## Usage for reading CSV
 
-### From CSV string
+### From string
 
 ```swift
 import CSV
 
-for row in try! CSV(string: "1,foo\n2,bar") {
+let csvString = "1,foo\n2,bar"
+let csv = try! CSVReader(string: csvString)
+while let row = csv.next() {
     print("\(row)")
-    // => ["1", "foo"]
-    // => ["2", "bar"]
 }
+// => ["1", "foo"]
+// => ["2", "bar"]
 ```
 
-### From file path
+### From file
 
 ```swift
 import Foundation
 import CSV
 
 let stream = InputStream(fileAtPath: "/path/to/file.csv")!
-for row in try! CSV(stream: stream) {
+let csv = try! CSVReader(stream: stream)
+while let row = csv.next() {
     print("\(row)")
 }
 ```
@@ -35,18 +38,18 @@ for row in try! CSV(stream: stream) {
 ```swift
 import CSV
 
-let csv = try! CSV(
-    string: "id,name\n1,foo\n2,bar",
-    hasHeaderRow: true) // default: false
+let csvString = "id,name\n1,foo\n2,bar"
+let csv = try! CSVReader(string: csvString,
+                         hasHeaderRow: true) // It must be true.
 
 let headerRow = csv.headerRow!
 print("\(headerRow)") // => ["id", "name"]
 
-for row in csv {
+while let row = csv.next() {
     print("\(row)")
-    // => ["1", "foo"]
-    // => ["2", "bar"]
 }
+// => ["1", "foo"]
+// => ["2", "bar"]
 ```
 
 ### Get the field value using subscript
@@ -54,11 +57,11 @@ for row in csv {
 ```swift
 import CSV
 
-var csv = try! CSV(
-    string: "id,name\n1,foo",
-    hasHeaderRow: true) // It must be true.
+let csvString = "id,name\n1,foo"
+let csv = try! CSVReader(string: csvString,
+                         hasHeaderRow: true) // It must be true.
 
-while let _ = csv.next() {
+while csv.next() != nil {
     print("\(csv["id"]!)")   // => "1"
     print("\(csv["name"]!)") // => "foo"
 }
@@ -72,10 +75,57 @@ If you use a file path, you can provide the character encoding to initializer.
 import Foundation
 import CSV
 
-let csv = try! CSV(
-    stream: InputStream(fileAtPath: "/path/to/file.csv")!,
-    codecType: UTF16.self,
-    endian: .big)
+let stream = InputStream(fileAtPath: "/path/to/file.csv")!
+let csv = try! CSV(stream: stream,
+                   codecType: UTF16.self,
+                   endian: .big)
+```
+
+## Usage for writing CSV
+
+### Write to memory and get a CSV String
+
+```swift
+import Foundation
+import CSV
+
+let stream = OutputStream(toMemory: ())
+let csv = try! CSVWriter(stream: stream)
+
+// Write a row
+try! csv.write(row: ["id", "name"])
+
+// Write fields separately
+csv.beginNewRow()
+try! csv.write(field: "1")
+try! csv.write(field: "foo")
+csv.beginNewRow()
+try! csv.write(field: "2")
+try! csv.write(field: "bar")
+
+csv.stream.close()
+
+// Get a String
+let csvData = stream.property(forKey: .dataWrittenToMemoryStreamKey) as! NSData
+let csvString = String(data: Data(referencing: csvData), encoding: .utf8)!
+print(csvString)
+// => "id,name\n1,foo\n2,bar"
+```
+
+### Write to file
+
+```swift
+import Foundation
+import CSV
+
+let stream = OutputStream(toFileAtPath: "/path/to/file.csv", append: false)!
+let csv = try! CSVWriter(stream: stream)
+
+try! csv.write(row: ["id", "name"])
+try! csv.write(row: ["1", "foo"])
+try! csv.write(row: ["1", "bar"])
+
+csv.stream.close()
 ```
 
 ## Installation
@@ -83,13 +133,13 @@ let csv = try! CSV(
 ### CocoaPods
 
 ```ruby
-pod 'CSV.swift', '~> 1.1'
+pod 'CSV.swift', '~> 2.0'
 ```
 
 ### Carthage
 
 ```
-github "yaslab/CSV.swift" ~> 1.1
+github "yaslab/CSV.swift" ~> 2.0
 ```
 
 ### Swift Package Manager
@@ -100,7 +150,7 @@ import PackageDescription
 let package = Package(
     name: "PackageName",
     dependencies: [
-        .Package(url: "https://github.com/yaslab/CSV.swift.git", majorVersion: 1, minor: 1)
+        .Package(url: "https://github.com/yaslab/CSV.swift.git", majorVersion: 2, minor: 0)
     ]
 )
 ```

@@ -10,7 +10,7 @@ import XCTest
 @testable import CSV
 
 class LineBreakTests: XCTestCase {
-    
+
     static let allTests = [
         ("testLF", testLF),
         ("testCRLF", testCRLF),
@@ -79,7 +79,7 @@ class LineBreakTests: XCTestCase {
         XCTAssertEqual(records[0], ["qwe", "asd"])
         XCTAssertEqual(records[1], ["zxc", "rty"])
     }
-    
+
     func testLineBreakCR() {
         let csv = "qwe,asd\rzxc,rty"
         let records = parse(csv: csv)
@@ -87,7 +87,7 @@ class LineBreakTests: XCTestCase {
         XCTAssertEqual(records[0], ["qwe", "asd"])
         XCTAssertEqual(records[1], ["zxc", "rty"])
     }
-    
+
     func testLineBreakCRLF() {
         let csv = "qwe,asd\r\nzxc,rty"
         let records = parse(csv: csv)
@@ -95,7 +95,7 @@ class LineBreakTests: XCTestCase {
         XCTAssertEqual(records[0], ["qwe", "asd"])
         XCTAssertEqual(records[1], ["zxc", "rty"])
     }
-    
+
     func testLineBreakLFLF() {
         let csv = "qwe,asd\n\nzxc,rty"
         let records = parse(csv: csv)
@@ -124,12 +124,13 @@ class LineBreakTests: XCTestCase {
     }
 
     private func parse(csv: String) -> [[String]] {
-        let reader = try! CSV(string: csv)
-        var records = [[String]]()
-        for row in reader {
-            records.append(row)
-        }
-        return records
+        let reader = try! CSVReader(string: csv)
+        return reader.map { $0 }
+//        var records = [[String]]()
+//        try! reader.enumerateRows { (row, _, _) in
+//            records.append(row)
+//        }
+//        return records
     }
 
 }

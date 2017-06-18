@@ -6,15 +6,14 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-// TODO: Documentation
-/// No overview available.
+/// Represents byte order.
 public enum Endian {
-    
-    /// No overview available.
+
+    /// Big endian.
     case big
-    /// No overview available.
+    /// Little endian.
     case little
-    /// No overview available.
+    /// Multibyte character sets.
     case unknown
-    
+
 }
