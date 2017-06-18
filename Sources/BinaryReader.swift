@@ -53,8 +53,8 @@ internal class BinaryReader {
 
     internal init(
         stream: InputStream,
-        endian: Endian = .unknown,
-        closeOnDeinit: Bool = true) throws {
+        endian: Endian,
+        closeOnDeinit: Bool) throws {
 
         var endian = endian
 
@@ -62,7 +62,7 @@ internal class BinaryReader {
             stream.open()
         }
         if stream.streamStatus != .open {
-            throw CSVError.cannotOpenStream
+            throw CSVError.cannotOpenFile
         }
 
         let readCount = stream.read(tempBuffer, maxLength: tempBufferSize)
@@ -93,7 +93,7 @@ internal class BinaryReader {
 
     private func readStream(_ buffer: UnsafeMutablePointer<UInt8>, maxLength: Int) throws -> Int {
         if stream.streamStatus != .open {
-            throw CSVError.cannotReadStream
+            throw CSVError.cannotReadFile
         }
 
         var i = 0
@@ -115,7 +115,7 @@ internal class BinaryReader {
             throw CSVError.streamErrorHasOccurred(error: stream.streamError!)
         }
         if length != bufferSize {
-            throw CSVError.cannotReadStream
+            throw CSVError.cannotReadFile
         }
         return buffer[0]
     }
@@ -169,7 +169,7 @@ extension BinaryReader {
     internal class UInt8Iterator: Sequence, IteratorProtocol {
 
         private let reader: BinaryReader
-        internal var errorHandler: ((Error) -> Void)? = nil
+        internal var errorHandler: ((Error) -> Void)?
 
         fileprivate init(reader: BinaryReader) {
             self.reader = reader
@@ -200,7 +200,7 @@ extension BinaryReader {
     internal class UInt16Iterator: Sequence, IteratorProtocol {
 
         private let reader: BinaryReader
-        internal var errorHandler: ((Error) -> Void)? = nil
+        internal var errorHandler: ((Error) -> Void)?
 
         fileprivate init(reader: BinaryReader) {
             self.reader = reader
@@ -231,7 +231,7 @@ extension BinaryReader {
     internal class UInt32Iterator: Sequence, IteratorProtocol {
 
         private let reader: BinaryReader
-        internal var errorHandler: ((Error) -> Void)? = nil
+        internal var errorHandler: ((Error) -> Void)?
 
         fileprivate init(reader: BinaryReader) {
             self.reader = reader

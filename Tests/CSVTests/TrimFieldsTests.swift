@@ -29,8 +29,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields1() {
         let csvString = "abc,def,ghi"
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, ["abc", "def", "ghi"])
         }
@@ -38,8 +37,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields2() {
         let csvString = " abc,  def,   ghi"
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, ["abc", "def", "ghi"])
         }
@@ -47,8 +45,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields3() {
         let csvString = "abc ,def  ,ghi   "
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, ["abc", "def", "ghi"])
         }
@@ -56,8 +53,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields4() {
         let csvString = " abc ,  def  ,   ghi   "
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, ["abc", "def", "ghi"])
         }
@@ -65,8 +61,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields5() {
         let csvString = "\"abc\",\"def\",\"ghi\""
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, ["abc", "def", "ghi"])
         }
@@ -74,8 +69,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields6() {
         let csvString = " \"abc\",  \"def\",   \"ghi\""
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, ["abc", "def", "ghi"])
         }
@@ -83,8 +77,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields7() {
         let csvString = "\"abc\" ,\"def\"  ,\"ghi\"   "
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, ["abc", "def", "ghi"])
         }
@@ -92,8 +85,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields8() {
         let csvString = " \"abc\" ,  \"def\"  ,   \"ghi\"   "
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, ["abc", "def", "ghi"])
         }
@@ -101,8 +93,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields9() {
         let csvString = "\" abc \",\" def \",\" ghi \""
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, [" abc ", " def ", " ghi "])
         }
@@ -110,8 +101,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields10() {
         let csvString = "\tabc,\t\tdef\t,ghi\t"
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, ["abc", "def", "ghi"])
         }
@@ -119,8 +109,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields11() {
         let csvString = " abc \n def "
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
 
         let record1 = csv.next()!
         XCTAssertEqual(record1, ["abc"])
@@ -130,8 +119,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields12() {
         let csvString = " \"abc \" \n \" def\" "
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
 
         let record1 = csv.next()!
         XCTAssertEqual(record1, ["abc "])
@@ -141,8 +129,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields13() {
         let csvString = " abc \t\tdef\t ghi "
-        let config = CSVReader.Configuration(trimFields: true, delimiter: UnicodeScalar("\t")!)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true, delimiter: "\t")
         for record in AnyIterator(csv) {
             XCTAssertEqual(record, ["abc", "", "def", "ghi"])
         }
@@ -150,8 +137,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields14() {
         let csvString = ""
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         let records = AnyIterator(csv).map { $0 }
 
         XCTAssertEqual(records.count, 0)
@@ -159,8 +145,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields15() {
         let csvString = " "
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         let records = AnyIterator(csv).map { $0 }
 
         XCTAssertEqual(records.count, 1)
@@ -169,8 +154,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields16() {
         let csvString = " , "
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         let records = AnyIterator(csv).map { $0 }
 
         XCTAssertEqual(records.count, 1)
@@ -179,8 +163,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields17() {
         let csvString = " , \n"
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         let records = AnyIterator(csv).map { $0 }
 
         XCTAssertEqual(records.count, 1)
@@ -189,8 +172,7 @@ class TrimFieldsTests: XCTestCase {
 
     func testTrimFields18() {
         let csvString = " , \n "
-        let config = CSVReader.Configuration(trimFields: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, trimFields: true)
         let records = AnyIterator(csv).map { $0 }
 
         XCTAssertEqual(records.count, 2)

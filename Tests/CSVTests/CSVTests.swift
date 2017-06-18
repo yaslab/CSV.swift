@@ -26,7 +26,7 @@ class CSVTests: XCTestCase {
         ("testSubscriptInt", testSubscriptInt),
         ("testSubscriptString1", testSubscriptString1),
         ("testSubscriptString2", testSubscriptString2),
-        ("testToArray", testToArray),
+        ("testToArray", testToArray)
         //("testToDictionary1", testToDictionary1),
         //("testToDictionary2", testToDictionary2)
     ]
@@ -34,7 +34,7 @@ class CSVTests: XCTestCase {
     func testOneLine() {
         let csv = "\"abc\",1,2"
         var i = 0
-        
+
         for record in AnyIterator(try! CSVReader(string: csv)) {
             switch i {
             case 0: XCTAssertEqual(record, ["abc", "1", "2"])
@@ -154,7 +154,11 @@ class CSVTests: XCTestCase {
 
     func testCSVState1() {
         let it = "あ,い1,\"う\",えお\n,,x,".unicodeScalars.makeIterator()
-        let csv = try! CSVReader(iterator: it, configuration: CSVReader.Configuration())
+        let config = CSVReader.Configuration(hasHeaderRow: false,
+                                             trimFields: false,
+                                             delimiter: ",",
+                                             whitespaces: .whitespaces)
+        let csv = try! CSVReader(iterator: it, configuration: config)
 
         var records = [[String]]()
 
@@ -178,8 +182,7 @@ class CSVTests: XCTestCase {
 
     func testSubscriptString1() {
         let csvString = "key1,key2\nvalue1,value2"
-        let config = CSVReader.Configuration(hasHeaderRecord: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, hasHeaderRow: true)
         csv.next()
         XCTAssertEqual(csv["key1"], "value1")
         XCTAssertEqual(csv["key2"], "value2")
@@ -188,8 +191,7 @@ class CSVTests: XCTestCase {
 
     func testSubscriptString2() {
         let csvString = "key1,key2\nvalue1"
-        let config = CSVReader.Configuration(hasHeaderRecord: true)
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString, hasHeaderRow: true)
         csv.next()
         XCTAssertEqual(csv["key1"], "value1")
         XCTAssertNil(csv["key2"])

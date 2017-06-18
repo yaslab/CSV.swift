@@ -14,7 +14,7 @@ internal class UnicodeIterator<
 
     private var input: Input
     private var inputEncoding: InputEncoding
-    internal var errorHandler: ((Error) -> Void)? = nil
+    internal var errorHandler: ((Error) -> Void)?
 
     internal init(input: Input, inputEncodingType: InputEncoding.Type) {
         self.input = input
