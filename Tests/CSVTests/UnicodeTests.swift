@@ -112,11 +112,12 @@ class UnicodeTests: XCTestCase {
     }
 
     private func getRecords(csv: CSVReader) -> [[String]] {
-        var records = [[String]]()
-        try! csv.enumerateRows { (record, _, _) in
-            records.append(record)
-        }
-        return records
+        return csv.map { $0 }
+//        var records = [[String]]()
+//        try! csv.enumerateRows { (record, _, _) in
+//            records.append(record)
+//        }
+//        return records
     }
 
 }

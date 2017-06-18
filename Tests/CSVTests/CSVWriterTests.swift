@@ -188,7 +188,7 @@ class CSVWriterTests: XCTestCase {
         let stream = OutputStream(toMemory: ())
         stream.open()
 
-        let csv = try! CSVWriter.init(stream: stream, newline: "\r\n")
+        let csv = try! CSVWriter.init(stream: stream, newline: .crlf)
         csv.beginNewRow()
         try! csv.write(field: str + "-1")
         csv.beginNewRow()

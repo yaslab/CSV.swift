@@ -15,10 +15,23 @@ public class CSVWriter {
         public var delimiter: String
         public var newline: String
 
-        internal init(delimiter: String, newline: String) {
+        internal init(delimiter: String, newline: Newline) {
             self.delimiter = delimiter
-            self.newline = newline
+
+            switch newline {
+            case .lf:   self.newline = String(LF)
+            case .crlf: self.newline = String(CR) + String(LF)
+            }
         }
+
+    }
+
+    public enum Newline {
+
+        /// "\n"
+        case lf
+        /// "\r\n"
+        case crlf
 
     }
 
@@ -59,7 +72,7 @@ extension CSVWriter {
     public convenience init(
         stream: OutputStream,
         delimiter: String = String(defaultDelimiter),
-        newline: String = String(defaultNewline)
+        newline: Newline = .lf
         ) throws {
 
         try self.init(stream: stream, codecType: UTF8.self, delimiter: delimiter, newline: newline)
@@ -69,7 +82,7 @@ extension CSVWriter {
         stream: OutputStream,
         codecType: T.Type,
         delimiter: String = String(defaultDelimiter),
-        newline: String = String(defaultNewline)
+        newline: Newline = .lf
         ) throws where T.CodeUnit == UInt8 {
 
         let config = Configuration(delimiter: delimiter, newline: newline)
@@ -93,7 +106,7 @@ extension CSVWriter {
         codecType: T.Type,
         endian: Endian = .big,
         delimiter: String = String(defaultDelimiter),
-        newline: String = String(defaultNewline)
+        newline: Newline = .lf
         ) throws where T.CodeUnit == UInt16 {
 
         let config = Configuration(delimiter: delimiter, newline: newline)
@@ -120,7 +133,7 @@ extension CSVWriter {
         codecType: T.Type,
         endian: Endian = .big,
         delimiter: String = String(defaultDelimiter),
-        newline: String = String(defaultNewline)
+        newline: Newline = .lf
         ) throws where T.CodeUnit == UInt32 {
 
         let config = Configuration(delimiter: delimiter, newline: newline)

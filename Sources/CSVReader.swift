@@ -19,7 +19,6 @@ internal let defaultHasHeaderRow = false
 internal let defaultTrimFields = false
 internal let defaultDelimiter: UnicodeScalar = ","
 internal let defaultWhitespaces = CharacterSet.whitespaces
-internal let defaultNewline: UnicodeScalar = LF
 
 /// No overview available.
 public class CSVReader {
@@ -353,22 +352,22 @@ extension CSVReader {
 
 }
 
-extension CSVReader {
-
-    public func enumerateRows(_ block: (([String], [String]?, inout Bool) throws -> Void)) throws {
-        var stop = false
-        while let row = readRow() {
-            try block(row, headerRow, &stop)
-            if stop {
-                break
-            }
-        }
-        if let error = error {
-            throw error
-        }
-    }
-
-}
+//extension CSVReader {
+//
+//    public func enumerateRows(_ block: (([String], [String]?, inout Bool) throws -> Void)) throws {
+//        var stop = false
+//        while let row = readRow() {
+//            try block(row, headerRow, &stop)
+//            if stop {
+//                break
+//            }
+//        }
+//        if let error = error {
+//            throw error
+//        }
+//    }
+//
+//}
 
 extension CSVReader: IteratorProtocol {
 
