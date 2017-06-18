@@ -126,8 +126,8 @@ class LineBreakTests: XCTestCase {
     private func parse(csv: String) -> [[String]] {
         let reader = try! CSVReader(string: csv)
         var records = [[String]]()
-        reader.enumerateRecords { (record, _, _) in
-            records.append(record)
+        try! reader.enumerateRows { (row, _, _) in
+            records.append(row)
         }
         return records
     }

@@ -113,7 +113,7 @@ class UnicodeTests: XCTestCase {
 
     private func getRecords(csv: CSVReader) -> [[String]] {
         var records = [[String]]()
-        csv.enumerateRecords { (record, _, _) in
+        try! csv.enumerateRows { (record, _, _) in
             records.append(record)
         }
         return records

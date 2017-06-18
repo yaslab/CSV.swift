@@ -22,8 +22,8 @@ class ReadmeTests: XCTestCase {
 
     func testFromCSVString() {
         let csv = try! CSVReader(string: "1,foo\n2,bar")
-        csv.enumerateRecords { (record, _, _) in
-            print("\(record)")
+        try! csv.enumerateRows { (row, _, _) in
+            print("\(row)")
             // => ["1", "foo"]
             // => ["2", "bar"]
         }
@@ -39,14 +39,14 @@ class ReadmeTests: XCTestCase {
 
     func testGettingTheHeaderRow() {
         let csvString = "id,name\n1,foo\n2,bar"
-        let config = CSVReader.Configuration(hasHeaderRecord: true) // It must be true.
-        let csv = try! CSVReader(string: csvString, configuration: config)
+        let csv = try! CSVReader(string: csvString,
+                                 hasHeaderRow: true) // It must be true.
 
-        let headerRow = csv.headerRecord!
+        let headerRow = csv.headerRow!
         print("\(headerRow)") // => ["id", "name"]
 
-        csv.enumerateRecords { (record, _, _) in
-            print("\(record)")
+        try! csv.enumerateRows { (row, _, _) in
+            print("\(row)")
             // => ["1", "foo"]
             // => ["2", "bar"]
         }
@@ -56,9 +56,9 @@ class ReadmeTests: XCTestCase {
         let csvString = "1,foo"
         let csv = try! CSVReader(string: csvString)
 
-        csv.enumerateRecords { (record, _, _) in
-            print("\(record[0])") // => "1"
-            print("\(record[1])") // => "foo"
+        try! csv.enumerateRows { (row, _, _) in
+            print("\(row[0])") // => "1"
+            print("\(row[1])") // => "foo"
         }
     }
 

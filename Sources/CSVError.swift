@@ -10,9 +10,9 @@
 public enum CSVError: Error {
 
     /// No overview available.
-    case cannotOpenStream
+    case cannotOpenFile
     /// No overview available.
-    case cannotReadStream
+    case cannotReadFile
     /// No overview available.
     case cannotWriteStream
     /// No overview available.
@@ -20,7 +20,7 @@ public enum CSVError: Error {
     /// No overview available.
     case unicodeDecoding
     /// No overview available.
-    case cannotReadHeaderRecord
+    case cannotReadHeaderRow
     /// No overview available.
     case stringEncodingMismatch
     /// No overview available.
