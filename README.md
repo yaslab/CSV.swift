@@ -23,6 +23,8 @@ while let row = csv.next() {
 
 ### From file
 
+NOTE: The default character encoding is `UTF8`.
+
 ```swift
 import Foundation
 import CSV
@@ -86,6 +88,8 @@ let csv = try! CSV(stream: stream,
 
 ### Write to memory and get a CSV String
 
+NOTE: The default character encoding is `UTF8`.
+
 ```swift
 import Foundation
 import CSV
@@ -114,6 +118,8 @@ print(csvString)
 ```
 
 ### Write to file
+
+NOTE: The default character encoding is `UTF8`.
 
 ```swift
 import Foundation
