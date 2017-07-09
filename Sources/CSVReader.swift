@@ -354,10 +354,10 @@ extension CSVReader {
 
 //extension CSVReader {
 //
-//    public func enumerateRows(_ block: (([String], [String]?, inout Bool) throws -> Void)) throws {
+//    public func enumerateRows(_ block: ((CSVReader, inout Bool) throws -> Void)) throws {
 //        var stop = false
-//        while let row = readRow() {
-//            try block(row, headerRow, &stop)
+//        while next() != nil {
+//            try block(self, &stop)
 //            if stop {
 //                break
 //            }
