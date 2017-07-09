@@ -1,12 +1,8 @@
-language: objective-c
+language: swift
 osx_image: xcode8.3
-env:
-  - LC_CTYPE=en_US.UTF-8
-git:
-  submodules: false
-before_install:
-  - git submodule update --init --recursive
 script:
   - set -o pipefail && xcodebuild test -scheme CSV-OSX
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 notifications:
   email: false
