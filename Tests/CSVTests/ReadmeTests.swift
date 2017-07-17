@@ -69,9 +69,9 @@ class ReadmeTests: XCTestCase {
 
     func testProvideTheCharacterEncoding() {
 //        let stream = InputStream(fileAtPath: "/path/to/file.csv")!
-//        let csv = try! CSV(stream: stream,
-//                           codecType: UTF16.self,
-//                           endian: .big)
+//        let csv = try! CSVReader(stream: stream,
+//                                 codecType: UTF16.self,
+//                                 endian: .big)
     }
 
     // MARK: - Writing
