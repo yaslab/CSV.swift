@@ -71,14 +71,14 @@
 			containerPortal = 0E7E8C781D0BC7BB0057A1C1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 0E7E8C801D0BC7BB0057A1C1;
-			remoteInfo = CSV;
+			remoteInfo = "CSV-iOS";
 		};
 		0E7E8CD11D0BCA2A0057A1C1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0E7E8C781D0BC7BB0057A1C1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 0E7E8CC51D0BCA2A0057A1C1;
-			remoteInfo = "CSV-OSX";
+			remoteInfo = "CSV-macOS";
 		};
 		0E7E8CF31D0BCD0B0057A1C1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -102,7 +102,7 @@
 		0E7E8CAE1D0BC8690057A1C1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0E7E8CB51D0BC98B0057A1C1 /* CSV.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CSV.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E7E8CC61D0BCA2A0057A1C1 /* CSV.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CSV.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0E7E8CCF1D0BCA2A0057A1C1 /* CSVTests-OSX.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CSVTests-OSX.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E7E8CCF1D0BCA2A0057A1C1 /* CSVTests-macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CSVTests-macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E7E8CE81D0BCD0B0057A1C1 /* CSV.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CSV.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E7E8CF11D0BCD0B0057A1C1 /* CSVTests-tvOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CSVTests-tvOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E7F657A1EF6437E00E1E1A0 /* Version1Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Version1Tests.swift; sourceTree = "<group>"; };
@@ -189,7 +189,7 @@
 				0E7E8C8B1D0BC7BB0057A1C1 /* CSVTests-iOS.xctest */,
 				0E7E8CB51D0BC98B0057A1C1 /* CSV.framework */,
 				0E7E8CC61D0BCA2A0057A1C1 /* CSV.framework */,
-				0E7E8CCF1D0BCA2A0057A1C1 /* CSVTests-OSX.xctest */,
+				0E7E8CCF1D0BCA2A0057A1C1 /* CSVTests-macOS.xctest */,
 				0E7E8CE81D0BCD0B0057A1C1 /* CSV.framework */,
 				0E7E8CF11D0BCD0B0057A1C1 /* CSVTests-tvOS.xctest */,
 			);
@@ -305,7 +305,7 @@
 				0E7E8C8E1D0BC7BB0057A1C1 /* PBXTargetDependency */,
 			);
 			name = "CSVTests-iOS";
-			productName = CSVTests;
+			productName = "CSVTests-iOS";
 			productReference = 0E7E8C8B1D0BC7BB0057A1C1 /* CSVTests-iOS.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -327,9 +327,9 @@
 			productReference = 0E7E8CB51D0BC98B0057A1C1 /* CSV.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		0E7E8CC51D0BCA2A0057A1C1 /* CSV-OSX */ = {
+		0E7E8CC51D0BCA2A0057A1C1 /* CSV-macOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0E7E8CD71D0BCA2A0057A1C1 /* Build configuration list for PBXNativeTarget "CSV-OSX" */;
+			buildConfigurationList = 0E7E8CD71D0BCA2A0057A1C1 /* Build configuration list for PBXNativeTarget "CSV-macOS" */;
 			buildPhases = (
 				0E47EEBF1DBBC05700EBF783 /* Run Script () */,
 				0E7E8CC11D0BCA2A0057A1C1 /* Sources */,
@@ -341,14 +341,14 @@
 			);
 			dependencies = (
 			);
-			name = "CSV-OSX";
-			productName = "CSV-OSX";
+			name = "CSV-macOS";
+			productName = "CSV-macOS";
 			productReference = 0E7E8CC61D0BCA2A0057A1C1 /* CSV.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		0E7E8CCE1D0BCA2A0057A1C1 /* CSVTests-OSX */ = {
+		0E7E8CCE1D0BCA2A0057A1C1 /* CSVTests-macOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0E7E8CDA1D0BCA2A0057A1C1 /* Build configuration list for PBXNativeTarget "CSVTests-OSX" */;
+			buildConfigurationList = 0E7E8CDA1D0BCA2A0057A1C1 /* Build configuration list for PBXNativeTarget "CSVTests-macOS" */;
 			buildPhases = (
 				0E7E8CCB1D0BCA2A0057A1C1 /* Sources */,
 				0E7E8CCC1D0BCA2A0057A1C1 /* Frameworks */,
@@ -359,9 +359,9 @@
 			dependencies = (
 				0E7E8CD21D0BCA2A0057A1C1 /* PBXTargetDependency */,
 			);
-			name = "CSVTests-OSX";
-			productName = "CSV-OSXTests";
-			productReference = 0E7E8CCF1D0BCA2A0057A1C1 /* CSVTests-OSX.xctest */;
+			name = "CSVTests-macOS";
+			productName = "CSVTests-macOS";
+			productReference = 0E7E8CCF1D0BCA2A0057A1C1 /* CSVTests-macOS.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		0E7E8CE71D0BCD0B0057A1C1 /* CSV-tvOS */ = {
@@ -396,7 +396,7 @@
 				0E7E8CF41D0BCD0B0057A1C1 /* PBXTargetDependency */,
 			);
 			name = "CSVTests-tvOS";
-			productName = "CSV-tvOSTests";
+			productName = "CSVTests-tvOS";
 			productReference = 0E7E8CF11D0BCD0B0057A1C1 /* CSVTests-tvOS.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -452,11 +452,11 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0E7E8CC51D0BCA2A0057A1C1 /* CSV-OSX */,
+				0E7E8CC51D0BCA2A0057A1C1 /* CSV-macOS */,
 				0E7E8C801D0BC7BB0057A1C1 /* CSV-iOS */,
 				0E7E8CE71D0BCD0B0057A1C1 /* CSV-tvOS */,
 				0E7E8CB41D0BC98B0057A1C1 /* CSV-watchOS */,
-				0E7E8CCE1D0BCA2A0057A1C1 /* CSVTests-OSX */,
+				0E7E8CCE1D0BCA2A0057A1C1 /* CSVTests-macOS */,
 				0E7E8C8A1D0BC7BB0057A1C1 /* CSVTests-iOS */,
 				0E7E8CF01D0BCD0B0057A1C1 /* CSVTests-tvOS */,
 			);
@@ -641,7 +641,7 @@
 		};
 		0E7E8CD21D0BCA2A0057A1C1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 0E7E8CC51D0BCA2A0057A1C1 /* CSV-OSX */;
+			target = 0E7E8CC51D0BCA2A0057A1C1 /* CSV-macOS */;
 			targetProxy = 0E7E8CD11D0BCA2A0057A1C1 /* PBXContainerItemProxy */;
 		};
 		0E7E8CF41D0BCD0B0057A1C1 /* PBXTargetDependency */ = {
@@ -909,7 +909,7 @@
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.yaslab.CSVTests-OSX";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.yaslab.CSVTests-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 3.0;
@@ -924,7 +924,7 @@
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_BUNDLE_IDENTIFIER = "net.yaslab.CSVTests-OSX";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.yaslab.CSVTests-macOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -1041,7 +1041,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0E7E8CD71D0BCA2A0057A1C1 /* Build configuration list for PBXNativeTarget "CSV-OSX" */ = {
+		0E7E8CD71D0BCA2A0057A1C1 /* Build configuration list for PBXNativeTarget "CSV-macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0E7E8CD81D0BCA2A0057A1C1 /* Debug */,
@@ -1050,7 +1050,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0E7E8CDA1D0BCA2A0057A1C1 /* Build configuration list for PBXNativeTarget "CSVTests-OSX" */ = {
+		0E7E8CDA1D0BCA2A0057A1C1 /* Build configuration list for PBXNativeTarget "CSVTests-macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0E7E8CDB1D0BCA2A0057A1C1 /* Debug */,
