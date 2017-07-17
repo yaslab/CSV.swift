@@ -16,7 +16,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
                BuildableName = "CSV.framework"
-               BlueprintName = "CSV-OSX"
+               BlueprintName = "CSV-macOS"
                ReferencedContainer = "container:CSV.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -34,8 +34,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0E7E8CCE1D0BCA2A0057A1C1"
-               BuildableName = "CSVTests-OSX.xctest"
-               BlueprintName = "CSVTests-OSX"
+               BuildableName = "CSVTests-macOS.xctest"
+               BlueprintName = "CSVTests-macOS"
                ReferencedContainer = "container:CSV.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -45,7 +45,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
             BuildableName = "CSV.framework"
-            BlueprintName = "CSV-OSX"
+            BlueprintName = "CSV-macOS"
             ReferencedContainer = "container:CSV.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -67,7 +67,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
             BuildableName = "CSV.framework"
-            BlueprintName = "CSV-OSX"
+            BlueprintName = "CSV-macOS"
             ReferencedContainer = "container:CSV.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -85,7 +85,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0E7E8CC51D0BCA2A0057A1C1"
             BuildableName = "CSV.framework"
-            BlueprintName = "CSV-OSX"
+            BlueprintName = "CSV-macOS"
             ReferencedContainer = "container:CSV.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
