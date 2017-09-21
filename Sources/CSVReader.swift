@@ -15,10 +15,10 @@ internal let DQUOTE: UnicodeScalar = "\""
 internal let DQUOTE_STR: String = "\""
 internal let DQUOTE2_STR: String = "\"\""
 
-internal let defaultHasHeaderRow = false
-internal let defaultTrimFields = false
-internal let defaultDelimiter: UnicodeScalar = ","
-internal let defaultWhitespaces = CharacterSet.whitespaces
+public let defaultHasHeaderRow = false
+public let defaultTrimFields = false
+public let defaultDelimiter: UnicodeScalar = ","
+public let defaultWhitespaces = CharacterSet.whitespaces
 
 /// No overview available.
 public class CSVReader {
