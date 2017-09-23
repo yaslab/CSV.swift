@@ -152,14 +152,7 @@ github "yaslab/CSV.swift" ~> 2.1
 ### Swift Package Manager
 
 ```swift
-import PackageDescription
-
-let package = Package(
-    name: "PackageName",
-    dependencies: [
-        .Package(url: "https://github.com/yaslab/CSV.swift.git", majorVersion: 2, minor: 1)
-    ]
-)
+.package(url: "https://github.com/yaslab/CSV.swift.git", from: "2.1.0")
 ```
 
 ## Reference specification
