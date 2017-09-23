@@ -15,11 +15,6 @@ internal let DQUOTE: UnicodeScalar = "\""
 internal let DQUOTE_STR: String = "\""
 internal let DQUOTE2_STR: String = "\"\""
 
-public let defaultHasHeaderRow = false
-public let defaultTrimFields = false
-public let defaultDelimiter: UnicodeScalar = ","
-public let defaultWhitespaces = CharacterSet.whitespaces
-
 /// No overview available.
 public class CSVReader {
 
@@ -88,6 +83,11 @@ public class CSVReader {
 }
 
 extension CSVReader {
+
+    public static let defaultHasHeaderRow: Bool = false
+    public static let defaultTrimFields: Bool = false
+    public static let defaultDelimiter: UnicodeScalar = ","
+    public static let defaultWhitespaces: CharacterSet = .whitespaces
 
     /// Create an instance with `InputStream`.
     ///

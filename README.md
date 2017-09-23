@@ -140,13 +140,13 @@ csv.stream.close()
 ### CocoaPods
 
 ```ruby
-pod 'CSV.swift', '~> 2.0'
+pod 'CSV.swift', '~> 2.1'
 ```
 
 ### Carthage
 
 ```
-github "yaslab/CSV.swift" ~> 2.0
+github "yaslab/CSV.swift" ~> 2.1
 ```
 
 ### Swift Package Manager
@@ -157,7 +157,7 @@ import PackageDescription
 let package = Package(
     name: "PackageName",
     dependencies: [
-        .Package(url: "https://github.com/yaslab/CSV.swift.git", majorVersion: 2, minor: 0)
+        .Package(url: "https://github.com/yaslab/CSV.swift.git", majorVersion: 2, minor: 1)
     ]
 )
 ```

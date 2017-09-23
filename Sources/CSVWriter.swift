@@ -69,6 +69,8 @@ public class CSVWriter {
 
 extension CSVWriter {
 
+    public static let defaultDelimiter: UnicodeScalar = ","
+
     public convenience init(
         stream: OutputStream,
         delimiter: String = String(defaultDelimiter),
