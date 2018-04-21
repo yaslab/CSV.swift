@@ -13,5 +13,5 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = '2.0'
 
   s.module_name = 'CSV'
-  s.source_files = 'Sources/*.swift'
+  s.source_files = 'Sources/CSV/*.swift'
 end
