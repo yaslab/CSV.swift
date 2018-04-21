@@ -7,47 +7,47 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0E0F160E1D197DB800C92580 /* Endian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0F160D1D197DB800C92580 /* Endian.swift */; };
-		0E0F160F1D197DB800C92580 /* Endian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0F160D1D197DB800C92580 /* Endian.swift */; };
-		0E0F16101D197DB800C92580 /* Endian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0F160D1D197DB800C92580 /* Endian.swift */; };
-		0E0F16111D197DB800C92580 /* Endian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0F160D1D197DB800C92580 /* Endian.swift */; };
 		0E54021B1ED9DDF40019C3ED /* CSVWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021A1ED9DDF40019C3ED /* CSVWriterTests.swift */; };
 		0E54021C1ED9DDF40019C3ED /* CSVWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021A1ED9DDF40019C3ED /* CSVWriterTests.swift */; };
 		0E54021D1ED9DDF40019C3ED /* CSVWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021A1ED9DDF40019C3ED /* CSVWriterTests.swift */; };
-		0E5402221EDA82220019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021E1EDA81E80019C3ED /* CSVWriter.swift */; };
-		0E5402231EDA82220019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021E1EDA81E80019C3ED /* CSVWriter.swift */; };
-		0E5402241EDA82220019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021E1EDA81E80019C3ED /* CSVWriter.swift */; };
-		0E5402251EDA82230019C3ED /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54021E1EDA81E80019C3ED /* CSVWriter.swift */; };
 		0E7E8C8C1D0BC7BB0057A1C1 /* CSV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E7E8C811D0BC7BB0057A1C1 /* CSV.framework */; };
-		0E7E8CA11D0BC7F10057A1C1 /* CSVReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7E8C9D1D0BC7F10057A1C1 /* CSVReader.swift */; };
-		0E7E8CA21D0BC7F10057A1C1 /* CSVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7E8C9E1D0BC7F10057A1C1 /* CSVError.swift */; };
 		0E7E8CA31D0BC7F10057A1C1 /* CSVVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 0E7E8C9F1D0BC7F10057A1C1 /* CSVVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		0E7E8CBE1D0BC9D70057A1C1 /* CSVReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7E8C9D1D0BC7F10057A1C1 /* CSVReader.swift */; };
-		0E7E8CBF1D0BC9D70057A1C1 /* CSVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7E8C9E1D0BC7F10057A1C1 /* CSVError.swift */; };
 		0E7E8CC01D0BC9D70057A1C1 /* CSVVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 0E7E8C9F1D0BC7F10057A1C1 /* CSVVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0E7E8CD01D0BCA2A0057A1C1 /* CSV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E7E8CC61D0BCA2A0057A1C1 /* CSV.framework */; };
-		0E7E8CE01D0BCA8E0057A1C1 /* CSVReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7E8C9D1D0BC7F10057A1C1 /* CSVReader.swift */; };
-		0E7E8CE11D0BCA8E0057A1C1 /* CSVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7E8C9E1D0BC7F10057A1C1 /* CSVError.swift */; };
 		0E7E8CE21D0BCA8E0057A1C1 /* CSVVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 0E7E8C9F1D0BC7F10057A1C1 /* CSVVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0E7E8CF21D0BCD0B0057A1C1 /* CSV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E7E8CE81D0BCD0B0057A1C1 /* CSV.framework */; };
-		0E7E8D001D0BCDCF0057A1C1 /* CSVReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7E8C9D1D0BC7F10057A1C1 /* CSVReader.swift */; };
-		0E7E8D011D0BCDCF0057A1C1 /* CSVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7E8C9E1D0BC7F10057A1C1 /* CSVError.swift */; };
 		0E7E8D021D0BCDCF0057A1C1 /* CSVVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 0E7E8C9F1D0BC7F10057A1C1 /* CSVVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0E7F657B1EF6437E00E1E1A0 /* Version1Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7F657A1EF6437E00E1E1A0 /* Version1Tests.swift */; };
 		0E7F657C1EF6437E00E1E1A0 /* Version1Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7F657A1EF6437E00E1E1A0 /* Version1Tests.swift */; };
 		0E7F657D1EF6437E00E1E1A0 /* Version1Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7F657A1EF6437E00E1E1A0 /* Version1Tests.swift */; };
-		0EA2AB7C1D183B45003EC967 /* BinaryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA2AB7B1D183B45003EC967 /* BinaryReader.swift */; };
-		0EA2AB7D1D183B45003EC967 /* BinaryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA2AB7B1D183B45003EC967 /* BinaryReader.swift */; };
-		0EA2AB7E1D183B45003EC967 /* BinaryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA2AB7B1D183B45003EC967 /* BinaryReader.swift */; };
-		0EA2AB7F1D183B45003EC967 /* BinaryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA2AB7B1D183B45003EC967 /* BinaryReader.swift */; };
-		0EA2AB811D183BA9003EC967 /* UnicodeIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA2AB801D183BA9003EC967 /* UnicodeIterator.swift */; };
-		0EA2AB821D183BA9003EC967 /* UnicodeIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA2AB801D183BA9003EC967 /* UnicodeIterator.swift */; };
-		0EA2AB831D183BA9003EC967 /* UnicodeIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA2AB801D183BA9003EC967 /* UnicodeIterator.swift */; };
-		0EA2AB841D183BA9003EC967 /* UnicodeIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EA2AB801D183BA9003EC967 /* UnicodeIterator.swift */; };
-		0EC628FE1EF675B300289554 /* CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC628FD1EF675B300289554 /* CSV.swift */; };
-		0EC628FF1EF675FD00289554 /* CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC628FD1EF675B300289554 /* CSV.swift */; };
-		0EC629001EF675FE00289554 /* CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC628FD1EF675B300289554 /* CSV.swift */; };
-		0EC629011EF675FF00289554 /* CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC628FD1EF675B300289554 /* CSV.swift */; };
+		0E959C62208B611F005F8D01 /* CSVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5B208B611F005F8D01 /* CSVError.swift */; };
+		0E959C63208B611F005F8D01 /* CSVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5B208B611F005F8D01 /* CSVError.swift */; };
+		0E959C64208B611F005F8D01 /* CSVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5B208B611F005F8D01 /* CSVError.swift */; };
+		0E959C65208B611F005F8D01 /* CSVError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5B208B611F005F8D01 /* CSVError.swift */; };
+		0E959C66208B611F005F8D01 /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5C208B611F005F8D01 /* CSVWriter.swift */; };
+		0E959C67208B611F005F8D01 /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5C208B611F005F8D01 /* CSVWriter.swift */; };
+		0E959C68208B611F005F8D01 /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5C208B611F005F8D01 /* CSVWriter.swift */; };
+		0E959C69208B611F005F8D01 /* CSVWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5C208B611F005F8D01 /* CSVWriter.swift */; };
+		0E959C6A208B611F005F8D01 /* CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5D208B611F005F8D01 /* CSV.swift */; };
+		0E959C6B208B611F005F8D01 /* CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5D208B611F005F8D01 /* CSV.swift */; };
+		0E959C6C208B611F005F8D01 /* CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5D208B611F005F8D01 /* CSV.swift */; };
+		0E959C6D208B611F005F8D01 /* CSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5D208B611F005F8D01 /* CSV.swift */; };
+		0E959C6E208B611F005F8D01 /* BinaryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5E208B611F005F8D01 /* BinaryReader.swift */; };
+		0E959C6F208B611F005F8D01 /* BinaryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5E208B611F005F8D01 /* BinaryReader.swift */; };
+		0E959C70208B611F005F8D01 /* BinaryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5E208B611F005F8D01 /* BinaryReader.swift */; };
+		0E959C71208B611F005F8D01 /* BinaryReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5E208B611F005F8D01 /* BinaryReader.swift */; };
+		0E959C72208B611F005F8D01 /* UnicodeIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5F208B611F005F8D01 /* UnicodeIterator.swift */; };
+		0E959C73208B611F005F8D01 /* UnicodeIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5F208B611F005F8D01 /* UnicodeIterator.swift */; };
+		0E959C74208B611F005F8D01 /* UnicodeIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5F208B611F005F8D01 /* UnicodeIterator.swift */; };
+		0E959C75208B611F005F8D01 /* UnicodeIterator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C5F208B611F005F8D01 /* UnicodeIterator.swift */; };
+		0E959C76208B611F005F8D01 /* Endian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C60208B611F005F8D01 /* Endian.swift */; };
+		0E959C77208B611F005F8D01 /* Endian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C60208B611F005F8D01 /* Endian.swift */; };
+		0E959C78208B611F005F8D01 /* Endian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C60208B611F005F8D01 /* Endian.swift */; };
+		0E959C79208B611F005F8D01 /* Endian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C60208B611F005F8D01 /* Endian.swift */; };
+		0E959C7A208B611F005F8D01 /* CSVReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C61208B611F005F8D01 /* CSVReader.swift */; };
+		0E959C7B208B611F005F8D01 /* CSVReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C61208B611F005F8D01 /* CSVReader.swift */; };
+		0E959C7C208B611F005F8D01 /* CSVReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C61208B611F005F8D01 /* CSVReader.swift */; };
+		0E959C7D208B611F005F8D01 /* CSVReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E959C61208B611F005F8D01 /* CSVReader.swift */; };
 		0EDF8ED71DDB73520068056A /* CSVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EDF8ECD1DDB73370068056A /* CSVTests.swift */; };
 		0EDF8ED81DDB73520068056A /* LineBreakTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EDF8ECE1DDB73370068056A /* LineBreakTests.swift */; };
 		0EDF8ED91DDB73520068056A /* ReadmeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EDF8ECF1DDB73370068056A /* ReadmeTests.swift */; };
@@ -90,13 +90,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0E0F160D1D197DB800C92580 /* Endian.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Endian.swift; sourceTree = "<group>"; };
 		0E54021A1ED9DDF40019C3ED /* CSVWriterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVWriterTests.swift; sourceTree = "<group>"; };
-		0E54021E1EDA81E80019C3ED /* CSVWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVWriter.swift; sourceTree = "<group>"; };
 		0E7E8C811D0BC7BB0057A1C1 /* CSV.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CSV.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E7E8C8B1D0BC7BB0057A1C1 /* CSVTests-iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CSVTests-iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		0E7E8C9D1D0BC7F10057A1C1 /* CSVReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVReader.swift; sourceTree = "<group>"; };
-		0E7E8C9E1D0BC7F10057A1C1 /* CSVError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVError.swift; sourceTree = "<group>"; };
 		0E7E8C9F1D0BC7F10057A1C1 /* CSVVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSVVersion.h; sourceTree = "<group>"; };
 		0E7E8CAC1D0BC8610057A1C1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0E7E8CAE1D0BC8690057A1C1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -106,9 +102,13 @@
 		0E7E8CE81D0BCD0B0057A1C1 /* CSV.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CSV.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E7E8CF11D0BCD0B0057A1C1 /* CSVTests-tvOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CSVTests-tvOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E7F657A1EF6437E00E1E1A0 /* Version1Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Version1Tests.swift; sourceTree = "<group>"; };
-		0EA2AB7B1D183B45003EC967 /* BinaryReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BinaryReader.swift; sourceTree = "<group>"; };
-		0EA2AB801D183BA9003EC967 /* UnicodeIterator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnicodeIterator.swift; sourceTree = "<group>"; };
-		0EC628FD1EF675B300289554 /* CSV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSV.swift; sourceTree = "<group>"; };
+		0E959C5B208B611F005F8D01 /* CSVError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVError.swift; sourceTree = "<group>"; };
+		0E959C5C208B611F005F8D01 /* CSVWriter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVWriter.swift; sourceTree = "<group>"; };
+		0E959C5D208B611F005F8D01 /* CSV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSV.swift; sourceTree = "<group>"; };
+		0E959C5E208B611F005F8D01 /* BinaryReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BinaryReader.swift; sourceTree = "<group>"; };
+		0E959C5F208B611F005F8D01 /* UnicodeIterator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnicodeIterator.swift; sourceTree = "<group>"; };
+		0E959C60208B611F005F8D01 /* Endian.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Endian.swift; sourceTree = "<group>"; };
+		0E959C61208B611F005F8D01 /* CSVReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVReader.swift; sourceTree = "<group>"; };
 		0EDF8ECD1DDB73370068056A /* CSVTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVTests.swift; sourceTree = "<group>"; };
 		0EDF8ECE1DDB73370068056A /* LineBreakTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineBreakTests.swift; sourceTree = "<group>"; };
 		0EDF8ECF1DDB73370068056A /* ReadmeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadmeTests.swift; sourceTree = "<group>"; };
@@ -199,15 +199,9 @@
 		0E7E8C9B1D0BC7F10057A1C1 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				0EA2AB7B1D183B45003EC967 /* BinaryReader.swift */,
-				0EC628FD1EF675B300289554 /* CSV.swift */,
-				0E7E8C9E1D0BC7F10057A1C1 /* CSVError.swift */,
-				0E7E8C9D1D0BC7F10057A1C1 /* CSVReader.swift */,
+				0E959C5A208B611F005F8D01 /* CSV */,
 				0E7E8C9F1D0BC7F10057A1C1 /* CSVVersion.h */,
-				0E54021E1EDA81E80019C3ED /* CSVWriter.swift */,
-				0E0F160D1D197DB800C92580 /* Endian.swift */,
 				0E7E8CAC1D0BC8610057A1C1 /* Info.plist */,
-				0EA2AB801D183BA9003EC967 /* UnicodeIterator.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -219,6 +213,20 @@
 				0E7E8CAE1D0BC8690057A1C1 /* Info.plist */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		0E959C5A208B611F005F8D01 /* CSV */ = {
+			isa = PBXGroup;
+			children = (
+				0E959C5E208B611F005F8D01 /* BinaryReader.swift */,
+				0E959C5D208B611F005F8D01 /* CSV.swift */,
+				0E959C5B208B611F005F8D01 /* CSVError.swift */,
+				0E959C61208B611F005F8D01 /* CSVReader.swift */,
+				0E959C5C208B611F005F8D01 /* CSVWriter.swift */,
+				0E959C60208B611F005F8D01 /* Endian.swift */,
+				0E959C5F208B611F005F8D01 /* UnicodeIterator.swift */,
+			);
+			path = CSV;
 			sourceTree = "<group>";
 		};
 		0EA37AC81DD8C0B900F5B274 /* CSVTests */ = {
@@ -537,13 +545,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0EA2AB821D183BA9003EC967 /* UnicodeIterator.swift in Sources */,
-				0E5402241EDA82220019C3ED /* CSVWriter.swift in Sources */,
-				0E7E8CA11D0BC7F10057A1C1 /* CSVReader.swift in Sources */,
-				0E0F160F1D197DB800C92580 /* Endian.swift in Sources */,
-				0E7E8CA21D0BC7F10057A1C1 /* CSVError.swift in Sources */,
-				0EC628FF1EF675FD00289554 /* CSV.swift in Sources */,
-				0EA2AB7D1D183B45003EC967 /* BinaryReader.swift in Sources */,
+				0E959C63208B611F005F8D01 /* CSVError.swift in Sources */,
+				0E959C6F208B611F005F8D01 /* BinaryReader.swift in Sources */,
+				0E959C77208B611F005F8D01 /* Endian.swift in Sources */,
+				0E959C67208B611F005F8D01 /* CSVWriter.swift in Sources */,
+				0E959C73208B611F005F8D01 /* UnicodeIterator.swift in Sources */,
+				0E959C6B208B611F005F8D01 /* CSV.swift in Sources */,
+				0E959C7B208B611F005F8D01 /* CSVReader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -565,13 +573,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0EA2AB841D183BA9003EC967 /* UnicodeIterator.swift in Sources */,
-				0E5402221EDA82220019C3ED /* CSVWriter.swift in Sources */,
-				0E7E8CBE1D0BC9D70057A1C1 /* CSVReader.swift in Sources */,
-				0E0F16111D197DB800C92580 /* Endian.swift in Sources */,
-				0E7E8CBF1D0BC9D70057A1C1 /* CSVError.swift in Sources */,
-				0EC629011EF675FF00289554 /* CSV.swift in Sources */,
-				0EA2AB7F1D183B45003EC967 /* BinaryReader.swift in Sources */,
+				0E959C65208B611F005F8D01 /* CSVError.swift in Sources */,
+				0E959C71208B611F005F8D01 /* BinaryReader.swift in Sources */,
+				0E959C79208B611F005F8D01 /* Endian.swift in Sources */,
+				0E959C69208B611F005F8D01 /* CSVWriter.swift in Sources */,
+				0E959C75208B611F005F8D01 /* UnicodeIterator.swift in Sources */,
+				0E959C6D208B611F005F8D01 /* CSV.swift in Sources */,
+				0E959C7D208B611F005F8D01 /* CSVReader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -579,13 +587,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0EA2AB811D183BA9003EC967 /* UnicodeIterator.swift in Sources */,
-				0E5402251EDA82230019C3ED /* CSVWriter.swift in Sources */,
-				0E7E8CE01D0BCA8E0057A1C1 /* CSVReader.swift in Sources */,
-				0E0F160E1D197DB800C92580 /* Endian.swift in Sources */,
-				0E7E8CE11D0BCA8E0057A1C1 /* CSVError.swift in Sources */,
-				0EC628FE1EF675B300289554 /* CSV.swift in Sources */,
-				0EA2AB7C1D183B45003EC967 /* BinaryReader.swift in Sources */,
+				0E959C62208B611F005F8D01 /* CSVError.swift in Sources */,
+				0E959C6E208B611F005F8D01 /* BinaryReader.swift in Sources */,
+				0E959C76208B611F005F8D01 /* Endian.swift in Sources */,
+				0E959C66208B611F005F8D01 /* CSVWriter.swift in Sources */,
+				0E959C72208B611F005F8D01 /* UnicodeIterator.swift in Sources */,
+				0E959C6A208B611F005F8D01 /* CSV.swift in Sources */,
+				0E959C7A208B611F005F8D01 /* CSVReader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -607,13 +615,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0EA2AB831D183BA9003EC967 /* UnicodeIterator.swift in Sources */,
-				0E5402231EDA82220019C3ED /* CSVWriter.swift in Sources */,
-				0E7E8D001D0BCDCF0057A1C1 /* CSVReader.swift in Sources */,
-				0E0F16101D197DB800C92580 /* Endian.swift in Sources */,
-				0E7E8D011D0BCDCF0057A1C1 /* CSVError.swift in Sources */,
-				0EC629001EF675FE00289554 /* CSV.swift in Sources */,
-				0EA2AB7E1D183B45003EC967 /* BinaryReader.swift in Sources */,
+				0E959C64208B611F005F8D01 /* CSVError.swift in Sources */,
+				0E959C70208B611F005F8D01 /* BinaryReader.swift in Sources */,
+				0E959C78208B611F005F8D01 /* Endian.swift in Sources */,
+				0E959C68208B611F005F8D01 /* CSVWriter.swift in Sources */,
+				0E959C74208B611F005F8D01 /* UnicodeIterator.swift in Sources */,
+				0E959C6C208B611F005F8D01 /* CSV.swift in Sources */,
+				0E959C7C208B611F005F8D01 /* CSVReader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -807,6 +815,7 @@
 		0E7E8C991D0BC7BB0057A1C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "net.yaslab.CSVTests-iOS";
@@ -818,6 +827,7 @@
 		0E7E8C9A1D0BC7BB0057A1C1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "net.yaslab.CSVTests-iOS";
@@ -920,6 +930,7 @@
 		0E7E8CDB1D0BCA2A0057A1C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
@@ -935,6 +946,7 @@
 		0E7E8CDC1D0BCA2A0057A1C1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
@@ -994,6 +1006,7 @@
 		0E7E8CFD1D0BCD0B0057A1C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "net.yaslab.CSVTests-tvOS";
@@ -1007,6 +1020,7 @@
 		0E7E8CFE1D0BCD0B0057A1C1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "net.yaslab.CSVTests-tvOS";
