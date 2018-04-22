@@ -182,6 +182,11 @@ extension CSVWriter {
 
         var value = value
 
+        var quoted = quoted
+        if value.contains("\"") {
+            quoted = true
+        }
+
         if quoted {
             value = value.replacingOccurrences(of: DQUOTE_STR, with: DQUOTE2_STR)
             try writeScalar(DQUOTE)
