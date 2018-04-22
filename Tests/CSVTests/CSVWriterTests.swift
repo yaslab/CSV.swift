@@ -32,6 +32,7 @@ class CSVWriterTests: XCTestCase {
         ("testQuoted", testQuoted),
         ("testQuotedNewline", testQuotedNewline),
         ("testEscapeQuote", testEscapeQuote),
+        ("testEscapeQuoteAutomatically", testEscapeQuoteAutomatically),
         ("testDelimiter", testDelimiter),
         ("testNewline", testNewline),
         ("testUTF16BE", testUTF16BE),
