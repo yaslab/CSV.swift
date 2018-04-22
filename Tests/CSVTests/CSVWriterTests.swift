@@ -166,6 +166,22 @@ class CSVWriterTests: XCTestCase {
         XCTAssertEqual(csvStr, "\(str)-1,\"\(str)-\"\"-2\"")
     }
 
+    /// csv.write(row: ["xxxx", "xx,\"xx"])
+    /// -> xxxx,"xx,""xx"
+    func testEscapeQuoteAutomatically() {
+        let stream = OutputStream(toMemory: ())
+        stream.open()
+        
+        let csv = try! CSVWriter(stream: stream)
+        try! csv.write(row: ["id", "testing,\"comma"]) // quoted: false
+        
+        stream.close()
+        let data = stream.data!
+        let csvStr = String(data: data, encoding: .utf8)!
+        
+        XCTAssertEqual(csvStr, "id,\"testing,\"\"comma\"")
+    }
+    
     /// Test delimiter: "\t"
     func testDelimiter() {
         let stream = OutputStream(toMemory: ())
