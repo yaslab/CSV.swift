@@ -24,7 +24,12 @@ class TrimFieldsTests: XCTestCase {
         ("testTrimFields10", testTrimFields10),
         ("testTrimFields11", testTrimFields11),
         ("testTrimFields12", testTrimFields12),
-        ("testTrimFields13", testTrimFields13)
+        ("testTrimFields13", testTrimFields13),
+        ("testTrimFields14", testTrimFields14),
+        ("testTrimFields15", testTrimFields15),
+        ("testTrimFields16", testTrimFields16),
+        ("testTrimFields17", testTrimFields17),
+        ("testTrimFields18", testTrimFields18)
     ]
 
     func testTrimFields1() {
