@@ -399,6 +399,12 @@ extension CSVReader {
 
 extension CSVReader {
     
+    static var dateFormatter: DateFormatter {
+        let result = DateFormatter()
+        result.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
+        return result
+    }
+    
     private class CSVRowDecoder: Decoder {
         let codingPath: [CodingKey]
         
@@ -594,23 +600,35 @@ extension CSVReader {
         }
         
         func decode<T>(_ type: T.Type, forKey key: K) throws -> T where T : Decodable {
+            guard let stringValue = self.valueFor(column: key) else {
+                throw DecodingError.valueNotFound(type,
+                                                  DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...)"))
+            }
+            if type == Date.self {
+                let formatter = CSVReader.dateFormatter
+
+                guard let result = formatter.date(from: stringValue) as? T else {
+                    throw DecodingError.dataCorruptedError(forKey: key, in: self, debugDescription: "decode(...) for type \(type) with value '\(stringValue)'")
+                }
+                return result
+            }
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(codingPath: codingPath,
-                                      debugDescription: "CSV does not support nested values")
+                                      debugDescription: "CSV does not single value support complex type \(T.self)")
             )
         }
         
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: K) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(codingPath: codingPath,
-                                      debugDescription: "CSV does not support nested values")
+                                      debugDescription: "nestedContainer(...) CSV does not support nested values")
             )
         }
         
         func nestedUnkeyedContainer(forKey key: K) throws -> UnkeyedDecodingContainer {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(codingPath: codingPath,
-                                      debugDescription: "CSV does not support nested values")
+                                      debugDescription: "nestedUnkeyedContainer(...) CSV does not support nested values")
             )
         }
         

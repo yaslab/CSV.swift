@@ -236,9 +236,13 @@ class CSVTests: XCTestCase {
         let intKey: Int
         let stringKey: String
         let optionalStringKey: String?
+        let dateKey: Date
         
         static func ==(left: DecodableExample, right: DecodableExample) -> Bool {
+            let formatter = CSVReader.dateFormatter
             return left.intKey == right.intKey && left.stringKey == right.stringKey && left.optionalStringKey == right.optionalStringKey
+            //&& left.dateKey.compare(right.dateKey) == ComparisonResult.orderedSame // TODO: find more accurate conversion method, cannot compare directly likely because we are losing precision when in csv
+            && formatter.string(from: left.dateKey) == formatter.string(from: right.dateKey)
         }
     }
 
@@ -260,9 +264,11 @@ class CSVTests: XCTestCase {
                                                      trimFields: false,
                                                      delimiter: ",",
                                                      whitespaces: .whitespaces)
-        let record0Example = DecodableExample(intKey: 12345, stringKey: "stringValue", optionalStringKey: nil)
-        let record1Example = DecodableExample(intKey: 54321, stringKey: "stringValue2", optionalStringKey: "withValue")
-        let headerIt = "stringKey,optionalStringKey,intKey,ignored\n\(record0Example.stringKey),,\(record0Example.intKey),\n\(record1Example.stringKey),\(record1Example.optionalStringKey!),\(record1Example.intKey),".unicodeScalars.makeIterator()
+        let record0Example = DecodableExample(intKey: 12345, stringKey: "stringValue", optionalStringKey: nil, dateKey: Date())
+        let record1Example = DecodableExample(intKey: 54321, stringKey: "stringValue2", optionalStringKey: "withValue", dateKey: Date(timeInterval: 100, since: Date()))
+        let dateFormatter = CSVReader.dateFormatter
+        
+        let headerIt = "stringKey,optionalStringKey,intKey,ignored,dateKey\n\(record0Example.stringKey),,\(record0Example.intKey),,\"\(dateFormatter.string(from: record0Example.dateKey))\"\n\(record1Example.stringKey),\(record1Example.optionalStringKey!),\(record1Example.intKey),,\"\(dateFormatter.string(from: record1Example.dateKey))\"".unicodeScalars.makeIterator()
         let headerCSV = try! CSVReader(iterator: headerIt, configuration: headerConfig)
 
         var records = [DecodableExample]()
