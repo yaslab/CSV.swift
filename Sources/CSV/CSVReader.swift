@@ -395,5 +395,258 @@ extension CSVReader {
         }
         return row[index]
     }
+}
 
+extension CSVReader {
+    
+    private class CSVRowDecoder: Decoder {
+        let codingPath: [CodingKey]
+        
+        let valuesByColumn: [String: String]
+        
+        let userInfo: [CodingUserInfoKey : Any]
+        
+        init(codingPath: [CodingKey], valuesByColumn: [String: String], userInfo: [CodingUserInfoKey : Any] = [:]) {
+            self.codingPath = codingPath
+            self.valuesByColumn = valuesByColumn
+            self.userInfo = userInfo
+        }
+        
+        func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key : CodingKey {
+            let container = CSVKeyedDecodingContainer<Key>(referencing: self)
+            return KeyedDecodingContainer(container)
+        }
+        
+        func unkeyedContainer() throws -> UnkeyedDecodingContainer {
+            throw DecodingError.valueNotFound(UnkeyedDecodingContainer.self,
+                                              DecodingError.Context(codingPath: self.codingPath,
+                                                                    debugDescription: "Cannot get unkeyed decoding container -- found null value instead."))
+        }
+        
+        func singleValueContainer() throws -> SingleValueDecodingContainer {
+            throw DecodingError.typeMismatch(SingleValueDecodingContainer.self,
+                                             DecodingError.Context(codingPath: self.codingPath,
+                                                                   debugDescription: "Cannot get single value decoding container -- found keyed container instead."))
+        }
+    }
+    
+    private class CSVKeyedDecodingContainer<K : CodingKey> : KeyedDecodingContainerProtocol {
+        typealias Key = K
+        
+        let decoder: CSVRowDecoder
+        
+        var codingPath: [CodingKey] {
+            return self.decoder.codingPath
+        }
+        
+        var allKeys: [K] {
+            return self.decoder.valuesByColumn.keys.compactMap { K(stringValue: $0) }
+        }
+        
+        var valuesByColumn: [String: String] {
+            return self.decoder.valuesByColumn
+        }
+        
+        func valueFor(column: CodingKey) -> String? {
+            return self.valuesByColumn[column.stringValue]
+        }
+        
+        init(referencing decoder: CSVRowDecoder) {
+            self.decoder = decoder
+        }
+        
+        func contains(_ key: K) -> Bool {
+            return self.valueFor(column: key) != nil
+        }
+        
+        func decodeNil(forKey key: K) throws -> Bool {
+            guard let value = self.valueFor(column: key) else {
+                return true
+            }
+            
+            if value.count == 0 {
+                return true
+            }
+            
+            return false
+        }
+        
+        // TODO: support DecodingError.keyNotFound
+        // TODO: support DecodingError.valueNotFound
+        func decode(_ type: Bool.Type, forKey key: K) throws -> Bool {
+            guard let result = self.valueFor(column: key).flatMap({ Bool($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+        }
+        
+        func decode(_ type: String.Type, forKey key: K) throws -> String {
+            guard let result = self.valueFor(column: key).flatMap({ String($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+        }
+        
+        func decode(_ type: Double.Type, forKey key: K) throws -> Double {
+            guard let result = self.valueFor(column: key).flatMap({ Double($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+        }
+        
+        func decode(_ type: Float.Type, forKey key: K) throws -> Float {
+            guard let result = self.valueFor(column: key).flatMap({ Float($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+        }
+        
+        func decode(_ type: Int.Type, forKey key: K) throws -> Int {
+            guard let result = self.valueFor(column: key).flatMap({ Int($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+        }
+        
+        func decode(_ type: Int8.Type, forKey key: K) throws -> Int8 {
+            guard let result = self.valueFor(column: key).flatMap({ Int8($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+        }
+        
+        func decode(_ type: Int16.Type, forKey key: K) throws -> Int16 {
+            guard let result = self.valueFor(column: key).flatMap({ Int16($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+
+        }
+        
+        func decode(_ type: Int32.Type, forKey key: K) throws -> Int32 {
+            guard let result = self.valueFor(column: key).flatMap({ Int32($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+
+        }
+        
+        func decode(_ type: Int64.Type, forKey key: K) throws -> Int64 {
+            guard let result = self.valueFor(column: key).flatMap({ Int64($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+
+        }
+        
+        func decode(_ type: UInt.Type, forKey key: K) throws -> UInt {
+            guard let result = self.valueFor(column: key).flatMap({ UInt($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+
+        }
+        
+        func decode(_ type: UInt8.Type, forKey key: K) throws -> UInt8 {
+            guard let result = self.valueFor(column: key).flatMap({ UInt8($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+
+        }
+        
+        func decode(_ type: UInt16.Type, forKey key: K) throws -> UInt16 {
+            guard let result = self.valueFor(column: key).flatMap({ UInt16($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+
+        }
+        
+        func decode(_ type: UInt32.Type, forKey key: K) throws -> UInt32 {
+            guard let result = self.valueFor(column: key).flatMap({ UInt32($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+
+        }
+        
+        func decode(_ type: UInt64.Type, forKey key: K) throws -> UInt64 {
+            guard let result = self.valueFor(column: key).flatMap({ UInt64($0) }) else {
+                throw DecodingError.typeMismatch(type,
+                                                 DecodingError.Context(codingPath: codingPath, debugDescription: "decode(...) value '\(self.valueFor(column: key) ?? "nil")'"))
+            }
+            return result
+
+        }
+        
+        func decode<T>(_ type: T.Type, forKey key: K) throws -> T where T : Decodable {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(codingPath: codingPath,
+                                      debugDescription: "CSV does not support nested values")
+            )
+        }
+        
+        func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: K) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(codingPath: codingPath,
+                                      debugDescription: "CSV does not support nested values")
+            )
+        }
+        
+        func nestedUnkeyedContainer(forKey key: K) throws -> UnkeyedDecodingContainer {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(codingPath: codingPath,
+                                      debugDescription: "CSV does not support nested values")
+            )
+        }
+        
+        func superDecoder() throws -> Decoder {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(codingPath: codingPath,
+                                      debugDescription: "CSV does not support nested values")
+            )
+        }
+        
+        func superDecoder(forKey key: K) throws -> Decoder {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(codingPath: codingPath,
+                                      debugDescription: "CSV does not support nested values")
+            )
+        }
+        
+        
+    }
+    
+
+    public func readRow<T>() throws -> T? where T: Decodable {
+        guard let headerRow = self.headerRow else {
+            throw DecodingError.typeMismatch(T.self,
+                                             DecodingError.Context(codingPath: [],
+                                                                   debugDescription: "readRow(): Header row required to map to Decodable")
+            )
+        }
+        
+        guard let valuesRow = self.readRow() else {
+            return nil
+        }
+        
+        let valuesForColumns = Dictionary(uniqueKeysWithValues: zip(headerRow, valuesRow))
+
+        let decoder = CSVRowDecoder(codingPath: [], valuesByColumn: valuesForColumns)
+        return try T(from: decoder)
+    }
 }

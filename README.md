@@ -85,6 +85,28 @@ let csv = try! CSVReader(stream: stream,
                          endian: .big)
 ```
 
+### Reading a row into a Decodable object
+If you have a destination object that conforms to the `Decodable` protocol and your CSV includes a header you can serialize a row with a new instances of the object.
+
+```swift
+struct DecodableExample: Decodable {
+	let intKey: Int
+	let stringKey: String
+	let optionalStringKey: String?
+}
+
+...
+    
+var records = [DecodableExample]()
+do {
+	while let record: DecodableExample = try headerCSV.readRow() {
+		records.append(record)
+	}
+} catch {
+	XCTFail("Invalid row format: \(error)")
+}
+```
+
 ## Usage for writing CSV
 
 ### Write to memory and get a CSV String

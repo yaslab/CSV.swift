@@ -231,5 +231,60 @@ class CSVTests: XCTestCase {
 //        XCTAssertEqual(rows[1]["name"], "name2")
 //        XCTAssertNil(rows[1]["yyy"])
 //    }
+    
+    struct DecodableExample: Decodable, Equatable {
+        let intKey: Int
+        let stringKey: String
+        let optionalStringKey: String?
+        
+        static func ==(left: DecodableExample, right: DecodableExample) -> Bool {
+            return left.intKey == right.intKey && left.stringKey == right.stringKey && left.optionalStringKey == right.optionalStringKey
+        }
+    }
 
+    func testDecodable() {
+        let noHeaderConfig = CSVReader.Configuration(hasHeaderRow: false,
+                                             trimFields: false,
+                                             delimiter: ",",
+                                             whitespaces: .whitespaces)
+        let noHeaderIt = "あ,い1,\"う\",えお\n,,x,".unicodeScalars.makeIterator()
+        let noHeaderCSV = try! CSVReader(iterator: noHeaderIt, configuration: noHeaderConfig)
+        
+        do {
+            let _: DecodableExample? = try noHeaderCSV.readRow()
+            XCTFail("Expect DecodingError.typeMismatch Error thrown")
+        } catch {
+        }
+
+        let headerConfig = CSVReader.Configuration(hasHeaderRow: true,
+                                                     trimFields: false,
+                                                     delimiter: ",",
+                                                     whitespaces: .whitespaces)
+        let record0Example = DecodableExample(intKey: 12345, stringKey: "stringValue", optionalStringKey: nil)
+        let record1Example = DecodableExample(intKey: 54321, stringKey: "stringValue2", optionalStringKey: "withValue")
+        let headerIt = "stringKey,optionalStringKey,intKey,ignored\n\(record0Example.stringKey),,\(record0Example.intKey),\n\(record1Example.stringKey),\(record1Example.optionalStringKey!),\(record1Example.intKey),".unicodeScalars.makeIterator()
+        let headerCSV = try! CSVReader(iterator: headerIt, configuration: headerConfig)
+
+        var records = [DecodableExample]()
+        do {
+            while let record: DecodableExample = try headerCSV.readRow() {
+                records.append(record)
+            }
+        } catch {
+            XCTFail("readRow<T>() threw error: \(error)")
+        }
+        XCTAssertEqual(records.count, 2)
+        XCTAssertEqual(records[0], record0Example)
+        XCTAssertEqual(records[1], record1Example)
+        
+        let invalidFieldTypeIt = "stringKey,optionalStringKey,intKey,ignored\n\(record0Example.stringKey),,this is a string where we expect an Int,\n\(record1Example.stringKey),\(record1Example.optionalStringKey!),\(record1Example.intKey),".unicodeScalars.makeIterator()
+        let invalidFieldTypeCSV = try! CSVReader(iterator: invalidFieldTypeIt, configuration: headerConfig)
+        
+        do {
+            while let _: DecodableExample = try invalidFieldTypeCSV.readRow() {
+            }
+            XCTFail("Expect DecodingError.typeMismatch Error thrown")
+        } catch {
+        }
+    }
 }
