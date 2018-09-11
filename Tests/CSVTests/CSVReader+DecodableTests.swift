@@ -16,23 +16,29 @@ class CSVReader_DecodableTests: XCTestCase {
         ("testTypeMismatch", testTypeMismatch),
     ]
     
+    enum Enum: String, Decodable {
+        case first
+        case second
+    }
     struct SupportedDecodableExample: Decodable, Equatable {
         let intKey: Int
         let stringKey: String
         let optionalStringKey: String?
         let dateKey: Date
+        let enumKey: Enum
         
         static func ==(left: SupportedDecodableExample, right: SupportedDecodableExample) -> Bool {
             let formatter = CSVReader.dateFormatter
             return left.intKey == right.intKey && left.stringKey == right.stringKey && left.optionalStringKey == right.optionalStringKey
                 //&& left.dateKey.compare(right.dateKey) == ComparisonResult.orderedSame // TODO: find more accurate conversion method, cannot compare directly likely because we are losing precision when in csv
                 && formatter.string(from: left.dateKey) == formatter.string(from: right.dateKey)
+                && left.enumKey == right.enumKey
         }
         
         static var examples: [SupportedDecodableExample] {
             return [
-                SupportedDecodableExample(intKey: 12345, stringKey: "stringValue", optionalStringKey: nil, dateKey: Date()),
-                SupportedDecodableExample(intKey: 54321, stringKey: "stringValue2", optionalStringKey: "withValue", dateKey: Date(timeInterval: 100, since: Date()))
+                SupportedDecodableExample(intKey: 12345, stringKey: "stringValue", optionalStringKey: nil, dateKey: Date(), enumKey: .first),
+                SupportedDecodableExample(intKey: 54321, stringKey: "stringValue2", optionalStringKey: "withValue", dateKey: Date(timeInterval: 100, since: Date()), enumKey: .second)
             ]
         }
     }
@@ -61,9 +67,9 @@ class CSVReader_DecodableTests: XCTestCase {
         let dateFormatter = CSVReader.dateFormatter
         
         let headerIt = """
-            stringKey,optionalStringKey,intKey,ignored,dateKey
-            \(exampleRecords[0].stringKey),,\(exampleRecords[0].intKey),,\"\(dateFormatter.string(from: exampleRecords[0].dateKey))\"
-            \(exampleRecords[1].stringKey),\(exampleRecords[1].optionalStringKey!),\(exampleRecords[1].intKey),,\"\(dateFormatter.string(from: exampleRecords[1].dateKey))\"
+            stringKey,optionalStringKey,intKey,ignored,dateKey,enumKey
+            \(exampleRecords[0].stringKey),,\(exampleRecords[0].intKey),,\"\(dateFormatter.string(from: exampleRecords[0].dateKey))\",\(exampleRecords[0].enumKey)
+            \(exampleRecords[1].stringKey),\(exampleRecords[1].optionalStringKey!),\(exampleRecords[1].intKey),,\"\(dateFormatter.string(from: exampleRecords[1].dateKey))\",\(exampleRecords[1].enumKey)
             """.unicodeScalars.makeIterator()
         let headerCSV = try! CSVReader(iterator: headerIt, configuration: headerConfig)
         
@@ -146,11 +152,7 @@ class CSVReader_DecodableTests: XCTestCase {
     }
     
     struct UnsupportedDecodableExample: Decodable, Equatable {
-        enum UndecodableEnum: Int, Decodable {
-            case first
-            case second
-        }
-        let enumKey: UndecodableEnum
+        let enumKey: Enum
         
         static func ==(left: UnsupportedDecodableExample, right: UnsupportedDecodableExample) -> Bool {
             return left.enumKey == right.enumKey
@@ -175,6 +177,7 @@ class CSVReader_DecodableTests: XCTestCase {
             enumKey,optionalStringKey,intKey,ignored,dateKey
             \(exampleRecords[0].enumKey),"hiiiii",123445,,
             \(exampleRecords[1].enumKey),,54231,,
+            \("third"),,54231,,
             """.unicodeScalars.makeIterator()
         let headerCSV = try! CSVReader(iterator: headerIt, configuration: headerConfig)
         
@@ -185,11 +188,11 @@ class CSVReader_DecodableTests: XCTestCase {
             }
             XCTFail("Expect Data Corrupted Error thrown")
         } catch {
-            guard let error = error as? DecodingError else {
-                XCTFail("Expect DecodingError Error thrown")
+            guard let decodingError = error as? DecodingError else {
+                XCTFail("Expect DecodingError Error thrown, instead we go \(error)")
                 return
             }
-            switch error {
+            switch decodingError {
             case let .dataCorrupted(context):
                 guard context.codingPath[0].stringValue == "enumKey" else {
                     XCTFail("Data Corrupted Error on unexpected field")
@@ -197,7 +200,7 @@ class CSVReader_DecodableTests: XCTestCase {
                 }
                 break
             default:
-                XCTFail("Expect Data Corrupted Error thrown")
+                XCTFail("Expect Data Corrupted Error thrown, instead we got \(decodingError)")
                 return
             }
         }
