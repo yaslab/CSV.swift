@@ -199,14 +199,6 @@ internal class BinaryReader {
         }
     }
 
-    fileprivate func copy(_ buffer: UnsafeMutablePointer<UInt8>, maxLength len: Int) -> Int {
-        let length = min(len, _count - _position)
-        for i in 0 ..< length {
-            buffer[i] = _buffer[_position + i]
-        }
-        return length
-    }
-
 }
 
 extension BinaryReader {

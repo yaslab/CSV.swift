@@ -10,7 +10,8 @@ import XCTest
 @testable import CSVTests
 
 XCTMain([
-     testCase(CSVTests.allTests),
+     testCase(BinaryReaderTests.allTests),
+     testCase(CSVReaderTests.allTests),
      testCase(CSVWriterTests.allTests),
      testCase(LineBreakTests.allTests),
      testCase(ReadmeTests.allTests),

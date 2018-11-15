@@ -1,5 +1,5 @@
 //
-//  CSVTests.swift
+//  CSVReaderTests.swift
 //  CSV
 //
 //  Created by Yasuhiro Hatta on 2016/06/11.
@@ -9,7 +9,7 @@
 import XCTest
 @testable import CSV
 
-class CSVTests: XCTestCase {
+class CSVReaderTests: XCTestCase {
 
     static let allTests = [
         ("testOneLine", testOneLine),
