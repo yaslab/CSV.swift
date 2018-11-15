@@ -49,7 +49,7 @@ class BinaryReaderTests: XCTestCase {
         do {
             let reader = try BinaryReader(stream: stream, endian: .big, closeOnDeinit: true, bufferSize: 7)
             for i in stride(from: 0, to: bytes.count, by: 2) {
-                let expected = (UInt16(bytes[i]) << 8) + UInt16(bytes[i + 1])
+                let expected = (UInt16(bytes[i]) << 8) | UInt16(bytes[i + 1])
                 let actual = try reader.readUInt16()
                 XCTAssertEqual(actual, expected)
             }
@@ -65,7 +65,7 @@ class BinaryReaderTests: XCTestCase {
         do {
             let reader = try BinaryReader(stream: stream, endian: .little, closeOnDeinit: true, bufferSize: 7)
             for i in stride(from: 0, to: bytes.count, by: 2) {
-                let expected = UInt16(bytes[i]) + (UInt16(bytes[i + 1]) << 8)
+                let expected = UInt16(bytes[i]) | (UInt16(bytes[i + 1]) << 8)
                 let actual = try reader.readUInt16()
                 XCTAssertEqual(actual, expected)
             }
@@ -82,8 +82,8 @@ class BinaryReaderTests: XCTestCase {
             let reader = try BinaryReader(stream: stream, endian: .big, closeOnDeinit: true, bufferSize: 7)
             for i in stride(from: 0, to: bytes.count, by: 4) {
                 let expected =
-                    (UInt32(bytes[i    ]) << 24) + (UInt32(bytes[i + 1]) << 16) +
-                    (UInt32(bytes[i + 2]) <<  8) + (UInt32(bytes[i + 3])      )
+                    (UInt32(bytes[i    ]) << 24) | (UInt32(bytes[i + 1]) << 16) |
+                    (UInt32(bytes[i + 2]) <<  8) | (UInt32(bytes[i + 3])      )
                 let actual = try reader.readUInt32()
                 XCTAssertEqual(actual, expected)
             }
@@ -100,8 +100,8 @@ class BinaryReaderTests: XCTestCase {
             let reader = try BinaryReader(stream: stream, endian: .little, closeOnDeinit: true, bufferSize: 7)
             for i in stride(from: 0, to: bytes.count, by: 4) {
                 let expected =
-                    (UInt32(bytes[i    ])      ) + (UInt32(bytes[i + 1]) <<  8) +
-                    (UInt32(bytes[i + 2]) << 16) + (UInt32(bytes[i + 3]) << 24)
+                    (UInt32(bytes[i    ])      ) | (UInt32(bytes[i + 1]) <<  8) |
+                    (UInt32(bytes[i + 2]) << 16) | (UInt32(bytes[i + 3]) << 24)
                 let actual = try reader.readUInt32()
                 XCTAssertEqual(actual, expected)
             }
