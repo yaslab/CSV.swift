@@ -139,11 +139,11 @@ internal class BinaryReader {
                         throw CSVError.cannotReadFile
                     }
                 }
+                _count = result
+                _position = 0
                 if result == 0 {
                     break
                 }
-                _count = result
-                _position = 0
             }
             buffer[i] = _buffer[_position]
             _position += 1
