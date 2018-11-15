@@ -28,7 +28,7 @@ class BinaryReaderTests: XCTestCase {
     }
 
     func testReadUInt8WithSmallBuffer() {
-        let bytes = random(100)
+        let bytes = [0xcc] + random(99)
         let stream = InputStream(data: Data(bytes: bytes))
 
         do {
@@ -43,7 +43,7 @@ class BinaryReaderTests: XCTestCase {
     }
 
     func testReadUInt16BEWithSmallBuffer() {
-        let bytes = random(100)
+        let bytes = [0xcc] + random(99)
         let stream = InputStream(data: Data(bytes: bytes))
 
         do {
@@ -59,7 +59,7 @@ class BinaryReaderTests: XCTestCase {
     }
 
     func testReadUInt16LEWithSmallBuffer() {
-        let bytes = random(100)
+        let bytes = [0xcc] + random(99)
         let stream = InputStream(data: Data(bytes: bytes))
 
         do {
@@ -75,7 +75,7 @@ class BinaryReaderTests: XCTestCase {
     }
 
     func testReadUInt32BEWithSmallBuffer() {
-        let bytes = random(100)
+        let bytes = [0xcc] + random(99)
         let stream = InputStream(data: Data(bytes: bytes))
 
         do {
@@ -93,7 +93,7 @@ class BinaryReaderTests: XCTestCase {
     }
 
     func testReadUInt32LEWithSmallBuffer() {
-        let bytes = random(100)
+        let bytes = [0xcc] + random(99)
         let stream = InputStream(data: Data(bytes: bytes))
 
         do {
