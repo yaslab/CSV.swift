@@ -26,7 +26,7 @@ class UnicodeTests: XCTestCase {
         let csvString = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf8
         var mutableData = Data()
-        mutableData.append(utf8BOM, count: utf8BOM.count)
+        mutableData.append(contentsOf: UnicodeBOM.utf8)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData)
         let csv = try! CSVReader(stream: stream, codecType: UTF8.self)
@@ -51,7 +51,7 @@ class UnicodeTests: XCTestCase {
         let csvString = "abab,,cdcd,efef\r\n😆zxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf16BigEndian
         var mutableData = Data()
-        mutableData.append(utf16BigEndianBOM, count: utf16BigEndianBOM.count)
+        mutableData.append(contentsOf: UnicodeBOM.utf16BE)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData as Data)
         let csv = try! CSVReader(stream: stream, codecType: UTF16.self, endian: .big)
@@ -64,7 +64,7 @@ class UnicodeTests: XCTestCase {
         let csvString = "abab,,cdcd,efef\r\nzxcv😆,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf16LittleEndian
         var mutableData = Data()
-        mutableData.append(utf16LittleEndianBOM, count: utf16LittleEndianBOM.count)
+        mutableData.append(contentsOf: UnicodeBOM.utf16LE)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData as Data)
         let csv = try! CSVReader(stream: stream, codecType: UTF16.self, endian: .little)
@@ -89,7 +89,7 @@ class UnicodeTests: XCTestCase {
         let csvString = "abab,,cd😆cd,efef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf32BigEndian
         var mutableData = Data()
-        mutableData.append(utf32BigEndianBOM, count: utf32BigEndianBOM.count)
+        mutableData.append(contentsOf: UnicodeBOM.utf32BE)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData as Data)
         let csv = try! CSVReader(stream: stream, codecType: UTF32.self, endian: .big)
@@ -102,7 +102,7 @@ class UnicodeTests: XCTestCase {
         let csvString = "abab,,cdcd,ef😆ef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf32LittleEndian
         var mutableData = Data()
-        mutableData.append(utf32LittleEndianBOM, count: utf32LittleEndianBOM.count)
+        mutableData.append(contentsOf: UnicodeBOM.utf32LE)
         mutableData.append(csvString.data(using: encoding)!)
         let stream = InputStream(data: mutableData as Data)
         let csv = try! CSVReader(stream: stream, codecType: UTF32.self, endian: .little)

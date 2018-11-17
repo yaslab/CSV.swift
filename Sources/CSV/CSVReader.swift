@@ -53,7 +53,6 @@ public class CSVReader {
     public fileprivate (set) var error: Error?
 
     fileprivate var back: UnicodeScalar?
-    fileprivate var fieldBuffer = String.UnicodeScalarView()
 
     fileprivate var currentRowIndex: Int = 0
     fileprivate var currentFieldIndex: Int = 0
@@ -281,7 +280,7 @@ extension CSVReader {
     }
 
     private func readField(quoted: Bool) -> (String, Bool) {
-        fieldBuffer.removeAll(keepingCapacity: true)
+        var fieldBuffer = String.UnicodeScalarView()
 
         while let c = moveNext() {
             if quoted {
