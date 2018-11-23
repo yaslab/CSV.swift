@@ -654,6 +654,8 @@ extension CSVReader._CSVRowDecoder {
     // TODO: Specialize the type of `Foundation` (such as Date, Data, ...).
 
     func unbox<T: Decodable>(_ value: String, as type: T.Type) throws -> T? {
+        if value.isEmpty { return nil }
+
         return try T(from: self)
     }
 
