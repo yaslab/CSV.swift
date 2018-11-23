@@ -205,4 +205,79 @@ class CSVReader_DecodableTests: XCTestCase {
             }
         }
     }
+
+    struct BooleanDecodableExample: Decodable {
+        let falseValue: Bool
+        let trueValue: Bool
+    }
+
+    func testDecodeBoolean() {
+        let csv = """
+            falseValue,trueValue
+            false,true
+            """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+
+            let row = try reader.readRow() as BooleanDecodableExample?
+            XCTAssertEqual(row!.falseValue, false)
+            XCTAssertEqual(row!.trueValue, true)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    struct IntegerDecodableExample: Decodable {
+        let intValue: Int
+        let int8Value: Int8
+        let int16Value: Int16
+        let int32Value: Int32
+        let int64Value: Int64
+    }
+
+    func testDecodeInteger() {
+        let csv = """
+            intValue,int8Value,int16Value,int32Value,int64Value
+            0,123,4567,89012,345678901234567890
+            """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+
+            let row = try reader.readRow() as IntegerDecodableExample?
+            XCTAssertEqual(row!.intValue, 0)
+            XCTAssertEqual(row!.int8Value, 123)
+            XCTAssertEqual(row!.int16Value, 4567)
+            XCTAssertEqual(row!.int32Value, 89012)
+            XCTAssertEqual(row!.int64Value, 345678901234567890)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    struct UnsignedIntegerDecodableExample: Decodable {
+        let uintValue: UInt
+        let uint8Value: UInt8
+        let uint16Value: UInt16
+        let uint32Value: UInt32
+        let uint64Value: UInt64
+    }
+
+    func testDecodeUnsignedInteger() {
+        let csv = """
+            uintValue,uint8Value,uint16Value,uint32Value,uint64Value
+            0,123,4567,89012,345678901234567890
+            """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+
+            let row = try reader.readRow() as UnsignedIntegerDecodableExample?
+            XCTAssertEqual(row!.uintValue, 0)
+            XCTAssertEqual(row!.uint8Value, 123)
+            XCTAssertEqual(row!.uint16Value, 4567)
+            XCTAssertEqual(row!.uint32Value, 89012)
+            XCTAssertEqual(row!.uint64Value, 345678901234567890)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
 }
