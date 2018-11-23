@@ -21,6 +21,12 @@ extension CSVReader {
         init() {}
 
         func decode<T: Decodable>(_ type: T.Type, from reader: CSVReader) throws -> T {
+            guard reader.headerRow != nil else {
+                throw DecodingError.typeMismatch(T.self,
+                                                       DecodingError.Context(codingPath: [],
+                                                                             debugDescription: "readRow(): Header row required to map to Decodable")
+                )
+            }
             let decoder = _CSVRowDecoder(referencing: reader, at: [], userInfo: [:])
             return try T(from: decoder)
         }
@@ -652,9 +658,23 @@ extension CSVReader._CSVRowDecoder {
     }
 
     // TODO: Specialize the type of `Foundation` (such as Date, Data, ...).
+    func unbox(_ value: String, as type: Date.Type) throws -> Date? {
+        if value.isEmpty { return nil }
+
+        guard let date = CSVReader.dateFormatter.date(from: value) else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Expected date string to be ISO8601-formatted."))
+
+        }
+
+        return date
+    }
 
     func unbox<T: Decodable>(_ value: String, as type: T.Type) throws -> T? {
         if value.isEmpty { return nil }
+
+        if type == Date.self || type == NSDate.self {
+            return try unbox(value, as: Date.self) as? T
+        }
 
         return try T(from: self)
     }
