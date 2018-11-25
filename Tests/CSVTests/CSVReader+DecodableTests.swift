@@ -14,6 +14,7 @@ class CSVReader_DecodableTests: XCTestCase {
         ("testNoHeader", testNoHeader),
         ("testStringCodingKey", testStringCodingKey),
         ("testIntCodingKey", testIntCodingKey),
+        ("testIntCodingKeyWhileIgnoringHeaders", testIntCodingKeyWhileIgnoringHeaders),
         ("testTypeMismatch", testTypeMismatch),
     ]
     
@@ -133,6 +134,32 @@ class CSVReader_DecodableTests: XCTestCase {
         let exampleRecords = IntKeyedDecodableExample.examples
         
         let allRows = IntKeyedDecodableExample.examples.reduce(into: "") {  $0 += $1.toRow() }
+        let rowIterator = allRows.unicodeScalars.makeIterator()
+        
+        let headerCSV = try! CSVReader(iterator: rowIterator, configuration: headerConfig)
+        
+        var records = [IntKeyedDecodableExample]()
+        do {
+            while let record: IntKeyedDecodableExample = try headerCSV.readRow() {
+                records.append(record)
+            }
+        } catch {
+            XCTFail("readRow<T>() threw error: \(error)")
+        }
+        XCTAssertEqual(records.count, 2)
+        XCTAssertEqual(records[0], exampleRecords[0])
+        XCTAssertEqual(records[1], exampleRecords[1])
+    }
+    
+    func testIntCodingKeyWhileIgnoringHeaders() {
+        let headerConfig = CSVReader.Configuration(hasHeaderRow: true,
+                                                   trimFields: false,
+                                                   delimiter: ",",
+                                                   whitespaces: .whitespaces)
+        let exampleRecords = IntKeyedDecodableExample.examples
+        
+        let header = "stringKey,optionalStringKey,intKey,ignored,dateKey,enumKey\n"
+        let allRows = IntKeyedDecodableExample.examples.reduce(into: header) {  $0 += $1.toRow() }
         let rowIterator = allRows.unicodeScalars.makeIterator()
         
         let headerCSV = try! CSVReader(iterator: rowIterator, configuration: headerConfig)
