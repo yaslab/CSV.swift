@@ -9,6 +9,37 @@
 import XCTest
 @testable import CSV
 
+enum Enum: String, Decodable {
+    case first
+    case second
+}
+
+protocol DecodableTest: Equatable {
+    var intKey: Int { get }
+    var stringKey: String { get }
+    var optionalStringKey: String? { get }
+    var dateKey: Date { get }
+    var enumKey: Enum { get }
+    
+    func toRow() -> String
+}
+
+extension DecodableTest {
+    func toRow() -> String {
+        return "\(self.stringKey),\(self.optionalStringKey ?? ""),\(self.intKey),,\"\(CSVReader.dateFormatter.string(from: self.dateKey))\",\(self.enumKey)\n"
+    }
+}
+
+extension Equatable where Self: DecodableTest {
+    static func ==(left: Self, right: Self) -> Bool {
+        let formatter = CSVReader.dateFormatter
+        return left.intKey == right.intKey && left.stringKey == right.stringKey && left.optionalStringKey == right.optionalStringKey
+            //&& left.dateKey.compare(right.dateKey) == ComparisonResult.orderedSame // TODO: find more accurate conversion method, cannot compare directly likely because we are losing precision when in csv
+            && formatter.string(from: left.dateKey) == formatter.string(from: right.dateKey)
+            && left.enumKey == right.enumKey
+    }
+}
+
 class CSVReader_DecodableTests: XCTestCase {
     static let allTests = [
         ("testNoHeader", testNoHeader),
@@ -18,30 +49,15 @@ class CSVReader_DecodableTests: XCTestCase {
         ("testTypeMismatch", testTypeMismatch),
     ]
     
-    enum Enum: String, Decodable {
-        case first
-        case second
-    }
+
     
-    struct SupportedDecodableExample: Decodable, Equatable {
+    struct SupportedDecodableExample: Decodable, DecodableTest {
         let intKey: Int
         let stringKey: String
         let optionalStringKey: String?
         let dateKey: Date
         let enumKey: Enum
-        
-        func toRow() -> String {
-            return "\(self.stringKey),\(self.optionalStringKey ?? ""),\(self.intKey),,\"\(CSVReader.dateFormatter.string(from: self.dateKey))\",\(self.enumKey)\n"
-        }
-        
-        static func ==(left: SupportedDecodableExample, right: SupportedDecodableExample) -> Bool {
-            let formatter = CSVReader.dateFormatter
-            return left.intKey == right.intKey && left.stringKey == right.stringKey && left.optionalStringKey == right.optionalStringKey
-                //&& left.dateKey.compare(right.dateKey) == ComparisonResult.orderedSame // TODO: find more accurate conversion method, cannot compare directly likely because we are losing precision when in csv
-                && formatter.string(from: left.dateKey) == formatter.string(from: right.dateKey)
-                && left.enumKey == right.enumKey
-        }
-        
+
         static var examples: [SupportedDecodableExample] {
             return [
                 SupportedDecodableExample(intKey: 12345, stringKey: "stringValue", optionalStringKey: nil, dateKey: Date(), enumKey: .first),
@@ -50,11 +66,11 @@ class CSVReader_DecodableTests: XCTestCase {
         }
     }
     
-    struct IntKeyedDecodableExample: Decodable, Equatable {
+    struct IntKeyedDecodableExample: Decodable, DecodableTest {
         private enum CodingKeys: Int, CodingKey {
-            case intKey = 2
             case stringKey = 0
             case optionalStringKey = 1
+            case intKey = 2
             case dateKey = 4
             case enumKey = 5
         }
@@ -64,18 +80,6 @@ class CSVReader_DecodableTests: XCTestCase {
         let optionalStringKey: String?
         let dateKey: Date
         let enumKey: Enum
-        
-        func toRow() -> String {
-            return "\(self.stringKey),\(self.optionalStringKey ?? ""),\(self.intKey),,\"\(CSVReader.dateFormatter.string(from: self.dateKey))\",\(self.enumKey)\n"
-        }
-        
-        static func ==(left: IntKeyedDecodableExample, right: IntKeyedDecodableExample) -> Bool {
-            let formatter = CSVReader.dateFormatter
-            return left.intKey == right.intKey && left.stringKey == right.stringKey && left.optionalStringKey == right.optionalStringKey
-                //&& left.dateKey.compare(right.dateKey) == ComparisonResult.orderedSame // TODO: find more accurate conversion method, cannot compare directly likely because we are losing precision when in csv
-                && formatter.string(from: left.dateKey) == formatter.string(from: right.dateKey)
-                && left.enumKey == right.enumKey
-        }
         
         static var examples: [IntKeyedDecodableExample] {
             return [
