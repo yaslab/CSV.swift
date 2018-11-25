@@ -12,7 +12,8 @@ import XCTest
 class CSVReader_DecodableTests: XCTestCase {
     static let allTests = [
         ("testNoHeader", testNoHeader),
-        ("testBasic", testBasic),
+        ("testStringCodingKey", testStringCodingKey),
+        ("testIntCodingKey", testIntCodingKey),
         ("testTypeMismatch", testTypeMismatch),
     ]
     
@@ -20,12 +21,17 @@ class CSVReader_DecodableTests: XCTestCase {
         case first
         case second
     }
+    
     struct SupportedDecodableExample: Decodable, Equatable {
         let intKey: Int
         let stringKey: String
         let optionalStringKey: String?
         let dateKey: Date
         let enumKey: Enum
+        
+        func toRow() -> String {
+            return "\(self.stringKey),\(self.optionalStringKey ?? ""),\(self.intKey),,\"\(CSVReader.dateFormatter.string(from: self.dateKey))\",\(self.enumKey)\n"
+        }
         
         static func ==(left: SupportedDecodableExample, right: SupportedDecodableExample) -> Bool {
             let formatter = CSVReader.dateFormatter
@@ -39,6 +45,41 @@ class CSVReader_DecodableTests: XCTestCase {
             return [
                 SupportedDecodableExample(intKey: 12345, stringKey: "stringValue", optionalStringKey: nil, dateKey: Date(), enumKey: .first),
                 SupportedDecodableExample(intKey: 54321, stringKey: "stringValue2", optionalStringKey: "withValue", dateKey: Date(timeInterval: 100, since: Date()), enumKey: .second)
+            ]
+        }
+    }
+    
+    struct IntKeyedDecodableExample: Decodable, Equatable {
+        private enum CodingKeys: Int, CodingKey {
+            case intKey = 2
+            case stringKey = 0
+            case optionalStringKey = 1
+            case dateKey = 4
+            case enumKey = 5
+        }
+        
+        let intKey: Int
+        let stringKey: String
+        let optionalStringKey: String?
+        let dateKey: Date
+        let enumKey: Enum
+        
+        func toRow() -> String {
+            return "\(self.stringKey),\(self.optionalStringKey ?? ""),\(self.intKey),,\"\(CSVReader.dateFormatter.string(from: self.dateKey))\",\(self.enumKey)\n"
+        }
+        
+        static func ==(left: IntKeyedDecodableExample, right: IntKeyedDecodableExample) -> Bool {
+            let formatter = CSVReader.dateFormatter
+            return left.intKey == right.intKey && left.stringKey == right.stringKey && left.optionalStringKey == right.optionalStringKey
+                //&& left.dateKey.compare(right.dateKey) == ComparisonResult.orderedSame // TODO: find more accurate conversion method, cannot compare directly likely because we are losing precision when in csv
+                && formatter.string(from: left.dateKey) == formatter.string(from: right.dateKey)
+                && left.enumKey == right.enumKey
+        }
+        
+        static var examples: [IntKeyedDecodableExample] {
+            return [
+                IntKeyedDecodableExample(intKey: 12345, stringKey: "stringValue", optionalStringKey: nil, dateKey: Date(), enumKey: .first),
+                IntKeyedDecodableExample(intKey: 54321, stringKey: "stringValue2", optionalStringKey: "withValue", dateKey: Date(timeInterval: 100, since: Date()), enumKey: .second)
             ]
         }
     }
@@ -58,24 +99,47 @@ class CSVReader_DecodableTests: XCTestCase {
         }
     }
     
-    func testBasic() {
+    func testStringCodingKey() {
         let headerConfig = CSVReader.Configuration(hasHeaderRow: true,
                                                    trimFields: false,
                                                    delimiter: ",",
                                                    whitespaces: .whitespaces)
         let exampleRecords = SupportedDecodableExample.examples
-        let dateFormatter = CSVReader.dateFormatter
         
-        let headerIt = """
-            stringKey,optionalStringKey,intKey,ignored,dateKey,enumKey
-            \(exampleRecords[0].stringKey),,\(exampleRecords[0].intKey),,\"\(dateFormatter.string(from: exampleRecords[0].dateKey))\",\(exampleRecords[0].enumKey)
-            \(exampleRecords[1].stringKey),\(exampleRecords[1].optionalStringKey!),\(exampleRecords[1].intKey),,\"\(dateFormatter.string(from: exampleRecords[1].dateKey))\",\(exampleRecords[1].enumKey)
-            """.unicodeScalars.makeIterator()
-        let headerCSV = try! CSVReader(iterator: headerIt, configuration: headerConfig)
+        let header = "stringKey,optionalStringKey,intKey,ignored,dateKey,enumKey\n"
+        let allRows = SupportedDecodableExample.examples.reduce(into: header) {  $0 += $1.toRow() }
+        let rowIterator = allRows.unicodeScalars.makeIterator()
+        
+        let headerCSV = try! CSVReader(iterator: rowIterator, configuration: headerConfig)
         
         var records = [SupportedDecodableExample]()
         do {
             while let record: SupportedDecodableExample = try headerCSV.readRow() {
+                records.append(record)
+            }
+        } catch {
+            XCTFail("readRow<T>() threw error: \(error)")
+        }
+        XCTAssertEqual(records.count, 2)
+        XCTAssertEqual(records[0], exampleRecords[0])
+        XCTAssertEqual(records[1], exampleRecords[1])
+    }
+    
+    func testIntCodingKey() {
+        let headerConfig = CSVReader.Configuration(hasHeaderRow: false,
+                                                   trimFields: false,
+                                                   delimiter: ",",
+                                                   whitespaces: .whitespaces)
+        let exampleRecords = IntKeyedDecodableExample.examples
+        
+        let allRows = IntKeyedDecodableExample.examples.reduce(into: "") {  $0 += $1.toRow() }
+        let rowIterator = allRows.unicodeScalars.makeIterator()
+        
+        let headerCSV = try! CSVReader(iterator: rowIterator, configuration: headerConfig)
+        
+        var records = [IntKeyedDecodableExample]()
+        do {
+            while let record: IntKeyedDecodableExample = try headerCSV.readRow() {
                 records.append(record)
             }
         } catch {

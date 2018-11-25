@@ -21,12 +21,14 @@ extension CSVReader {
         init() {}
 
         func decode<T: Decodable>(_ type: T.Type, from reader: CSVReader) throws -> T {
-            guard reader.headerRow != nil else {
-                throw DecodingError.typeMismatch(T.self,
-                                                       DecodingError.Context(codingPath: [],
-                                                                             debugDescription: "readRow(): Header row required to map to Decodable")
-                )
-            }
+            
+            
+//            guard reader.headerRow != nil else {
+//                throw DecodingError.typeMismatch(T.self,
+//                                                       DecodingError.Context(codingPath: [],
+//                                                                             debugDescription: "readRow(): Header row required to map to Decodable")
+//                )
+//            }
             let decoder = _CSVRowDecoder(referencing: reader, at: [], userInfo: [:])
             return try T(from: decoder)
         }
@@ -91,11 +93,14 @@ extension CSVReader {
         }
 
         func contains(_ key: K) -> Bool {
+            guard let index = key.intValue else {
             return decoder.reader[key.stringValue] != nil
+            }
+            return index < decoder.reader.currentRow!.count
         }
 
         func decodeNil(forKey key: K) throws -> Bool {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -103,7 +108,7 @@ extension CSVReader {
         }
 
         func decode(_ type: Bool.Type, forKey key: K) throws -> Bool {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -117,7 +122,7 @@ extension CSVReader {
         }
 
         func decode(_ type: String.Type, forKey key: K) throws -> String {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -131,7 +136,7 @@ extension CSVReader {
         }
 
         func decode(_ type: Double.Type, forKey key: K) throws -> Double {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -145,7 +150,7 @@ extension CSVReader {
         }
 
         func decode(_ type: Float.Type, forKey key: K) throws -> Float {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -159,7 +164,7 @@ extension CSVReader {
         }
 
         func decode(_ type: Int.Type, forKey key: K) throws -> Int {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -173,7 +178,7 @@ extension CSVReader {
         }
 
         func decode(_ type: Int8.Type, forKey key: K) throws -> Int8 {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -187,7 +192,7 @@ extension CSVReader {
         }
 
         func decode(_ type: Int16.Type, forKey key: K) throws -> Int16 {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -201,7 +206,7 @@ extension CSVReader {
         }
 
         func decode(_ type: Int32.Type, forKey key: K) throws -> Int32 {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -215,7 +220,7 @@ extension CSVReader {
         }
 
         func decode(_ type: Int64.Type, forKey key: K) throws -> Int64 {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -229,7 +234,7 @@ extension CSVReader {
         }
 
         func decode(_ type: UInt.Type, forKey key: K) throws -> UInt {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -243,7 +248,7 @@ extension CSVReader {
         }
 
         func decode(_ type: UInt8.Type, forKey key: K) throws -> UInt8 {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -257,7 +262,7 @@ extension CSVReader {
         }
 
         func decode(_ type: UInt16.Type, forKey key: K) throws -> UInt16 {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -271,7 +276,7 @@ extension CSVReader {
         }
 
         func decode(_ type: UInt32.Type, forKey key: K) throws -> UInt32 {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -285,7 +290,7 @@ extension CSVReader {
         }
 
         func decode(_ type: UInt64.Type, forKey key: K) throws -> UInt64 {
-            guard let field = decoder.reader[key.stringValue] else {
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -299,7 +304,8 @@ extension CSVReader {
         }
 
         func decode<T>(_ type: T.Type, forKey key: K) throws -> T where T: Decodable {
-            guard let field = decoder.reader[key.stringValue] else {
+
+            guard let field = self.value(for: key) else {
                 throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "No value associated with key \(_errorDescription(of: key))."))
             }
 
@@ -310,6 +316,17 @@ extension CSVReader {
                 throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
             }
             return result
+        }
+        
+        func value(for codingKey: CodingKey) -> String? {
+            var value: String? = nil
+            
+            if let index = codingKey.intValue {
+                value = decoder.reader[index]
+            } else {
+                value = decoder.reader[codingKey.stringValue]
+            }
+            return value
         }
 
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: K) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
@@ -351,7 +368,10 @@ extension CSVReader._CSVRowDecoder: SingleValueDecodingContainer {
 
         private var value: String {
             let key = codingPath.last!
-            return reader[key.stringValue]!
+            guard let index = key.intValue else {
+                return reader[key.stringValue]!
+            }
+            return reader[index]!
         }
 
         private func expectNonNull<T>(_ type: T.Type) throws {
