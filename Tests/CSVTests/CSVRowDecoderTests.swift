@@ -1,5 +1,5 @@
 //
-//  CSVReader+DecodableTests.swift
+//  CSVRowDecoderTests.swift
 //  CSV
 //
 //  Created by Ian Grossberg on 9/11/18.
