@@ -10,26 +10,70 @@ import Foundation
 
 extension CSVReader {
 
-    static var dateFormatter: DateFormatter {
-        let result = DateFormatter()
-        result.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
-        return result
-    }
+    open class CSVRowDecoder {
 
-    final class CSVRowDecoder {
+        /// The strategy to use for decoding `Date` values.
+        public enum DateDecodingStrategy {
+            /// Defer to `Date` for decoding. This is the default strategy.
+            case deferredToDate
 
-        init() {}
+            /// Decode the `Date` as a UNIX timestamp from a JSON number.
+            case secondsSince1970
 
-        func decode<T: Decodable>(_ type: T.Type, from reader: CSVReader) throws -> T {
-            
-            
-//            guard reader.headerRow != nil else {
-//                throw DecodingError.typeMismatch(T.self,
-//                                                       DecodingError.Context(codingPath: [],
-//                                                                             debugDescription: "readRow(): Header row required to map to Decodable")
-//                )
-//            }
-            let decoder = _CSVRowDecoder(referencing: reader, at: [], userInfo: [:])
+            /// Decode the `Date` as UNIX millisecond timestamp from a JSON number.
+            case millisecondsSince1970
+
+            /// Decode the `Date` as an ISO-8601-formatted string (in RFC 3339 format).
+            @available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *)
+            case iso8601
+
+            /// Decode the `Date` as a string parsed by the given formatter.
+            case formatted(DateFormatter)
+
+            /// Decode the `Date` as a custom value decoded by the given closure.
+            case custom((_ value: String) throws -> Date)
+        }
+
+        /// The strategy to use for decoding `Data` values.
+        public enum DataDecodingStrategy {
+            /// Defer to `Data` for decoding.
+            case deferredToData
+
+            /// Decode the `Data` from a Base64-encoded string. This is the default strategy.
+            case base64
+
+            /// Decode the `Data` as a custom value decoded by the given closure.
+            case custom((_ value: String) throws -> Data)
+        }
+
+        /// The strategy to use in decoding dates. Defaults to `.deferredToDate`.
+        open var dateDecodingStrategy: DateDecodingStrategy = .deferredToDate
+
+        /// The strategy to use in decoding binary data. Defaults to `.base64`.
+        open var dataDecodingStrategy: DataDecodingStrategy = .base64
+
+        /// Contextual user-provided information for use during decoding.
+        open var userInfo: [CodingUserInfoKey: Any] = [:]
+
+        /// Options set on the top-level encoder to pass down the decoding hierarchy.
+        fileprivate struct _Options {
+            let dateDecodingStrategy: DateDecodingStrategy
+            let dataDecodingStrategy: DataDecodingStrategy
+            let userInfo: [CodingUserInfoKey: Any]
+        }
+
+        /// The options set on the top-level decoder.
+        fileprivate var options: _Options {
+            return _Options(dateDecodingStrategy: dateDecodingStrategy,
+                            dataDecodingStrategy: dataDecodingStrategy,
+                            userInfo: userInfo)
+        }
+
+        /// Initializes `self` with default strategies.
+        public init() {}
+
+        open func decode<T: Decodable>(_ type: T.Type, from reader: CSVReader) throws -> T {
+            let decoder = _CSVRowDecoder(referencing: reader, options: self.options)
             return try T(from: decoder)
         }
 
@@ -41,15 +85,18 @@ extension CSVReader {
 
         var codingPath: [CodingKey]
 
-        let valuesByColumn: [String: String]
+        /// Options set on the top-level decoder.
+        fileprivate let options: CSVRowDecoder._Options
 
-        let userInfo: [CodingUserInfoKey: Any]
+        /// Contextual user-provided information for use during encoding.
+        public var userInfo: [CodingUserInfoKey: Any] {
+            return self.options.userInfo
+        }
 
-        init(referencing reader: CSVReader, at codingPath: [CodingKey], userInfo: [CodingUserInfoKey: Any]) {
+        init(referencing reader: CSVReader, at codingPath: [CodingKey] = [], options: CSVRowDecoder._Options) {
             self.reader = reader
             self.codingPath = codingPath
-            self.valuesByColumn = [:]
-            self.userInfo = userInfo
+            self.options = options
         }
 
         func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
@@ -317,14 +364,16 @@ extension CSVReader {
             }
             return result
         }
-        
+
         func value(for codingKey: CodingKey) -> String? {
-            var value: String? = nil
-            
+            var value: String?
+
             if let index = codingKey.intValue {
                 value = decoder.reader[index]
             } else {
-                value = decoder.reader[codingKey.stringValue]
+                if decoder.reader.headerRow != nil {
+                    value = decoder.reader[codingKey.stringValue]
+                }
             }
             return value
         }
@@ -466,55 +515,6 @@ extension CSVReader._CSVRowDecoder: SingleValueDecodingContainer {
             try expectNonNull(String.self)
 
             return try unbox(value, as: String.self)!
-        }
-
-        public func decode(_ expectedType: Date.Type) throws -> Date {
-            try expectNonNull(String.self)
-            /*
-             switch self.options.dateDecodingStrategy {
-             case .deferredToDate:
-             self.storage.push(container: value)
-             defer { self.storage.popContainer() }
-             return try Date(from: self)
-             case .secondsSince1970:
-             let double = try self.unbox(value, as: Double.self)!
-             return Date(timeIntervalSince1970: double)
-             case .millisecondsSince1970:
-             let double = try self.unbox(value, as: Double.self)!
-             return Date(timeIntervalSince1970: double / 1000.0)
-             case .iso8601:
-             if #available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *) {
-             let string = try self.unbox(value, as: String.self)!
-             guard let date = _iso8601Formatter.date(from: string) else {
-             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Expected date string to be ISO8601-formatted."))
-             }
-             return date
-             } else {
-             fatalError("ISO8601DateFormatter is unavailable on this platform.")
-             }
-             case .formatted(let formatter):
-             let string = try self.unbox(value, as: String.self)!
-             guard let date = formatter.date(from: string) else {
-             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Date string does not match format expected by formatter."))
-             }
-             return date
-             case .custom(let closure):
-             self.storage.push(container: value)
-             defer { self.storage.popContainer() }
-             return try closure(self)
-             }*/
-
-            let formatter = CSVReader.dateFormatter
-
-            guard let string = value as? String else {
-                throw DecodingError.typeMismatch(expectedType,
-                                                 DecodingError.Context(codingPath: self.codingPath, debugDescription: "Value '\(self.value)' is of type \(type(of: self.value))"))
-            }
-
-            guard let result = formatter.date(from: string) else {
-                throw DecodingError.dataCorruptedError(in: self, debugDescription: "decode(...) for type \(expectedType) with value '\(self.value)'")
-            }
-            return result
         }
 
         public func decode<T: Decodable>(_ type: T.Type) throws -> T {
@@ -681,22 +681,89 @@ extension CSVReader._CSVRowDecoder {
     func unbox(_ value: String, as type: Date.Type) throws -> Date? {
         if value.isEmpty { return nil }
 
-        guard let date = CSVReader.dateFormatter.date(from: value) else {
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Expected date string to be ISO8601-formatted."))
+        switch self.options.dateDecodingStrategy {
+        case .deferredToDate:
+            return try Date(from: self)
 
+        case .secondsSince1970:
+            let double = try self.unbox(value, as: Double.self)!
+            return Date(timeIntervalSince1970: double)
+
+        case .millisecondsSince1970:
+            let double = try self.unbox(value, as: Double.self)!
+            return Date(timeIntervalSince1970: double / 1000.0)
+
+        case .iso8601:
+            if #available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *) {
+                guard let date = _iso8601Formatter.date(from: value) else {
+                    throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Expected date string to be ISO8601-formatted."))
+                }
+
+                return date
+            } else {
+                fatalError("ISO8601DateFormatter is unavailable on this platform.")
+            }
+
+        case .formatted(let formatter):
+            guard let date = formatter.date(from: value) else {
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Date string does not match format expected by formatter."))
+            }
+
+            return date
+
+        case .custom(let closure):
+            return try closure(value)
         }
+    }
 
-        return date
+    func unbox(_ value: String, as type: Data.Type) throws -> Data? {
+        if value.isEmpty { return nil }
+
+        switch self.options.dataDecodingStrategy {
+        case .deferredToData:
+            return try Data(from: self)
+
+        case .base64:
+            guard let data = Data(base64Encoded: value) else {
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Encountered Data is not valid Base64."))
+            }
+            return data
+
+        case .custom(let closure):
+            return try closure(value)
+        }
+    }
+
+    func unbox(_ value: String, as type: Decimal.Type) throws -> Decimal? {
+        if value.isEmpty { return nil }
+
+        let doubleValue = try self.unbox(value, as: Double.self)!
+        return Decimal(doubleValue)
     }
 
     func unbox<T: Decodable>(_ value: String, as type: T.Type) throws -> T? {
         if value.isEmpty { return nil }
 
-        if type == Date.self || type == NSDate.self {
-            return try unbox(value, as: Date.self) as? T
+        let decoded: T
+        if T.self == Date.self {
+            guard let date = try unbox(value, as: Date.self) else { return nil }
+            decoded = date as! T
+        } else if type == Data.self {
+            guard let data = try unbox(value, as: Data.self) else { return nil }
+            decoded = data as! T
+        } else if type == URL.self {
+            guard let url = URL(string: value) else {
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath,
+                                                                        debugDescription: "Invalid URL string."))
+            }
+            decoded = (url as! T)
+        } else if type == Decimal.self {
+            guard let decimal = try self.unbox(value, as: Decimal.self) else { return nil }
+            decoded = decimal as! T
+        } else {
+            return try type.init(from: self)
         }
-
-        return try T(from: self)
+        return decoded
     }
 
 }
@@ -709,3 +776,16 @@ extension DecodingError {
     }
 
 }
+
+//===----------------------------------------------------------------------===//
+// Shared ISO8601 Date Formatter
+//===----------------------------------------------------------------------===//
+// NOTE: This value is implicitly lazy and _must_ be lazy.
+// We're compiled against the latest SDK (w/ ISO8601DateFormatter), but linked against whichever Foundation the user has.
+// ISO8601DateFormatter might not exist, so we better not hit this code path on an older OS.
+@available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *)
+fileprivate var _iso8601Formatter: ISO8601DateFormatter = {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = .withInternetDateTime
+    return formatter
+}()
