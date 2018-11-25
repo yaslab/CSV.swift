@@ -26,16 +26,18 @@ protocol DecodableTest: Equatable {
 
 extension DecodableTest {
     func toRow() -> String {
-        return "\(self.stringKey),\(self.optionalStringKey ?? ""),\(self.intKey),,\"\(CSVReader.dateFormatter.string(from: self.dateKey))\",\(self.enumKey)\n"
+        //return "\(self.stringKey),\(self.optionalStringKey ?? ""),\(self.intKey),,\"\(CSVReader.dateFormatter.string(from: self.dateKey))\",\(self.enumKey)\n"
+        return "\(self.stringKey),\(self.optionalStringKey ?? ""),\(self.intKey),,\"\(self.dateKey.timeIntervalSinceReferenceDate)\",\(self.enumKey)\n"
     }
 }
 
 extension Equatable where Self: DecodableTest {
     static func ==(left: Self, right: Self) -> Bool {
-        let formatter = CSVReader.dateFormatter
+        //let formatter = CSVReader.dateFormatter
         return left.intKey == right.intKey && left.stringKey == right.stringKey && left.optionalStringKey == right.optionalStringKey
             //&& left.dateKey.compare(right.dateKey) == ComparisonResult.orderedSame // TODO: find more accurate conversion method, cannot compare directly likely because we are losing precision when in csv
-            && formatter.string(from: left.dateKey) == formatter.string(from: right.dateKey)
+            //&& formatter.string(from: left.dateKey) == formatter.string(from: right.dateKey)
+            && Int(left.dateKey.timeIntervalSince1970) == Int(right.dateKey.timeIntervalSince1970)
             && left.enumKey == right.enumKey
     }
 }
@@ -236,7 +238,8 @@ class CSVReader_DecodableTests: XCTestCase {
                 return
             }
             switch error {
-            case let .dataCorrupted(context):
+            case let DecodingError.typeMismatch(type, context):
+                XCTAssert(type == Double.self)
                 XCTAssertEqual(context.codingPath[0].stringValue, "dateKey", "Type Mismatch Error on unexpected field")
                 break
             default:

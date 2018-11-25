@@ -394,7 +394,7 @@ extension CSVReader {
         }
         return row[index]
     }
-    
+
     public subscript(key: Int) -> String? {
         guard let row = currentRow else {
             fatalError("CSVReader.currentRow must not be nil")
