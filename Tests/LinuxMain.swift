@@ -12,6 +12,7 @@ import XCTest
 XCTMain([
      testCase(BinaryReaderTests.allTests),
      testCase(CSVReaderTests.allTests),
+     testCase(CSVRowDecoderTests.allTests),
      testCase(CSVWriterTests.allTests),
      testCase(LineBreakTests.allTests),
      testCase(ReadmeTests.allTests),
