@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// `CSVRowDecoder` facilitates the decoding of CSV row into semantic `Decodable` types.
 open class CSVRowDecoder {
 
     /// The strategy to use for decoding `Date` values.
@@ -70,34 +71,32 @@ open class CSVRowDecoder {
     /// Initializes `self` with default strategies.
     public init() {}
 
+    /// Decodes a top-level value of the given type from the given CSV row representation.
     open func decode<T: Decodable>(_ type: T.Type, from reader: CSVReader) throws -> T {
         let decoder = _CSVRowDecoder(referencing: reader, options: self.options)
-        return try T(from: decoder)
+        return try type.init(from: decoder)
     }
 
 }
 
-private class _CSVRowDecoder: Decoder {
+fileprivate final class _CSVRowDecoder: Decoder {
 
     fileprivate let reader: CSVReader
 
-    public fileprivate(set) var codingPath: [CodingKey]
-
-    /// Options set on the top-level decoder.
     fileprivate let options: CSVRowDecoder._Options
 
-    /// Contextual user-provided information for use during encoding.
+    public var codingPath: [CodingKey] = []
+
     public var userInfo: [CodingUserInfoKey: Any] {
         return self.options.userInfo
     }
 
-    fileprivate init(referencing reader: CSVReader, at codingPath: [CodingKey] = [], options: CSVRowDecoder._Options) {
+    fileprivate init(referencing reader: CSVReader, options: CSVRowDecoder._Options) {
         self.reader = reader
-        self.codingPath = codingPath
         self.options = options
     }
 
-    public func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
+    public func container<Key: CodingKey>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> {
         let container = CSVKeyedDecodingContainer<Key>(referencing: self)
         return KeyedDecodingContainer(container)
     }
@@ -114,37 +113,33 @@ private class _CSVRowDecoder: Decoder {
 
 }
 
-private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerProtocol {
+fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingContainerProtocol {
 
     typealias Key = K
 
     private let decoder: _CSVRowDecoder
-        var codingPath: [CodingKey] {
+
+    public var codingPath: [CodingKey] {
         return self.decoder.codingPath
     }
 
     public var allKeys: [Key] {
-        guard let headerRow = decoder.reader.headerRow else {
-            return []
-        }
+        guard let headerRow = self.decoder.reader.headerRow else { return [] }
         return headerRow.compactMap { Key(stringValue: $0) }
     }
 
-    init(referencing decoder: _CSVRowDecoder) {
+    fileprivate init(referencing decoder: _CSVRowDecoder) {
         self.decoder = decoder
     }
 
-    private func value(for codingKey: CodingKey) -> String? {
-        var value: String?
+    private func value(for key: Key) -> String? {
+        guard self.contains(key) else { return nil }
 
-        if let index = codingKey.intValue {
-            value = decoder.reader[index]
+        if let index = key.intValue {
+            return self.decoder.reader.currentRow![index]
         } else {
-            if decoder.reader.headerRow != nil {
-                value = decoder.reader[codingKey.stringValue]
-            }
+            return self.decoder.reader[key.stringValue]
         }
-        return value
     }
 
     private func _errorDescription(of key: CodingKey) -> String {
@@ -152,10 +147,16 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
     }
 
     public func contains(_ key: Key) -> Bool {
-        guard let index = key.intValue else {
-            return decoder.reader[key.stringValue] != nil
+        guard let row = self.decoder.reader.currentRow else { return false }
+
+        if let index = key.intValue {
+            return index < row.count
+        } else {
+            guard let headerRow = self.decoder.reader.headerRow else {
+                return false
+            }
+            return headerRow.contains(key.stringValue)
         }
-        return index < decoder.reader.currentRow!.count
     }
 
     public func decodeNil(forKey key: Key) throws -> Bool {
@@ -174,7 +175,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: Bool.self) else {
+        guard let result = try self.decoder.unbox(field, as: Bool.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -188,7 +189,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: String.self) else {
+        guard let result = try self.decoder.unbox(field, as: String.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -202,7 +203,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: Double.self) else {
+        guard let result = try self.decoder.unbox(field, as: Double.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -216,7 +217,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: Float.self) else {
+        guard let result = try self.decoder.unbox(field, as: Float.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -230,7 +231,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: Int.self) else {
+        guard let result = try self.decoder.unbox(field, as: Int.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -244,7 +245,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: Int8.self) else {
+        guard let result = try self.decoder.unbox(field, as: Int8.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -258,7 +259,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: Int16.self) else {
+        guard let result = try self.decoder.unbox(field, as: Int16.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -272,7 +273,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: Int32.self) else {
+        guard let result = try self.decoder.unbox(field, as: Int32.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -286,7 +287,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: Int64.self) else {
+        guard let result = try self.decoder.unbox(field, as: Int64.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -300,7 +301,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: UInt.self) else {
+        guard let result = try self.decoder.unbox(field, as: UInt.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -314,7 +315,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: UInt8.self) else {
+        guard let result = try self.decoder.unbox(field, as: UInt8.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -328,7 +329,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: UInt16.self) else {
+        guard let result = try self.decoder.unbox(field, as: UInt16.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -342,7 +343,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: UInt32.self) else {
+        guard let result = try self.decoder.unbox(field, as: UInt32.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -356,7 +357,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: UInt64.self) else {
+        guard let result = try self.decoder.unbox(field, as: UInt64.self) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
@@ -370,16 +371,16 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
         self.decoder.codingPath.append(key)
         defer { self.decoder.codingPath.removeLast() }
 
-        guard let result = try decoder.unbox(field, as: type) else {
+        guard let result = try self.decoder.unbox(field, as: type) else {
             throw DecodingError.valueNotFound(type, DecodingError.Context(codingPath: self.decoder.codingPath, debugDescription: "Expected \(type) value but found null instead."))
         }
         return result
     }
 
-    public func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+    public func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> {
         // Not supported
         throw DecodingError.dataCorrupted(
-            DecodingError.Context(codingPath: codingPath,
+            DecodingError.Context(codingPath: self.codingPath,
                                   debugDescription: "nestedContainer(...) CSV does not support nested values")
         )
     }
@@ -387,7 +388,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
     public func nestedUnkeyedContainer(forKey key: Key) throws -> UnkeyedDecodingContainer {
         // Not supported
         throw DecodingError.dataCorrupted(
-            DecodingError.Context(codingPath: codingPath,
+            DecodingError.Context(codingPath: self.codingPath,
                                   debugDescription: "nestedUnkeyedContainer(...) CSV does not support nested values")
         )
     }
@@ -395,7 +396,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
     public func superDecoder() throws -> Decoder {
         // Not supported
         throw DecodingError.dataCorrupted(
-            DecodingError.Context(codingPath: codingPath,
+            DecodingError.Context(codingPath: self.codingPath,
                                   debugDescription: "CSV does not support nested values")
         )
     }
@@ -403,7 +404,7 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
     public func superDecoder(forKey key: Key) throws -> Decoder {
         // Not supported
         throw DecodingError.dataCorrupted(
-            DecodingError.Context(codingPath: codingPath,
+            DecodingError.Context(codingPath: self.codingPath,
                                   debugDescription: "CSV does not support nested values")
         )
     }
@@ -413,11 +414,12 @@ private class CSVKeyedDecodingContainer<K: CodingKey> : KeyedDecodingContainerPr
 extension _CSVRowDecoder: SingleValueDecodingContainer {
 
     private var value: String {
-        let key = codingPath.last!
-        guard let index = key.intValue else {
-            return reader[key.stringValue]!
+        let key = self.codingPath.last!
+        if let index = key.intValue {
+            return self.reader.currentRow![index]
+        } else {
+            return self.reader[key.stringValue]!
         }
-        return reader[index]!
     }
 
     private func expectNonNull<T>(_ type: T.Type) throws {
@@ -427,82 +429,82 @@ extension _CSVRowDecoder: SingleValueDecodingContainer {
     }
 
     public func decodeNil() -> Bool {
-        return value.isEmpty
+        return self.value.isEmpty
     }
 
     public func decode(_ expectedType: Bool.Type) throws -> Bool {
-        try expectNonNull(Bool.self)
-        return try unbox(value, as: Bool.self)!
+        try self.expectNonNull(Bool.self)
+        return try self.unbox(self.value, as: Bool.self)!
     }
 
     public func decode(_ expectedType: Int.Type) throws -> Int {
-        try expectNonNull(Int.self)
-        return try unbox(value, as: Int.self)!
+        try self.expectNonNull(Int.self)
+        return try self.unbox(self.value, as: Int.self)!
     }
 
     public func decode(_ expectedType: Int8.Type) throws -> Int8 {
-        try expectNonNull(Int8.self)
-        return try unbox(value, as: Int8.self)!
+        try self.expectNonNull(Int8.self)
+        return try self.unbox(self.value, as: Int8.self)!
     }
 
     public func decode(_ expectedType: Int16.Type) throws -> Int16 {
-        try expectNonNull(Int16.self)
-        return try unbox(value, as: Int16.self)!
+        try self.expectNonNull(Int16.self)
+        return try self.unbox(self.value, as: Int16.self)!
     }
 
     public func decode(_ expectedType: Int32.Type) throws -> Int32 {
-        try expectNonNull(Int32.self)
-        return try unbox(value, as: Int32.self)!
+        try self.expectNonNull(Int32.self)
+        return try self.unbox(self.value, as: Int32.self)!
     }
 
     public func decode(_ expectedType: Int64.Type) throws -> Int64 {
-        try expectNonNull(Int64.self)
-        return try unbox(value, as: Int64.self)!
+        try self.expectNonNull(Int64.self)
+        return try self.unbox(self.value, as: Int64.self)!
     }
 
     public func decode(_ expectedType: UInt.Type) throws -> UInt {
-        try expectNonNull(UInt.self)
-        return try unbox(value, as: UInt.self)!
+        try self.expectNonNull(UInt.self)
+        return try self.unbox(self.value, as: UInt.self)!
     }
 
     public func decode(_ expectedType: UInt8.Type) throws -> UInt8 {
-        try expectNonNull(UInt8.self)
-        return try unbox(value, as: UInt8.self)!
+        try self.expectNonNull(UInt8.self)
+        return try self.unbox(self.value, as: UInt8.self)!
     }
 
     public func decode(_ expectedType: UInt16.Type) throws -> UInt16 {
-        try expectNonNull(UInt16.self)
-        return try unbox(value, as: UInt16.self)!
+        try self.expectNonNull(UInt16.self)
+        return try self.unbox(self.value, as: UInt16.self)!
     }
 
     public func decode(_ expectedType: UInt32.Type) throws -> UInt32 {
-        try expectNonNull(UInt32.self)
-        return try unbox(value, as: UInt32.self)!
+        try self.expectNonNull(UInt32.self)
+        return try self.unbox(self.value, as: UInt32.self)!
     }
 
     public func decode(_ expectedType: UInt64.Type) throws -> UInt64 {
-        try expectNonNull(UInt64.self)
-        return try unbox(value, as: UInt64.self)!
+        try self.expectNonNull(UInt64.self)
+        return try self.unbox(self.value, as: UInt64.self)!
     }
 
     public func decode(_ expectedType: Float.Type) throws -> Float {
-        try expectNonNull(Float.self)
-        return try unbox(value, as: Float.self)!
+        try self.expectNonNull(Float.self)
+        return try self.unbox(self.value, as: Float.self)!
     }
 
     public func decode(_ expectedType: Double.Type) throws -> Double {
-        try expectNonNull(Double.self)
-        return try unbox(value, as: Double.self)!
+        try self.expectNonNull(Double.self)
+        return try self.unbox(self.value, as: Double.self)!
     }
 
     public func decode(_ expectedType: String.Type) throws -> String {
-        try expectNonNull(String.self)
-        return try unbox(value, as: String.self)!
+        try self.expectNonNull(String.self)
+        return try self.unbox(self.value, as: String.self)!
     }
 
     public func decode<T: Decodable>(_ type: T.Type) throws -> T {
-        try expectNonNull(type)
-        return try unbox(value, as: type)!
+        try self.expectNonNull(type)
+        return try self.unbox(self.value, as: type)!
     }
 
 }
@@ -525,131 +527,131 @@ extension _CSVRowDecoder {
     fileprivate func unbox(_ value: String, as type: Bool.Type) throws -> Bool? {
         if value.isEmpty { return nil }
 
-        if let bool = Bool(value) {
-            return bool
+        guard let bool = Bool(value) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return bool
     }
 
     fileprivate func unbox(_ value: String, as type: Int.Type) throws -> Int? {
         if value.isEmpty { return nil }
 
-        if let int = Int(value, radix: 10) {
-            return int
+        guard let int = Int(value, radix: 10) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return int
     }
 
     fileprivate func unbox(_ value: String, as type: Int8.Type) throws -> Int8? {
         if value.isEmpty { return nil }
 
-        if let int8 = Int8(value, radix: 10) {
-            return int8
+        guard let int8 = Int8(value, radix: 10) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return int8
     }
 
     fileprivate func unbox(_ value: String, as type: Int16.Type) throws -> Int16? {
         if value.isEmpty { return nil }
 
-        if let int16 = Int16(value, radix: 10) {
-            return int16
+        guard let int16 = Int16(value, radix: 10) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return int16
     }
 
     fileprivate func unbox(_ value: String, as type: Int32.Type) throws -> Int32? {
         if value.isEmpty { return nil }
 
-        if let int32 = Int32(value, radix: 10) {
-            return int32
+        guard let int32 = Int32(value, radix: 10) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return int32
     }
 
     fileprivate func unbox(_ value: String, as type: Int64.Type) throws -> Int64? {
         if value.isEmpty { return nil }
 
-        if let int64 = Int64(value, radix: 10) {
-            return int64
+        guard let int64 = Int64(value, radix: 10) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return int64
     }
 
     fileprivate func unbox(_ value: String, as type: UInt.Type) throws -> UInt? {
         if value.isEmpty { return nil }
 
-        if let uint = UInt(value, radix: 10) {
-            return uint
+        guard let uint = UInt(value, radix: 10) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return uint
     }
 
     fileprivate func unbox(_ value: String, as type: UInt8.Type) throws -> UInt8? {
         if value.isEmpty { return nil }
 
-        if let uint8 = UInt8(value, radix: 10) {
-            return uint8
+        guard let uint8 = UInt8(value, radix: 10) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return uint8
     }
 
     fileprivate func unbox(_ value: String, as type: UInt16.Type) throws -> UInt16? {
         if value.isEmpty { return nil }
 
-        if let uint16 = UInt16(value, radix: 10) {
-            return uint16
+        guard let uint16 = UInt16(value, radix: 10) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return uint16
     }
 
     fileprivate func unbox(_ value: String, as type: UInt32.Type) throws -> UInt32? {
         if value.isEmpty { return nil }
 
-        if let uint32 = UInt32(value, radix: 10) {
-            return uint32
+        guard let uint32 = UInt32(value, radix: 10) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return uint32
     }
 
     fileprivate func unbox(_ value: String, as type: UInt64.Type) throws -> UInt64? {
         if value.isEmpty { return nil }
 
-        if let uint64 = UInt64(value, radix: 10) {
-            return uint64
+        guard let uint64 = UInt64(value, radix: 10) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
-    }
-
-    fileprivate func unbox(_ value: String, as type: Double.Type) throws -> Double? {
-        if value.isEmpty { return nil }
-
-        if let float = Double(value) {
-            return float
-        }
-
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return uint64
     }
 
     fileprivate func unbox(_ value: String, as type: Float.Type) throws -> Float? {
         if value.isEmpty { return nil }
 
-        if let float = Float(value) {
-            return float
+        guard let float = Float(value) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
         }
 
-        throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        return float
+    }
+
+    fileprivate func unbox(_ value: String, as type: Double.Type) throws -> Double? {
+        if value.isEmpty { return nil }
+
+        guard let double = Double(value) else {
+            throw DecodingError._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        }
+
+        return double
     }
 
     fileprivate func unbox(_ value: String, as type: String.Type) throws -> String? {
@@ -678,7 +680,6 @@ extension _CSVRowDecoder {
                 guard let date = _iso8601Formatter.date(from: value) else {
                     throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Expected date string to be ISO8601-formatted."))
                 }
-
                 return date
             } else {
                 fatalError("ISO8601DateFormatter is unavailable on this platform.")
@@ -688,7 +689,6 @@ extension _CSVRowDecoder {
             guard let date = formatter.date(from: value) else {
                 throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Date string does not match format expected by formatter."))
             }
-
             return date
 
         case .custom(let closure):
@@ -714,43 +714,37 @@ extension _CSVRowDecoder {
         }
     }
 
-    fileprivate func unbox(_ value: String, as type: Decimal.Type) throws -> Decimal? {
-        if value.isEmpty { return nil }
-
-        let doubleValue = try self.unbox(value, as: Double.self)!
-        return Decimal(doubleValue)
-    }
-
     fileprivate func unbox<T: Decodable>(_ value: String, as type: T.Type) throws -> T? {
         if value.isEmpty { return nil }
 
-        let decoded: T
         if T.self == Date.self {
             guard let date = try unbox(value, as: Date.self) else { return nil }
-            decoded = date as! T
+            return (date as! T)
         } else if type == Data.self {
             guard let data = try unbox(value, as: Data.self) else { return nil }
-            decoded = data as! T
+            return (data as! T)
         } else if type == URL.self {
             guard let url = URL(string: value) else {
                 throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath,
                                                                         debugDescription: "Invalid URL string."))
             }
-            decoded = (url as! T)
+            return (url as! T)
         } else if type == Decimal.self {
-            guard let decimal = try self.unbox(value, as: Decimal.self) else { return nil }
-            decoded = decimal as! T
+            guard let decimal = Decimal(string: value) else {
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath,
+                                                                        debugDescription: "Invalid Decimal string."))
+            }
+            return (decimal as! T)
         } else {
             return try type.init(from: self)
         }
-        return decoded
     }
 
 }
 
 extension DecodingError {
 
-    internal static func _typeMismatch(at path: [CodingKey], expectation: Any.Type, reality: String) -> DecodingError {
+    fileprivate static func _typeMismatch(at path: [CodingKey], expectation: Any.Type, reality: String) -> DecodingError {
         let description = "Expected to decode \(expectation) but found \(reality) instead."
         return .typeMismatch(expectation, Context(codingPath: path, debugDescription: description))
     }
