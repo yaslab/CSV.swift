@@ -91,9 +91,9 @@ If you have a destination object that conforms to the `Decodable` protocol, you 
 
 ```swift
 struct DecodableExample: Decodable {
-	let intKey: Int
-	let stringKey: String
-	let optionalStringKey: String?
+    let intKey: Int
+    let stringKey: String
+    let optionalStringKey: String?
 }
 
 let csv = """
@@ -110,7 +110,7 @@ do {
         records.append(row)
     }
 } catch {
-	// Invalid row format
+    // Invalid row format
 }
 ```
 
