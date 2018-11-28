@@ -509,19 +509,6 @@ extension _CSVRowDecoder: SingleValueDecodingContainer {
 
 }
 
-extension CSVReader {
-
-    public func readRow<T>() throws -> T? where T: Decodable {
-        guard next() != nil else {
-            return nil
-        }
-
-        let decoder = CSVRowDecoder()
-        return try decoder.decode(T.self, from: self)
-    }
-
-}
-
 extension _CSVRowDecoder {
 
     fileprivate func unbox(_ value: String, as type: Bool.Type) throws -> Bool? {
