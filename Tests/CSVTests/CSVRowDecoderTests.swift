@@ -75,19 +75,6 @@ class CSVRowDecoderTests: XCTestCase {
         ("testDecodeUnsignedInteger", testDecodeUnsignedInteger),
     ]
 
-    func testNoHeader() {
-        let noHeaderStr = "あ,い1,\"う\",えお\n,,x,"
-        let noHeaderCSV = try! CSVReader(string: noHeaderStr, hasHeaderRow: false)
-
-        do {
-            let decoder = CSVRowDecoder()
-            let _ = try decoder.decode(SupportedDecodableExample.self, from: noHeaderCSV)
-            XCTFail("Expect DecodingError.typeMismatch Error thrown")
-        } catch {
-            // Success
-        }
-    }
-
     //===----------------------------------------------------------------------===//
 
     fileprivate struct SupportedDecodableExample: Decodable, DecodableTest {
@@ -102,6 +89,19 @@ class CSVRowDecoderTests: XCTestCase {
                 SupportedDecodableExample(intKey: 12345, stringKey: "stringValue", optionalStringKey: nil, dateKey: Date(), enumKey: .first),
                 SupportedDecodableExample(intKey: 54321, stringKey: "stringValue2", optionalStringKey: "withValue", dateKey: Date(timeInterval: 100, since: Date()), enumKey: .second)
             ]
+        }
+    }
+
+    func testNoHeader() {
+        let noHeaderStr = "あ,い1,\"う\",えお\n,,x,"
+        let noHeaderCSV = try! CSVReader(string: noHeaderStr, hasHeaderRow: false)
+
+        do {
+            let decoder = CSVRowDecoder()
+            let _ = try decoder.decode(SupportedDecodableExample.self, from: noHeaderCSV)
+            XCTFail("Expect DecodingError.typeMismatch Error thrown")
+        } catch {
+            // Success
         }
     }
 
