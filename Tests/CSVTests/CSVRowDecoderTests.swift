@@ -72,7 +72,16 @@ class CSVRowDecoderTests: XCTestCase {
         ("testUnsupportedDecodableField", testUnsupportedDecodableField),
         ("testDecodeBoolean", testDecodeBoolean),
         ("testDecodeInteger", testDecodeInteger),
-        ("testDecodeUnsignedInteger", testDecodeUnsignedInteger),
+        ("testDecodeFloat", testDecodeFloat),
+        ("testDateDecodingStrategy_deferredToDate", testDateDecodingStrategy_deferredToDate),
+        ("testDateDecodingStrategy_secondsSince1970", testDateDecodingStrategy_secondsSince1970),
+        ("testDateDecodingStrategy_millisecondsSince1970", testDateDecodingStrategy_millisecondsSince1970),
+        //("testDateDecodingStrategy_iso8601", testDateDecodingStrategy_iso8601),
+        ("testDateDecodingStrategy_formatted", testDateDecodingStrategy_formatted),
+        ("testDateDecodingStrategy_custom", testDateDecodingStrategy_custom),
+        ("testDataDecodingStrategy_base64", testDataDecodingStrategy_base64),
+        ("testDataDecodingStrategy_custom", testDataDecodingStrategy_custom),
+        ("testFoundationDecoding", testFoundationDecoding),
     ]
 
     //===----------------------------------------------------------------------===//
@@ -338,12 +347,17 @@ class CSVRowDecoderTests: XCTestCase {
         let int16Value: Int16
         let int32Value: Int32
         let int64Value: Int64
+        let uintValue: UInt
+        let uint8Value: UInt8
+        let uint16Value: UInt16
+        let uint32Value: UInt32
+        let uint64Value: UInt64
     }
 
     func testDecodeInteger() {
         let csv = """
-            intValue,int8Value,int16Value,int32Value,int64Value
-            0,123,4567,89012,345678901234567890
+            intValue,int8Value,int16Value,int32Value,int64Value,uintValue,uint8Value,uint16Value,uint32Value,uint64Value
+            0,123,4567,89012,345678901234567890,1,124,4568,89013,345678901234567891
             """
         do {
             let reader = try CSVReader(string: csv, hasHeaderRow: true)
@@ -356,6 +370,11 @@ class CSVRowDecoderTests: XCTestCase {
             XCTAssertEqual(row.int16Value, 4567)
             XCTAssertEqual(row.int32Value, 89012)
             XCTAssertEqual(row.int64Value, 345678901234567890)
+            XCTAssertEqual(row.uintValue, 1)
+            XCTAssertEqual(row.uint8Value, 124)
+            XCTAssertEqual(row.uint16Value, 4568)
+            XCTAssertEqual(row.uint32Value, 89013)
+            XCTAssertEqual(row.uint64Value, 345678901234567891)
         } catch {
             XCTFail("\(error)")
         }
@@ -363,30 +382,230 @@ class CSVRowDecoderTests: XCTestCase {
 
     //===----------------------------------------------------------------------===//
 
-    fileprivate struct UnsignedIntegerDecodableExample: Decodable {
-        let uintValue: UInt
-        let uint8Value: UInt8
-        let uint16Value: UInt16
-        let uint32Value: UInt32
-        let uint64Value: UInt64
+    fileprivate struct FloatDecodableExample: Decodable {
+        let floatValue: Float
+        let doubleValue: Double
     }
 
-    func testDecodeUnsignedInteger() {
+    func testDecodeFloat() {
         let csv = """
-            uintValue,uint8Value,uint16Value,uint32Value,uint64Value
-            0,123,4567,89012,345678901234567890
+            floatValue,doubleValue
+            123.456,7890.1234
             """
         do {
             let reader = try CSVReader(string: csv, hasHeaderRow: true)
             reader.next()
 
             let decoder = CSVRowDecoder()
-            let row = try decoder.decode(UnsignedIntegerDecodableExample.self, from: reader)
-            XCTAssertEqual(row.uintValue, 0)
-            XCTAssertEqual(row.uint8Value, 123)
-            XCTAssertEqual(row.uint16Value, 4567)
-            XCTAssertEqual(row.uint32Value, 89012)
-            XCTAssertEqual(row.uint64Value, 345678901234567890)
+            let row = try decoder.decode(FloatDecodableExample.self, from: reader)
+            XCTAssertEqual(row.floatValue, 123.456)
+            XCTAssertEqual(row.doubleValue, 7890.1234)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    //===----------------------------------------------------------------------===//
+
+    fileprivate struct DateDecodingStrategyExample: Decodable {
+        let date: Date
+    }
+
+    func testDateDecodingStrategy_deferredToDate() {
+        let expected = Date()
+        let csv = """
+            date
+            \(expected.timeIntervalSinceReferenceDate)
+            """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            decoder.dateDecodingStrategy = .deferredToDate
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: reader)
+            XCTAssertEqual(row.date, expected)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    func testDateDecodingStrategy_secondsSince1970() {
+        let expected = Date()
+        let csv = """
+        date
+        \(expected.timeIntervalSince1970)
+        """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            decoder.dateDecodingStrategy = .secondsSince1970
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: reader)
+            XCTAssertEqual(row.date.timeIntervalSince1970, expected.timeIntervalSince1970)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    func testDateDecodingStrategy_millisecondsSince1970() {
+        let expected = Date()
+        let csv = """
+        date
+        \(expected.timeIntervalSince1970 * 1000.0)
+        """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            decoder.dateDecodingStrategy = .millisecondsSince1970
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: reader)
+            XCTAssertEqual(row.date.timeIntervalSince1970, expected.timeIntervalSince1970)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    @available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *)
+    func testDateDecodingStrategy_iso8601() {
+        let csv = """
+        date
+        2018-11-22T12:34:56+09:00
+        """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: reader)
+            XCTAssertEqual(row.date.timeIntervalSince1970, 1542857696)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    func testDateDecodingStrategy_formatted() {
+        let csv = """
+        date
+        2018/11/22
+        """
+        do {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
+            formatter.dateFormat = "yyyy/MM/dd"
+
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            decoder.dateDecodingStrategy = .formatted(formatter)
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: reader)
+            XCTAssertEqual(row.date.timeIntervalSince1970, 1542812400)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    func testDateDecodingStrategy_custom() {
+        let expected = Date()
+        let csv = """
+        date
+        \(expected.timeIntervalSinceReferenceDate)
+        """
+        do {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
+            formatter.dateFormat = "yyyy/MM/dd"
+
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            decoder.dateDecodingStrategy = .custom({ Date(timeIntervalSinceReferenceDate: Double($0)!) })
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: reader)
+            XCTAssertEqual(row.date, expected)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    //===----------------------------------------------------------------------===//
+
+    fileprivate struct DataDecodingStrategyExample: Decodable {
+        let data: Data
+    }
+
+    func testDataDecodingStrategy_base64() {
+        let expected = Data(bytes: [0x56, 0x12, 0x00, 0x34, 0x1a, 0xfe])
+        let csv = """
+        data
+        "\(expected.base64EncodedString())"
+        """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            decoder.dataDecodingStrategy = .base64
+            let row = try decoder.decode(DataDecodingStrategyExample.self, from: reader)
+            XCTAssertEqual(row.data, expected)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    func testDataDecodingStrategy_custom() {
+        let expected = Data(bytes: [0x34, 0x1a, 0xfe, 0x56, 0x12, 0x00])
+        let csv = """
+        data
+        "\(expected.map({ String(format: "%02x", $0) }).joined())"
+        """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            decoder.dataDecodingStrategy = .custom { value in
+                var bytes = [UInt8]()
+                for i in stride(from: 0, to: value.count, by: 2) {
+                    let start = value.index(value.startIndex, offsetBy: i)
+                    let end = value.index(value.startIndex, offsetBy: i + 1)
+                    bytes.append(UInt8(value[start...end], radix: 16)!)
+                }
+                return Data(bytes)
+            }
+            let row = try decoder.decode(DataDecodingStrategyExample.self, from: reader)
+            XCTAssertEqual(row.data, expected)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    //===----------------------------------------------------------------------===//
+
+    fileprivate struct FoundationDecodingExample: Decodable {
+        let url: URL
+        let decimal: Decimal
+    }
+
+    func testFoundationDecoding() {
+        let csv = """
+        url,decimal
+        "https://www.example.com/path?param=1",99999999999999999999.9999999999999999
+        """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            let row = try decoder.decode(FoundationDecodingExample.self, from: reader)
+            XCTAssertEqual(row.url.absoluteString, "https://www.example.com/path?param=1")
+            XCTAssertEqual(row.decimal.description, "99999999999999999999.9999999999999999")
         } catch {
             XCTFail("\(error)")
         }
