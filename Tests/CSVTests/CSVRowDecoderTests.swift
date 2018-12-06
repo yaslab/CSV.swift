@@ -70,9 +70,10 @@ class CSVRowDecoderTests: XCTestCase {
         ("testIntCodingKeyWhileIgnoringHeaders", testIntCodingKeyWhileIgnoringHeaders),
         ("testTypeMismatch", testTypeMismatch),
         ("testUnsupportedDecodableField", testUnsupportedDecodableField),
-        ("testDecodeBoolean", testDecodeBoolean),
         ("testDecodeInteger", testDecodeInteger),
         ("testDecodeFloat", testDecodeFloat),
+        ("testBoolDecodingStrategy_default", testBoolDecodingStrategy_default),
+        ("testBoolDecodingStrategy_custom", testBoolDecodingStrategy_custom),
         ("testDateDecodingStrategy_deferredToDate", testDateDecodingStrategy_deferredToDate),
         ("testDateDecodingStrategy_secondsSince1970", testDateDecodingStrategy_secondsSince1970),
         ("testDateDecodingStrategy_millisecondsSince1970", testDateDecodingStrategy_millisecondsSince1970),
@@ -316,31 +317,6 @@ class CSVRowDecoderTests: XCTestCase {
 
     //===----------------------------------------------------------------------===//
 
-    fileprivate struct BooleanDecodableExample: Decodable {
-        let falseValue: Bool
-        let trueValue: Bool
-    }
-
-    func testDecodeBoolean() {
-        let csv = """
-            falseValue,trueValue
-            false,true
-            """
-        do {
-            let reader = try CSVReader(string: csv, hasHeaderRow: true)
-            reader.next()
-
-            let decoder = CSVRowDecoder()
-            let row = try decoder.decode(BooleanDecodableExample.self, from: reader)
-            XCTAssertEqual(row.falseValue, false)
-            XCTAssertEqual(row.trueValue, true)
-        } catch {
-            XCTFail("\(error)")
-        }
-    }
-
-    //===----------------------------------------------------------------------===//
-
     fileprivate struct IntegerDecodableExample: Decodable {
         let intValue: Int
         let int8Value: Int8
@@ -400,6 +376,51 @@ class CSVRowDecoderTests: XCTestCase {
             let row = try decoder.decode(FloatDecodableExample.self, from: reader)
             XCTAssertEqual(row.floatValue, 123.456)
             XCTAssertEqual(row.doubleValue, 7890.1234)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    //===----------------------------------------------------------------------===//
+
+    fileprivate struct BoolDecodingStrategyExample: Decodable {
+        let falseValue: Bool
+        let trueValue: Bool
+    }
+
+    func testBoolDecodingStrategy_default() {
+        let csv = """
+            falseValue,trueValue
+            false,true
+            """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            decoder.boolDecodingStrategy = .default
+            let row = try decoder.decode(BoolDecodingStrategyExample.self, from: reader)
+            XCTAssertEqual(row.falseValue, false)
+            XCTAssertEqual(row.trueValue, true)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    func testBoolDecodingStrategy_custom() {
+        let csv = """
+            falseValue,trueValue
+            0,1
+            """
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+            reader.next()
+
+            let decoder = CSVRowDecoder()
+            decoder.boolDecodingStrategy = .custom({ $0 != "0" })
+            let row = try decoder.decode(BoolDecodingStrategyExample.self, from: reader)
+            XCTAssertEqual(row.falseValue, false)
+            XCTAssertEqual(row.trueValue, true)
         } catch {
             XCTFail("\(error)")
         }

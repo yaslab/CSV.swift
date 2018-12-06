@@ -11,6 +11,15 @@ import Foundation
 /// `CSVRowDecoder` facilitates the decoding of CSV row into semantic `Decodable` types.
 open class CSVRowDecoder {
 
+    /// The strategy to use for decoding `Bool` values.
+    public enum BoolDecodingStrategy {
+        /// Decode the `Bool` using default initializer.
+        case `default`
+
+        /// Decode the `Bool` as a custom value decoded by the given closure.
+        case custom((_ value: String) throws -> Bool)
+    }
+
     /// The strategy to use for decoding `Date` values.
     public enum DateDecodingStrategy {
         /// Defer to `Date` for decoding. This is the default strategy.
@@ -46,6 +55,9 @@ open class CSVRowDecoder {
         case custom((_ value: String) throws -> Data)
     }
 
+    /// The strategy to use in decoding bools. Defaults to `.default`.
+    open var boolDecodingStrategy: BoolDecodingStrategy = .default
+
     /// The strategy to use in decoding dates. Defaults to `.deferredToDate`.
     open var dateDecodingStrategy: DateDecodingStrategy = .deferredToDate
 
@@ -57,6 +69,7 @@ open class CSVRowDecoder {
 
     /// Options set on the top-level encoder to pass down the decoding hierarchy.
     fileprivate struct _Options {
+        let boolDecodingStrategy: BoolDecodingStrategy
         let dateDecodingStrategy: DateDecodingStrategy
         let dataDecodingStrategy: DataDecodingStrategy
         let userInfo: [CodingUserInfoKey: Any]
@@ -64,7 +77,8 @@ open class CSVRowDecoder {
 
     /// The options set on the top-level decoder.
     fileprivate var options: _Options {
-        return _Options(dateDecodingStrategy: dateDecodingStrategy,
+        return _Options(boolDecodingStrategy: boolDecodingStrategy,
+                        dateDecodingStrategy: dateDecodingStrategy,
                         dataDecodingStrategy: dataDecodingStrategy,
                         userInfo: userInfo)
     }
@@ -490,10 +504,16 @@ extension _CSVRowDecoder {
     fileprivate func unbox(_ value: String, as type: Bool.Type) throws -> Bool? {
         if value.isEmpty { return nil }
 
-        guard let bool = Bool(value) else {
-            throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+        switch self.options.boolDecodingStrategy {
+        case .default:
+            guard let bool = Bool(value) else {
+                throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
+            }
+            return bool
+
+        case .custom(let closure):
+            return try closure(value)
         }
-        return bool
     }
 
     fileprivate func unbox(_ value: String, as type: Int.Type) throws -> Int? {
