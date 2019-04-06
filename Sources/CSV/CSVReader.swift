@@ -383,7 +383,7 @@ extension CSVReader {
         guard let header = headerRow else {
             fatalError("CSVReader.headerRow must not be nil")
         }
-        guard let index = header.index(of: key) else {
+        guard let index = header.firstIndex(of: key) else {
             return nil
         }
         guard let row = currentRow else {
