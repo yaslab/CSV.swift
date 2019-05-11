@@ -562,7 +562,7 @@ class CSVRowDecoderTests: XCTestCase {
     }
 
     func testDataDecodingStrategy_base64() {
-        let expected = Data(bytes: [0x56, 0x12, 0x00, 0x34, 0x1a, 0xfe])
+        let expected = Data([0x56, 0x12, 0x00, 0x34, 0x1a, 0xfe])
         let csv = """
         data
         "\(expected.base64EncodedString())"
@@ -581,7 +581,7 @@ class CSVRowDecoderTests: XCTestCase {
     }
 
     func testDataDecodingStrategy_custom() {
-        let expected = Data(bytes: [0x34, 0x1a, 0xfe, 0x56, 0x12, 0x00])
+        let expected = Data([0x34, 0x1a, 0xfe, 0x56, 0x12, 0x00])
         let csv = """
         data
         "\(expected.map({ String(format: "%02x", $0) }).joined())"

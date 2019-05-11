@@ -448,11 +448,11 @@
 					};
 					0E7E8CC51D0BCA2A0057A1C1 = {
 						CreatedOnToolsVersion = 7.3.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1020;
 					};
 					0E7E8CCE1D0BCA2A0057A1C1 = {
 						CreatedOnToolsVersion = 7.3.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1020;
 					};
 					0E7E8CE71D0BCD0B0057A1C1 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -742,7 +742,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -796,7 +796,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -819,7 +819,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.yaslab.CSV;
 				PRODUCT_NAME = CSV;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -839,7 +838,6 @@
 				PRODUCT_NAME = CSV;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -851,7 +849,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "net.yaslab.CSVTests-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -864,7 +861,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "net.yaslab.CSVTests-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
