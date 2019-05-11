@@ -29,7 +29,7 @@ class BinaryReaderTests: XCTestCase {
 
     func testReadUInt8WithSmallBuffer() {
         let bytes = [0xcc] + random(99)
-        let stream = InputStream(data: Data(bytes: bytes))
+        let stream = InputStream(data: Data(bytes))
 
         do {
             let reader = try BinaryReader(stream: stream, endian: .unknown, closeOnDeinit: true, bufferSize: 7)
@@ -44,7 +44,7 @@ class BinaryReaderTests: XCTestCase {
 
     func testReadUInt16BEWithSmallBuffer() {
         let bytes = [0xcc] + random(99)
-        let stream = InputStream(data: Data(bytes: bytes))
+        let stream = InputStream(data: Data(bytes))
 
         do {
             let reader = try BinaryReader(stream: stream, endian: .big, closeOnDeinit: true, bufferSize: 7)
@@ -60,7 +60,7 @@ class BinaryReaderTests: XCTestCase {
 
     func testReadUInt16LEWithSmallBuffer() {
         let bytes = [0xcc] + random(99)
-        let stream = InputStream(data: Data(bytes: bytes))
+        let stream = InputStream(data: Data(bytes))
 
         do {
             let reader = try BinaryReader(stream: stream, endian: .little, closeOnDeinit: true, bufferSize: 7)
@@ -76,7 +76,7 @@ class BinaryReaderTests: XCTestCase {
 
     func testReadUInt32BEWithSmallBuffer() {
         let bytes = [0xcc] + random(99)
-        let stream = InputStream(data: Data(bytes: bytes))
+        let stream = InputStream(data: Data(bytes))
 
         do {
             let reader = try BinaryReader(stream: stream, endian: .big, closeOnDeinit: true, bufferSize: 7)
@@ -94,7 +94,7 @@ class BinaryReaderTests: XCTestCase {
 
     func testReadUInt32LEWithSmallBuffer() {
         let bytes = [0xcc] + random(99)
-        let stream = InputStream(data: Data(bytes: bytes))
+        let stream = InputStream(data: Data(bytes))
 
         do {
             let reader = try BinaryReader(stream: stream, endian: .little, closeOnDeinit: true, bufferSize: 7)
