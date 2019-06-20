@@ -218,6 +218,23 @@ class CSVWriterTests: XCTestCase {
         XCTAssertEqual(csvStr, "\(str)-1\r\n\(str)-2")
     }
 
+    /// xxxx,xxxx
+    func testValueContainsComma() {
+        let stream = OutputStream(toMemory: ())
+        stream.open()
+
+        let csv = try! CSVWriter(stream: stream)
+        csv.beginNewRow()
+        try! csv.write(field: str + ",1", quoted: true)
+        try! csv.write(field: str + ",2") // quoted: false
+
+        stream.close()
+        let data = stream.data!
+        let csvStr = String(data: data, encoding: .utf8)!
+
+        XCTAssertEqual(csvStr, "\"\(str),1\",\"\(str),2\"")
+    }
+
     /// UTF16 Big Endian
     func testUTF16BE() {
         let stream = OutputStream(toMemory: ())
