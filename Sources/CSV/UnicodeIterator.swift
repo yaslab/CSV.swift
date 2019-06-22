@@ -8,8 +8,7 @@
 
 internal class UnicodeIterator<
     Input: IteratorProtocol,
-    InputEncoding: UnicodeCodec>
-    : IteratorProtocol
+    InputEncoding: UnicodeCodec>: IteratorProtocol
     where InputEncoding.CodeUnit == Input.Element {
 
     private var input: Input
