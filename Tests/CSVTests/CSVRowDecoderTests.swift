@@ -64,6 +64,7 @@ class CSVRowDecoderTests: XCTestCase {
 
     static let allTests = [
         ("testNoHeader", testNoHeader),
+        ("testNumberOfFieldsIsSmall", testNumberOfFieldsIsSmall),
         ("testStringCodingKey", testStringCodingKey),
         ("testTypeInvalidDateFormat", testTypeInvalidDateFormat),
         ("testIntCodingKey", testIntCodingKey),
@@ -112,6 +113,28 @@ class CSVRowDecoderTests: XCTestCase {
             XCTFail("Expect DecodingError.typeMismatch Error thrown")
         } catch {
             // Success
+        }
+    }
+
+    func testNumberOfFieldsIsSmall() {
+        let csv = """
+            stringKey,intKey,optionalStringKey,dateKey,enumKey
+            string 0  0 first
+            string,0,,0,first
+            """
+        let reader = try! CSVReader(string: csv, hasHeaderRow: true)
+
+        do {
+            let decoder = CSVRowDecoder()
+            if reader.next() != nil {
+                _ = try decoder.decode(SupportedDecodableExample.self, from: reader)
+            }
+            XCTFail("decode<T>() did not threw error")
+        } catch let DecodingError.valueNotFound(_, context) {
+            // Success
+            XCTAssertEqual("intKey", context.codingPath.last!.stringValue)
+        } catch {
+            XCTFail("The error thrown is not a DecodingError.valueNotFound")
         }
     }
 

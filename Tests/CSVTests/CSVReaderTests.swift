@@ -24,11 +24,12 @@ class CSVReaderTests: XCTestCase {
         ("testDoubleQuoteBeforeLineBreak", testDoubleQuoteBeforeLineBreak),
         ("testCSVState1", testCSVState1),
         ("testSubscriptInt", testSubscriptInt),
-        ("testSubscriptString1", testSubscriptString1),
-        ("testSubscriptString2", testSubscriptString2),
+        ("testHasHeaderRow1", testHasHeaderRow1),
+        ("testHasHeaderRow2", testHasHeaderRow2),
+        ("testHasHeaderRow3", testHasHeaderRow3),
+        ("testSubscript1", testSubscript1),
+        ("testSubscript2", testSubscript2),
         ("testToArray", testToArray)
-        //("testToDictionary1", testToDictionary1),
-        //("testToDictionary2", testToDictionary2)
     ]
 
     func testOneLine() {
@@ -180,7 +181,34 @@ class CSVReaderTests: XCTestCase {
         }
     }
 
-    func testSubscriptString1() {
+    func testHasHeaderRow1() {
+        let csvString = "key1,key2\nvalue1,value2"
+        let csv = try! CSVReader(string: csvString, hasHeaderRow: true)
+        XCTAssertEqual(csv.headerRow, ["key1", "key2"])
+        XCTAssertNil(csv.currentRow)
+        csv.next()
+        XCTAssertEqual(csv.currentRow, ["value1", "value2"])
+    }
+
+    func testHasHeaderRow2() {
+        let csvString = "key1,key2\n"
+        let csv = try! CSVReader(string: csvString, hasHeaderRow: true)
+        XCTAssertEqual(csv.headerRow, ["key1", "key2"])
+        XCTAssertNil(csv.currentRow)
+        csv.next()
+        XCTAssertNil(csv.currentRow)
+    }
+
+    func testHasHeaderRow3() {
+        let csvString = "key1,key2"
+        let csv = try! CSVReader(string: csvString, hasHeaderRow: true)
+        XCTAssertEqual(csv.headerRow, ["key1", "key2"])
+        XCTAssertNil(csv.currentRow)
+        csv.next()
+        XCTAssertNil(csv.currentRow)
+    }
+
+    func testSubscript1() {
         let csvString = "key1,key2\nvalue1,value2"
         let csv = try! CSVReader(string: csvString, hasHeaderRow: true)
         csv.next()
@@ -189,12 +217,12 @@ class CSVReaderTests: XCTestCase {
         XCTAssertNil(csv["key9"])
     }
 
-    func testSubscriptString2() {
+    func testSubscript2() {
         let csvString = "key1,key2\nvalue1"
         let csv = try! CSVReader(string: csvString, hasHeaderRow: true)
         csv.next()
         XCTAssertEqual(csv["key1"], "value1")
-        XCTAssertNil(csv["key2"])
+        XCTAssertEqual(csv["key2"], "")
         XCTAssertNil(csv["key9"])
     }
 
@@ -206,30 +234,4 @@ class CSVReaderTests: XCTestCase {
         XCTAssertEqual(records[1], ["6", "7", "8", "9", "0"])
     }
 
-//    func testToDictionary1() {
-//        let csvString = "id,name\n1,name1\n2,name2"
-//        let config = CSVReader.Configuration(hasHeaderRow: true)
-//        let csv = try! CSVReader(string: csvString, configuration: config)
-//        let rows = AnyIterator(csv).map { $0.toDictionary() }
-//        XCTAssertEqual(rows[0]["id"], "1")
-//        XCTAssertEqual(rows[0]["name"], "name1")
-//        XCTAssertNil(rows[0]["xxx"])
-//        XCTAssertEqual(rows[1]["id"], "2")
-//        XCTAssertEqual(rows[1]["name"], "name2")
-//        XCTAssertNil(rows[1]["yyy"])
-//    }
-
-//    func testToDictionary2() {
-//        let csvString = "id,name,id\n1,name1,11\n2,name2,22"
-//        let config = CSVReader.Configuration(hasHeaderRow: true)
-//        let csv = try! CSVReader(string: csvString, configuration: config)
-//        let rows = AnyIterator(csv).map { $0.toDictionary() }
-//        XCTAssertEqual(rows[0]["id"], "1")
-//        XCTAssertEqual(rows[0]["name"], "name1")
-//        XCTAssertNil(rows[0]["xxx"])
-//        XCTAssertEqual(rows[1]["id"], "2")
-//        XCTAssertEqual(rows[1]["name"], "name2")
-//        XCTAssertNil(rows[1]["yyy"])
-//    }
-    
 }
