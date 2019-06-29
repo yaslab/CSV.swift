@@ -54,9 +54,6 @@ public class CSVReader {
 
     fileprivate var back: UnicodeScalar?
 
-    fileprivate var currentRowIndex: Int = 0
-    fileprivate var currentFieldIndex: Int = 0
-
     /// CSV header row. To set a value for this property,
     /// you set `true` to `headerRow` in initializer.
     public private (set) var headerRow: [String]?
@@ -76,6 +73,7 @@ public class CSVReader {
                 throw CSVError.cannotReadHeaderRow
             }
             self.headerRow = headerRow
+            self.currentRow = nil
         }
     }
 
@@ -232,10 +230,9 @@ extension CSVReader {
 extension CSVReader {
 
     fileprivate func readRow() -> [String]? {
-        currentFieldIndex = 0
-
         var c = moveNext()
         if c == nil {
+            currentRow = nil
             return nil
         }
 
@@ -268,12 +265,8 @@ extension CSVReader {
                 break
             }
 
-            currentFieldIndex += 1
-
             c = moveNext()
         }
-
-        currentRowIndex += 1
 
         currentRow = row
         return row
@@ -389,8 +382,8 @@ extension CSVReader {
         guard let row = currentRow else {
             fatalError("CSVReader.currentRow must not be nil")
         }
-        if index >= row.count {
-            return nil
+        guard index < row.count else {
+            return ""
         }
         return row[index]
     }
