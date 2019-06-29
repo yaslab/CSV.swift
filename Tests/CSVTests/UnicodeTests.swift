@@ -12,16 +12,6 @@ import XCTest
 
 class UnicodeTests: XCTestCase {
 
-    static let allTests = [
-        ("testUTF8WithBOM", testUTF8WithBOM),
-        ("testUTF16WithNativeEndianBOM", testUTF16WithNativeEndianBOM),
-        ("testUTF16WithBigEndianBOM", testUTF16WithBigEndianBOM),
-        ("testUTF16WithLittleEndianBOM", testUTF16WithLittleEndianBOM),
-        ("testUTF32WithNativeEndianBOM", testUTF32WithNativeEndianBOM),
-        ("testUTF32WithBigEndianBOM", testUTF32WithBigEndianBOM),
-        ("testUTF32WithLittleEndianBOM", testUTF32WithLittleEndianBOM)
-    ]
-
     func testUTF8WithBOM() {
         let csvString = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\","
         let encoding = String.Encoding.utf8

@@ -11,14 +11,6 @@ import XCTest
 
 class BinaryReaderTests: XCTestCase {
 
-    static let allTests = [
-        ("testReadUInt8WithSmallBuffer", testReadUInt8WithSmallBuffer),
-        ("testReadUInt16BEWithSmallBuffer", testReadUInt16BEWithSmallBuffer),
-        ("testReadUInt16LEWithSmallBuffer", testReadUInt16LEWithSmallBuffer),
-        ("testReadUInt32BEWithSmallBuffer", testReadUInt32BEWithSmallBuffer),
-        ("testReadUInt32LEWithSmallBuffer", testReadUInt32LEWithSmallBuffer)
-    ]
-
     private func random(_ count: Int) -> [UInt8] {
         var array = [UInt8]()
         for _ in 0 ..< count {

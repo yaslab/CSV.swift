@@ -13,10 +13,6 @@ import CSV
 
 class Version1Tests: XCTestCase {
 
-    static let allTests = [
-        ("testV1", testV1)
-    ]
-
     func testV1() {
         let str = "a,b,c\n1,2,3"
         let data8 = str.data(using: .utf8)!
@@ -28,7 +24,7 @@ class Version1Tests: XCTestCase {
 
         do {
             let stream = InputStream(data: data8)
-            let csv = try CSV(stream: stream,
+            let csv = try CSVReader(stream: stream,
                               codecType: UTF8.self,
                               hasHeaderRow: true,
                               trimFields: false,
@@ -42,7 +38,7 @@ class Version1Tests: XCTestCase {
 
         do {
             let stream = InputStream(data: data16)
-            let csv = try CSV(stream: stream,
+            let csv = try CSVReader(stream: stream,
                               codecType: UTF16.self,
                               endian: .big,
                               hasHeaderRow: true,
@@ -57,7 +53,7 @@ class Version1Tests: XCTestCase {
 
         do {
             let stream = InputStream(data: data32)
-            let csv = try CSV(stream: stream,
+            let csv = try CSVReader(stream: stream,
                               codecType: UTF32.self,
                               endian: .big,
                               hasHeaderRow: true,
@@ -72,7 +68,7 @@ class Version1Tests: XCTestCase {
 
         do {
             let stream = InputStream(data: data8)
-            let csv = try CSV(stream: stream,
+            let csv = try CSVReader(stream: stream,
                               hasHeaderRow: true,
                               trimFields: false,
                               delimiter: ",")
@@ -84,7 +80,7 @@ class Version1Tests: XCTestCase {
         }
 
         do {
-            let csv = try CSV(string: str,
+            let csv = try CSVReader(string: str,
                               hasHeaderRow: true,
                               trimFields: false,
                               delimiter: ",")
