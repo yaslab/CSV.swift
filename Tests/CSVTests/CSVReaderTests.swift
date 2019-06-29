@@ -11,29 +11,6 @@ import XCTest
 
 class CSVReaderTests: XCTestCase {
 
-    static let allTests = [
-        ("testOneLine", testOneLine),
-        ("testTwoLines", testTwoLines),
-        ("testLastLineIsEmpty", testLastLineIsEmpty),
-        ("testLastLineIsWhiteSpace", testLastLineIsWhiteSpace),
-        ("testMiddleLineIsEmpty", testMiddleLineIsEmpty),
-        ("testCommaInQuotationMarks", testCommaInQuotationMarks),
-        ("testEscapedQuotationMark1", testEscapedQuotationMark1),
-        ("testEscapedQuotationMark2", testEscapedQuotationMark2),
-        ("testEmptyField", testEmptyField),
-        ("testDoubleQuoteBeforeLineBreak1", testDoubleQuoteBeforeLineBreak1),
-        ("testDoubleQuoteBeforeLineBreak2", testDoubleQuoteBeforeLineBreak2),
-        ("testCSVState1", testCSVState1),
-        ("testSubscriptInt", testSubscriptInt),
-        ("testHasHeaderRow1", testHasHeaderRow1),
-        ("testHasHeaderRow2", testHasHeaderRow2),
-        ("testHasHeaderRow3", testHasHeaderRow3),
-        ("testHasHeaderRow4", testHasHeaderRow4),
-        ("testSubscript1", testSubscript1),
-        ("testSubscript2", testSubscript2),
-        ("testToArray", testToArray)
-    ]
-
     func testOneLine() {
         let csv = "\"abc\",1,2"
         var i = 0

@@ -13,10 +13,6 @@ import CSV
 
 class Version1Tests: XCTestCase {
 
-    static let allTests = [
-        ("testV1", testV1)
-    ]
-
     func testV1() {
         let str = "a,b,c\n1,2,3"
         let data8 = str.data(using: .utf8)!

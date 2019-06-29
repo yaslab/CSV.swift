@@ -24,23 +24,6 @@ extension OutputStream {
 
 class CSVWriterTests: XCTestCase {
 
-    static let allTests = [
-        ("testSingleFieldSingleRecord", testSingleFieldSingleRecord),
-        ("testSingleFieldMultipleRecord", testSingleFieldMultipleRecord),
-        ("testMultipleFieldSingleRecord", testMultipleFieldSingleRecord),
-        ("testMultipleFieldMultipleRecord", testMultipleFieldMultipleRecord),
-        ("testQuoted", testQuoted),
-        ("testQuotedNewline", testQuotedNewline),
-        ("testEscapeQuote", testEscapeQuote),
-        ("testEscapeQuoteAutomatically", testEscapeQuoteAutomatically),
-        ("testDelimiter", testDelimiter),
-        ("testNewline", testNewline),
-        ("testUTF16BE", testUTF16BE),
-        ("testUTF16LE", testUTF16LE),
-        ("testUTF32BE", testUTF32BE),
-        ("testUTF32LE", testUTF32LE)
-    ]
-
     let str = "TEST-test-1234-😄😆👨‍👩‍👧‍👦"
 
     /// xxxx

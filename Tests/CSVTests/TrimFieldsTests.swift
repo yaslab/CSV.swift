@@ -11,27 +11,6 @@ import XCTest
 
 class TrimFieldsTests: XCTestCase {
 
-    static let allTests = [
-        ("testTrimFields1", testTrimFields1),
-        ("testTrimFields2", testTrimFields2),
-        ("testTrimFields3", testTrimFields3),
-        ("testTrimFields4", testTrimFields4),
-        ("testTrimFields5", testTrimFields5),
-        ("testTrimFields6", testTrimFields6),
-        ("testTrimFields7", testTrimFields7),
-        ("testTrimFields8", testTrimFields8),
-        ("testTrimFields9", testTrimFields9),
-        ("testTrimFields10", testTrimFields10),
-        ("testTrimFields11", testTrimFields11),
-        ("testTrimFields12", testTrimFields12),
-        ("testTrimFields13", testTrimFields13),
-        ("testTrimFields14", testTrimFields14),
-        ("testTrimFields15", testTrimFields15),
-        ("testTrimFields16", testTrimFields16),
-        ("testTrimFields17", testTrimFields17),
-        ("testTrimFields18", testTrimFields18)
-    ]
-
     func testTrimFields1() {
         let csvString = "abc,def,ghi"
         let csv = try! CSVReader(string: csvString, trimFields: true)

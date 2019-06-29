@@ -62,30 +62,6 @@ extension Equatable where Self: DecodableTest {
 
 class CSVRowDecoderTests: XCTestCase {
 
-    static let allTests = [
-        ("testNoHeader", testNoHeader),
-        ("testNumberOfFieldsIsSmall", testNumberOfFieldsIsSmall),
-        ("testStringCodingKey", testStringCodingKey),
-        ("testTypeInvalidDateFormat", testTypeInvalidDateFormat),
-        ("testIntCodingKey", testIntCodingKey),
-        ("testIntCodingKeyWhileIgnoringHeaders", testIntCodingKeyWhileIgnoringHeaders),
-        ("testTypeMismatch", testTypeMismatch),
-        ("testUnsupportedDecodableField", testUnsupportedDecodableField),
-        ("testDecodeInteger", testDecodeInteger),
-        ("testDecodeFloat", testDecodeFloat),
-        ("testBoolDecodingStrategy_default", testBoolDecodingStrategy_default),
-        ("testBoolDecodingStrategy_custom", testBoolDecodingStrategy_custom),
-        ("testDateDecodingStrategy_deferredToDate", testDateDecodingStrategy_deferredToDate),
-        ("testDateDecodingStrategy_secondsSince1970", testDateDecodingStrategy_secondsSince1970),
-        ("testDateDecodingStrategy_millisecondsSince1970", testDateDecodingStrategy_millisecondsSince1970),
-        //("testDateDecodingStrategy_iso8601", testDateDecodingStrategy_iso8601),
-        ("testDateDecodingStrategy_formatted", testDateDecodingStrategy_formatted),
-        ("testDateDecodingStrategy_custom", testDateDecodingStrategy_custom),
-        ("testDataDecodingStrategy_base64", testDataDecodingStrategy_base64),
-        ("testDataDecodingStrategy_custom", testDataDecodingStrategy_custom),
-        ("testFoundationDecoding", testFoundationDecoding),
-    ]
-
     //===----------------------------------------------------------------------===//
 
     fileprivate struct SupportedDecodableExample: Decodable, DecodableTest {

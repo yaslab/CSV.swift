@@ -11,16 +11,6 @@ import XCTest
 
 class ReadmeTests: XCTestCase {
 
-    static let allTests = [
-        ("testFromCSVString", testFromCSVString),
-        ("testFromFile", testFromFile),
-        ("testGettingTheHeaderRow", testGettingTheHeaderRow),
-        ("testGetTheFieldValueUsingKey", testGetTheFieldValueUsingKey),
-        ("testProvideTheCharacterEncoding", testProvideTheCharacterEncoding),
-        ("testWriteToMemory", testWriteToMemory),
-        ("testWriteToFile", testWriteToFile)
-    ]
-    
     // MARK: - Reading
 
     func testFromCSVString() {
