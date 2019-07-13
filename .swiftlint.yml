@@ -4,3 +4,8 @@ disabled_rules:
   - variable_name
 included:
   - Sources
+line_length: 300
+file_length: 1500
+cyclomatic_complexity:
+  warning: 15
+  error: 20
