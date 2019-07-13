@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'CSV.swift'
-  s.version = '2.4.1'
+  s.version = '2.4.2'
   s.license = 'MIT'
   s.summary = 'CSV reading and writing library written in Swift.'
   s.homepage = 'https://github.com/yaslab/CSV.swift'
