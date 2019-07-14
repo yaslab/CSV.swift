@@ -84,6 +84,7 @@ extension CSVWriterTests {
         ("testNewline", testNewline),
         ("testQuoted", testQuoted),
         ("testQuotedNewline", testQuotedNewline),
+        ("testReadme", testReadme),
         ("testSingleFieldMultipleRecord", testSingleFieldMultipleRecord),
         ("testSingleFieldSingleRecord", testSingleFieldSingleRecord),
         ("testUTF16BE", testUTF16BE),

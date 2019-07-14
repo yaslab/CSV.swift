@@ -14,10 +14,7 @@ import CSV
 extension OutputStream {
 
     var data: Data? {
-        guard let nsData = property(forKey: .dataWrittenToMemoryStreamKey) as? NSData else {
-            return nil
-        }
-        return Data(referencing: nsData)
+        return self.property(forKey: .dataWrittenToMemoryStreamKey) as? Data
     }
 
 }
@@ -28,15 +25,11 @@ class CSVWriterTests: XCTestCase {
 
     /// xxxx
     func testSingleFieldSingleRecord() {
-        let stream = OutputStream(toMemory: ())
-        stream.open()
-
-        let csv = try! CSVWriter(stream: stream)
+        let csv = try! CSVWriter(stream: .toMemory())
         csv.beginNewRow()
         try! csv.write(field: str)
 
-        stream.close()
-        let data = stream.data!
+        let data = csv.stream.data!
         let csvStr = String(data: data, encoding: .utf8)!
 
         XCTAssertEqual(csvStr, str)
@@ -45,7 +38,7 @@ class CSVWriterTests: XCTestCase {
     /// xxxx
     /// xxxx
     func testSingleFieldMultipleRecord() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
@@ -63,7 +56,7 @@ class CSVWriterTests: XCTestCase {
 
     /// xxxx,xxxx
     func testMultipleFieldSingleRecord() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
@@ -81,7 +74,7 @@ class CSVWriterTests: XCTestCase {
     /// xxxx,xxxx
     /// xxxx,xxxx
     func testMultipleFieldMultipleRecord() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
@@ -101,7 +94,7 @@ class CSVWriterTests: XCTestCase {
 
     /// "xxxx",xxxx
     func testQuoted() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
@@ -118,7 +111,7 @@ class CSVWriterTests: XCTestCase {
 
     /// xxxx,"xx\nxx"
     func testQuotedNewline() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
@@ -135,7 +128,7 @@ class CSVWriterTests: XCTestCase {
 
     /// xxxx,"xx""xx"
     func testEscapeQuote() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
@@ -153,7 +146,7 @@ class CSVWriterTests: XCTestCase {
     /// csv.write(row: ["xxxx", "xx,\"xx"])
     /// -> xxxx,"xx,""xx"
     func testEscapeQuoteAutomatically() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
         
         let csv = try! CSVWriter(stream: stream)
@@ -168,7 +161,7 @@ class CSVWriterTests: XCTestCase {
     
     /// Test delimiter: "\t"
     func testDelimiter() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter.init(stream: stream, delimiter: "\t")
@@ -185,7 +178,7 @@ class CSVWriterTests: XCTestCase {
 
     /// Test newline: "\r\n"
     func testNewline() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter.init(stream: stream, newline: .crlf)
@@ -203,7 +196,7 @@ class CSVWriterTests: XCTestCase {
 
     /// xxxx,xxxx
     func testValueContainsComma() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
@@ -220,7 +213,7 @@ class CSVWriterTests: XCTestCase {
 
     /// UTF16 Big Endian
     func testUTF16BE() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream, codecType: UTF16.self, endian: .big)
@@ -236,7 +229,7 @@ class CSVWriterTests: XCTestCase {
 
     /// UTF16 Little Endian
     func testUTF16LE() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream, codecType: UTF16.self, endian: .little)
@@ -252,7 +245,7 @@ class CSVWriterTests: XCTestCase {
 
     /// UTF32 Big Endian
     func testUTF32BE() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream, codecType: UTF32.self, endian: .big)
@@ -268,7 +261,7 @@ class CSVWriterTests: XCTestCase {
 
     /// UTF32 Little Endian
     func testUTF32LE() {
-        let stream = OutputStream(toMemory: ())
+        let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream, codecType: UTF32.self, endian: .little)
@@ -280,6 +273,31 @@ class CSVWriterTests: XCTestCase {
         let csvStr = String(data: data, encoding: .utf32LittleEndian)!
 
         XCTAssertEqual(csvStr, str)
+    }
+
+    func testReadme() {
+        let csv = try! CSVWriter(stream: .toMemory())
+
+        // Write a row
+        try! csv.write(row: ["id", "name"])
+
+        // Write fields separately
+        csv.beginNewRow()
+        try! csv.write(field: "1")
+        try! csv.write(field: "foo")
+        csv.beginNewRow()
+        try! csv.write(field: "2")
+        try! csv.write(field: "bar")
+
+        csv.stream.close()
+
+        // Get a String
+        let csvData = csv.stream.property(forKey: .dataWrittenToMemoryStreamKey) as! Data
+        let csvString = String(data: csvData, encoding: .utf8)!
+        print(csvString)
+        // => "id,name\n1,foo\n2,bar"
+
+        XCTAssertEqual("id,name\n1,foo\n2,bar", csvString)
     }
 
 }

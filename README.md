@@ -124,8 +124,7 @@ NOTE: The default character encoding is `UTF8`.
 import Foundation
 import CSV
 
-let stream = OutputStream(toMemory: ())
-let csv = try! CSVWriter(stream: stream)
+let csv = try! CSVWriter(stream: .toMemory())
 
 // Write a row
 try! csv.write(row: ["id", "name"])
@@ -141,8 +140,8 @@ try! csv.write(field: "bar")
 csv.stream.close()
 
 // Get a String
-let csvData = stream.property(forKey: .dataWrittenToMemoryStreamKey) as! NSData
-let csvString = String(data: Data(referencing: csvData), encoding: .utf8)!
+let csvData = csv.stream.property(forKey: .dataWrittenToMemoryStreamKey) as! Data
+let csvString = String(data: csvData, encoding: .utf8)!
 print(csvString)
 // => "id,name\n1,foo\n2,bar"
 ```
