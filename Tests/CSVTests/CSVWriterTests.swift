@@ -159,6 +159,39 @@ class CSVWriterTests: XCTestCase {
         XCTAssertEqual(csvStr, "id,\"testing,\"\"comma\"")
     }
     
+    /// csv.write(row: ["xxxx", "xx\rxx", "xx\nxx", "xx\r\nrxx"])
+    /// -> xxxx,"xx\rxx","xx\nxx","xx\r\nxx"
+    func testEscapeNewlineAutomatically() {
+        let stream = OutputStream.toMemory()
+        stream.open()
+        
+        let csv = try! CSVWriter(stream: stream)
+        try! csv.write(row: ["id", "testing\rCR", "testing\nLF", "testing\r\nCRLF"]) // quoted: false
+        
+        stream.close()
+        let data = stream.data!
+        let csvStr = String(data: data, encoding: .utf8)!
+        
+        XCTAssertEqual(csvStr, "id,\"testing\rCR\",\"testing\nLF\",\"testing\r\nCRLF\"")
+    }
+    
+    /// Test delimiter: $
+    /// csv.write(row: ["xxxx", "xx$xx"])
+    /// -> xxxx$"xx$xx"
+    func testEscapeDelimiterAutomatically() {
+        let stream = OutputStream.toMemory()
+        stream.open()
+        
+        let csv = try! CSVWriter(stream: stream, delimiter: "$")
+        try! csv.write(row: ["id", "testing$dollar"]) // quoted: false
+        
+        stream.close()
+        let data = stream.data!
+        let csvStr = String(data: data, encoding: .utf8)!
+        
+        XCTAssertEqual(csvStr, "id$\"testing$dollar\"")
+    }
+    
     /// Test delimiter: "\t"
     func testDelimiter() {
         let stream = OutputStream.toMemory()
