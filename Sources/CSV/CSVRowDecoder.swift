@@ -54,6 +54,12 @@ open class CSVRowDecoder {
         /// Decode the `Data` as a custom value decoded by the given closure.
         case custom((_ value: String) throws -> Data)
     }
+    
+    /// The strategy to use for decoding `nil` values.
+    public enum NilDecodingStrategy {
+        case empty
+        case custom((_ value: String) -> Bool)
+    }
 
     /// The strategy to use in decoding bools. Defaults to `.default`.
     open var boolDecodingStrategy: BoolDecodingStrategy = .default
@@ -63,6 +69,9 @@ open class CSVRowDecoder {
 
     /// The strategy to use in decoding binary data. Defaults to `.base64`.
     open var dataDecodingStrategy: DataDecodingStrategy = .base64
+    
+    /// The strategy to use in decoding nil data. Defaults to `.empty`.
+    open var nilDecodingStrategy: NilDecodingStrategy = .empty
 
     /// Contextual user-provided information for use during decoding.
     open var userInfo: [CodingUserInfoKey: Any] = [:]
@@ -72,6 +81,7 @@ open class CSVRowDecoder {
         let boolDecodingStrategy: BoolDecodingStrategy
         let dateDecodingStrategy: DateDecodingStrategy
         let dataDecodingStrategy: DataDecodingStrategy
+        let nilDecodingStrategy: NilDecodingStrategy
         let userInfo: [CodingUserInfoKey: Any]
     }
 
@@ -80,6 +90,7 @@ open class CSVRowDecoder {
         return _Options(boolDecodingStrategy: boolDecodingStrategy,
                         dateDecodingStrategy: dateDecodingStrategy,
                         dataDecodingStrategy: dataDecodingStrategy,
+                        nilDecodingStrategy: nilDecodingStrategy,
                         userInfo: userInfo)
     }
 
@@ -178,7 +189,12 @@ fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingCo
     }
 
     public func decodeNil(forKey key: Key) throws -> Bool {
-        return try self.value(for: key).isEmpty
+        switch decoder.options.nilDecodingStrategy {
+        case .empty:
+            return try self.value(for: key).isEmpty
+        case .custom(let customClosure):
+            return customClosure(try self.value(for: key))
+        }
     }
 
     public func decode(_ type: Bool.Type, forKey key: Key) throws -> Bool {
@@ -414,7 +430,13 @@ extension _CSVRowDecoder: SingleValueDecodingContainer {
     }
 
     public func decodeNil() -> Bool {
-        return self.value.isEmpty
+        switch options.nilDecodingStrategy {
+        case .empty:
+            return self.value.isEmpty
+        case .custom(let customClosure):
+            return customClosure(self.value)
+        }
+        
     }
 
     public func decode(_ type: Bool.Type) throws -> Bool {
