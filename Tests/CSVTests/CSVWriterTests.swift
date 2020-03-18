@@ -159,14 +159,14 @@ class CSVWriterTests: XCTestCase {
         XCTAssertEqual(csvStr, "id,\"testing,\"\"comma\"")
     }
 
-    /// csv.write(row: Set(["id", "cool"])
+    /// csv.write(row: NSArray(["id", "cool"])
     /// -> id,cool
-    func testSet() {
+    func testNSArray() {
         let stream = OutputStream.toMemory()
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
-        try! csv.write(row: Set(["id", "cool"])) // quoted: false
+        try! csv.write(row: NSArray(["id", "cool"])) // quoted: false
 
         stream.close()
         let data = stream.data!
