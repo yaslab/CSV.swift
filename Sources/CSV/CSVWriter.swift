@@ -201,7 +201,7 @@ extension CSVWriter {
         }
     }
 
-    public func write(row values: [String], quotedAtIndex: ((Int) -> Bool) = { _ in false }) throws {
+    public func write<S>(row values: S, quotedAtIndex: ((Int) -> Bool) = { _ in false }) throws where S: Sequence, S.Element == String {
         beginNewRow()
         for (i, value) in values.enumerated() {
             try write(field: value, quoted: quotedAtIndex(i))
