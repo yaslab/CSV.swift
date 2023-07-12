@@ -81,6 +81,8 @@ open class CSVRowDecoder {
         /// 
         /// `__one__two__three__` -> `__oneTwoThree__`
         /// 
+        /// `ONE_TWO_THREE` -> `oneTwoThree`
+        /// 
         /// - Parameter key: key in snake case format
         /// - Returns: key in camel case format
         private static func _convertFromSnakeCase(_ key: String) -> String {
@@ -99,6 +101,9 @@ open class CSVRowDecoder {
 
             // not every part is capitalized
             let start = keyParts[0] == "_" ? 2 : 1
+            for i in 0..<min(start, keyParts.count) {
+                keyParts[i] = keyParts[i].lowercased()
+            }
             for i in start..<keyParts.count {
                 keyParts[i] = keyParts[i].capitalized
             }

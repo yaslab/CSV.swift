@@ -139,8 +139,8 @@ class CSVRowDecoderTests: XCTestCase {
 
     func testConvertFromSnakeCase() {
         let csv = """
-        first_column,second_column
-        first_value,second_value
+        first_column,SECOND_COLUMN
+        first_value,SECOND_VALUE
         """
 
         struct SnakeCaseCsvRow: Codable, Equatable {
@@ -164,7 +164,7 @@ class CSVRowDecoderTests: XCTestCase {
             return
         }
         XCTAssertEqual(records.count, 1)
-        XCTAssertEqual(records[0], SnakeCaseCsvRow(firstColumn: "first_value", secondColumn: "second_value"))
+        XCTAssertEqual(records[0], SnakeCaseCsvRow(firstColumn: "first_value", secondColumn: "SECOND_VALUE"))
     }
 
     func testConvertFromCustom() {
