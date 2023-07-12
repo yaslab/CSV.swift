@@ -50,7 +50,7 @@ class ReadmeTests: XCTestCase {
         let csvString = "id,name\n1,foo"
         let csv = try! CSVReader(string: csvString,
                                  hasHeaderRow: true) // It must be true.
-        
+
         while csv.next() != nil {
             print("\(csv["id"]!)")   // => "1"
             print("\(csv["name"]!)") // => "foo"
@@ -72,7 +72,7 @@ class ReadmeTests: XCTestCase {
 
         // Write a row
         try! csv.write(row: ["id", "name"])
-        
+
         // Write fields separately
         csv.beginNewRow()
         try! csv.write(field: "1")
@@ -80,9 +80,9 @@ class ReadmeTests: XCTestCase {
         csv.beginNewRow()
         try! csv.write(field: "2")
         try! csv.write(field: "bar")
-        
+
         csv.stream.close()
-        
+
         // Get a String
         let csvData = stream.property(forKey: .dataWrittenToMemoryStreamKey) as! NSData
         let csvString = String(data: Data(referencing: csvData), encoding: .utf8)!
@@ -100,5 +100,5 @@ class ReadmeTests: XCTestCase {
 //        
 //        csv.stream.close()
     }
-    
+
 }
