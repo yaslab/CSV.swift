@@ -71,49 +71,39 @@ open class CSVRowDecoder {
             }
         }
 
-        private static func _convertFromSnakeCase(_ stringKey: String) -> String {
-            guard !stringKey.isEmpty else { return stringKey }
+        /// convert snake-case to camelCase
+        /// 
+        /// `oneTwoThree` -> `oneTwoThree`
+        ///
+        /// `one_two_three` -> `oneTwoThree`
+        /// 
+        /// `_one_two_three_` -> `_oneTwoThree_`
+        /// 
+        /// `__one__two__three__` -> `__oneTwoThree__`
+        /// 
+        /// - Parameter key: key in snake case format
+        /// - Returns: key in camel case format
+        private static func _convertFromSnakeCase(_ key: String) -> String {
+            // match either starting/ending underscore or not underscore
+            let regex = try! NSRegularExpression(pattern: "^_+|[^_]+|_+$")
 
-            // Find the first non-underscore character
-            guard let firstNonUnderscore = stringKey.firstIndex(where: { $0 != "_" }) else {
-                // Reached the end without finding an _
-                return stringKey
+            let matches = regex.matches(in: key, range: NSRange(key.startIndex..., in: key))
+
+            var keyParts = matches.map {
+                String(key[Range($0.range, in: key)!])
             }
 
-            // Find the last non-underscore character
-            var lastNonUnderscore = stringKey.index(before: stringKey.endIndex)
-            while lastNonUnderscore > firstNonUnderscore && stringKey[lastNonUnderscore] == "_" {
-                stringKey.formIndex(before: &lastNonUnderscore)
+            if keyParts.count == 0 {
+                return ""
             }
 
-            let keyRange = firstNonUnderscore...lastNonUnderscore
-            let leadingUnderscoreRange = stringKey.startIndex..<firstNonUnderscore
-            let trailingUnderscoreRange = stringKey.index(after: lastNonUnderscore)..<stringKey.endIndex
-
-            let components = stringKey[keyRange].split(separator: "_")
-            let joinedString: String
-            if components.count == 1 {
-                // No underscores in key, leave the word as is - maybe already camel cased
-                joinedString = String(stringKey[keyRange])
-            } else {
-                joinedString = ([components[0].lowercased()] + components[1...].map { $0.capitalized }).joined()
+            // not every part is capitalized
+            let start = keyParts[0] == "_" ? 2 : 1
+            for i in start..<keyParts.count {
+                keyParts[i] = keyParts[i].capitalized
             }
 
-            // Do a cheap isEmpty check before creating and appending potentially empty strings
-            let result: String
-            if leadingUnderscoreRange.isEmpty && trailingUnderscoreRange.isEmpty {
-                result = joinedString
-            } else if !leadingUnderscoreRange.isEmpty && !trailingUnderscoreRange.isEmpty {
-                // Both leading and trailing underscores
-                result = String(stringKey[leadingUnderscoreRange]) + joinedString + String(stringKey[trailingUnderscoreRange])
-            } else if !leadingUnderscoreRange.isEmpty {
-                // Just leading
-                result = String(stringKey[leadingUnderscoreRange]) + joinedString
-            } else {
-                // Just trailing
-                result = joinedString + String(stringKey[trailingUnderscoreRange])
-            }
-            return result
+            return keyParts.joined()
         }
     }
 
