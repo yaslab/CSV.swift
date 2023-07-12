@@ -83,32 +83,33 @@ open class CSVRowDecoder {
         /// 
         /// `ONE_TWO_THREE` -> `oneTwoThree`
         /// 
+        /// `ONE` -> `ONE`
+        /// 
         /// - Parameter key: key in snake case format
         /// - Returns: key in camel case format
         private static func _convertFromSnakeCase(_ key: String) -> String {
-            // match either starting/ending underscore or not underscore
-            let regex = try! NSRegularExpression(pattern: "^_+|[^_]+|_+$")
+            // match anything but underscore
+            let nonUnderscore = try! NSRegularExpression(pattern: "[^_]+")
 
-            let matches = regex.matches(in: key, range: NSRange(key.startIndex..., in: key))
+            let matches = nonUnderscore.matches(in: key, range: NSRange(key.startIndex..., in: key))
 
             var keyParts = matches.map {
                 String(key[Range($0.range, in: key)!])
             }
 
-            if keyParts.count == 0 {
-                return ""
+            if keyParts.count <= 1 {
+                return key
             }
 
-            // not every part is capitalized
-            let start = keyParts[0] == "_" ? 2 : 1
-            for i in 0..<min(start, keyParts.count) {
-                keyParts[i] = keyParts[i].lowercased()
-            }
-            for i in start..<keyParts.count {
+            keyParts[0] = keyParts[0].lowercased()
+            for i in 1..<keyParts.count {
                 keyParts[i] = keyParts[i].capitalized
             }
 
-            return keyParts.joined()
+            let pre = String(repeating: "_", count: key.countConsecutiveLeft("_"))
+            let post = String(repeating: "_", count: key.countConsecutiveRight("_"))
+
+            return pre + keyParts.joined() + post
         }
     }
 
@@ -165,6 +166,26 @@ open class CSVRowDecoder {
         return try type.init(from: decoder)
     }
 
+}
+
+fileprivate extension String{
+    func countConsecutiveLeft(_ character: String.Element) -> Int {
+        for (index, char) in self.enumerated() {
+            if char != character {
+                return index
+            }
+        }
+        return 0
+    }
+
+    func countConsecutiveRight(_ character: String.Element) -> Int {
+        for (index, char) in self.reversed().enumerated() {
+            if char != character {
+                return index
+            }
+        }
+        return 0
+    }
 }
 
 fileprivate final class _CSVRowDecoder: Decoder {
