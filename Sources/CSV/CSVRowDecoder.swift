@@ -20,6 +20,18 @@ open class CSVRowDecoder {
         case custom((_ value: String) throws -> Bool)
     }
 
+    /// The strategy to use for decoding `String` values.
+    public enum StringDecodingStrategy {
+        /// Decode empty String to `nil`
+        case `default`
+
+        /// Decode empty String to `""`
+        case allowEmpty
+
+        /// Decode the `Bool` as a custom value decoded by the given closure.
+        case custom((_ value: String) throws -> String)
+    }
+
     /// The strategy to use for decoding `Date` values.
     public enum DateDecodingStrategy {
         /// Defer to `Date` for decoding. This is the default strategy.
@@ -106,8 +118,8 @@ open class CSVRowDecoder {
                 keyParts[i] = keyParts[i].capitalized
             }
 
-            let pre = String(repeating: "_", count: key.countConsecutiveLeft("_"))
-            let post = String(repeating: "_", count: key.countConsecutiveRight("_"))
+            let pre = String(key.prefix(while: { $0 == "_" }))
+            let post = String(key.suffix(while: { $0 == "_" }))
 
             return pre + keyParts.joined() + post
         }
@@ -121,6 +133,9 @@ open class CSVRowDecoder {
 
     /// The strategy to use in decoding bools. Defaults to `.default`.
     open var boolDecodingStrategy: BoolDecodingStrategy = .default
+
+    /// The strategy to use in decoding strings. Defaults to `.default`.
+    open var stringDecodingStrategy: StringDecodingStrategy = .default
 
     /// The strategy to use in decoding dates. Defaults to `.deferredToDate`.
     open var dateDecodingStrategy: DateDecodingStrategy = .deferredToDate
@@ -140,6 +155,7 @@ open class CSVRowDecoder {
     /// Options set on the top-level encoder to pass down the decoding hierarchy.
     fileprivate struct _Options {
         let boolDecodingStrategy: BoolDecodingStrategy
+        let stringDecodingStrategy: StringDecodingStrategy
         let dateDecodingStrategy: DateDecodingStrategy
         let dataDecodingStrategy: DataDecodingStrategy
         let keyDecodingStrategy: KeyDecodingStrategy
@@ -150,6 +166,7 @@ open class CSVRowDecoder {
     /// The options set on the top-level decoder.
     fileprivate var options: _Options {
         return _Options(boolDecodingStrategy: boolDecodingStrategy,
+                        stringDecodingStrategy: stringDecodingStrategy,
                         dateDecodingStrategy: dateDecodingStrategy,
                         dataDecodingStrategy: dataDecodingStrategy,
                         keyDecodingStrategy: keyDecodingStrategy,
@@ -168,23 +185,13 @@ open class CSVRowDecoder {
 
 }
 
-fileprivate extension String{
-    func countConsecutiveLeft(_ character: String.Element) -> Int {
-        for (index, char) in self.enumerated() {
-            if char != character {
-                return index
-            }
+fileprivate extension String {
+    func suffix(while predicate: (Element) throws -> Bool) rethrows -> SubSequence {
+        var index = self.index(endIndex, offsetBy: -1)
+        while index >= startIndex, try predicate(self[index]) {
+            index = self.index(before: index)
         }
-        return 0
-    }
-
-    func countConsecutiveRight(_ character: String.Element) -> Int {
-        for (index, char) in self.reversed().enumerated() {
-            if char != character {
-                return index
-            }
-        }
-        return 0
+        return index < startIndex ? self[self.index(after: index)...] : ""
     }
 }
 
@@ -761,9 +768,16 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: String.Type) throws -> String? {
-        if value.isEmpty { return nil }
-
-        return value
+        switch self.options.stringDecodingStrategy {
+        case .default:
+            if value.isEmpty { return nil }
+            return value
+        case .allowEmpty:
+            if value.isEmpty { return "" }
+            return value
+        case .custom(let closure):
+            return try closure(value)
+        }
     }
 
     private func unbox(_ value: String, as type: Date.Type) throws -> Date? {

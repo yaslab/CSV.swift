@@ -197,6 +197,60 @@ class CSVRowDecoderTests: XCTestCase {
         XCTAssertEqual(records[0], CustomCsvRow(firstColumn: "first_value", secondColumn: "second_value"))
     }
 
+    func testEmptyStringDecodingFail() throws {
+        let csv = """
+        a,"b"
+        ,""
+        """
+
+        struct EmptyStringCsvRow: Decodable {
+            let a: String
+            let b: String
+        }
+
+        let reader = try! CSVReader(string: csv, hasHeaderRow: true)
+        let decoder = CSVRowDecoder()
+
+        var records = [EmptyStringCsvRow]()
+
+        do {
+            while reader.next() != nil {
+                try records.append(decoder.decode(EmptyStringCsvRow.self, from: reader))
+            }
+        } catch {}
+        XCTAssertEqual(records.count, 0)
+    }
+
+    func testEmptyStringDecodingSuccess() throws {
+        let csv = """
+        a,"b"
+        ,""
+        """
+
+        struct EmptyStringCsvRow: Decodable {
+            let a: String
+            let b: String
+        }
+
+        let reader = try! CSVReader(string: csv, hasHeaderRow: true)
+        let decoder = CSVRowDecoder()
+        decoder.stringDecodingStrategy = .allowEmpty
+
+        var records = [EmptyStringCsvRow]()
+
+        do {
+            while reader.next() != nil {
+                try records.append(decoder.decode(EmptyStringCsvRow.self, from: reader))
+            }
+        } catch {
+            XCTFail("decode<T>() threw error: \(error)")
+            return
+        }
+        XCTAssertEqual(records.count, 1)
+        XCTAssertEqual(records[0].a, "")
+        XCTAssertEqual(records[0].b, "")
+    }
+
     func testTypeInvalidDateFormat() {
         let invalidFieldTypeStr = """
             dateKey,stringKey,optionalStringKey,intKey,ignored
