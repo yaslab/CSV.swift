@@ -50,15 +50,15 @@ public class CSVReader {
 
     fileprivate var iterator: AnyIterator<UnicodeScalar>
     public let configuration: Configuration
-    public fileprivate (set) var error: Error?
+    public fileprivate(set) var error: Error?
 
     fileprivate var back: UnicodeScalar?
 
     /// CSV header row. To set a value for this property,
     /// you set `true` to `headerRow` in initializer.
-    public private (set) var headerRow: [String]?
+    public private(set) var headerRow: [String]?
 
-    public fileprivate (set) var currentRow: [String]?
+    public fileprivate(set) var currentRow: [String]?
 
     internal init<T: IteratorProtocol>(
         iterator: T,
