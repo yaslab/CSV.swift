@@ -166,22 +166,16 @@ csv.stream.close()
 
 ## Installation
 
+### Swift Package Manager
+
+```swift
+.package(url: "https://github.com/yaslab/CSV.swift.git", from: "2.4.3")
+```
+
 ### CocoaPods
 
 ```ruby
 pod 'CSV.swift', '~> 2.4.3'
-```
-
-### Carthage
-
-```
-github "yaslab/CSV.swift" ~> 2.4.3
-```
-
-### Swift Package Manager
-
-```swift
-.package(url: "https://github.com/yaslab/CSV.swift.git", .upToNextMinor(from: "2.4.3"))
 ```
 
 ## Reference specification
