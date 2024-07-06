@@ -1,7 +1,7 @@
 # CSV.swift
 
-[![Build Status](https://travis-ci.org/yaslab/CSV.swift.svg?branch=master)](https://travis-ci.org/yaslab/CSV.swift)
-[![codecov](https://codecov.io/gh/yaslab/CSV.swift/branch/master/graph/badge.svg)](https://codecov.io/gh/yaslab/CSV.swift)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fyaslab%2FCSV.swift%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/yaslab/CSV.swift)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fyaslab%2FCSV.swift%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/yaslab/CSV.swift)
 [![Open Source Helpers](https://www.codetriage.com/yaslab/csv.swift/badges/users.svg)](https://www.codetriage.com/yaslab/csv.swift)
 
 CSV reading and writing library written in Swift.
