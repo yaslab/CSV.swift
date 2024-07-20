@@ -6,7 +6,19 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-@available(*, deprecated, renamed: "CSVReader")
-public typealias CSV = CSVReader
+@available(*, unavailable, renamed: "CSVReader")
+public enum CSV {}
 
-extension CSVReader: Sequence { }
+extension CSVReader {
+    @available(*, unavailable, renamed: "CSVRow")
+    var headerRow: [String]? { nil }
+
+    @available(*, unavailable, renamed: "CSVRow")
+    var currentRow: [String]? { nil }
+
+    @available(*, unavailable, renamed: "CSVError")
+    var error: Error? { nil }
+
+    @available(*, unavailable, renamed: "CSVRow")
+    subscript(key: String) -> String? { nil }
+}

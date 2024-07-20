@@ -6,10 +6,9 @@
 //  Copyright © 2017年 yaslab. All rights reserved.
 //
 
+import CSV
 import Foundation
 import XCTest
-
-import CSV
 
 extension OutputStream {
 
@@ -100,7 +99,7 @@ class CSVWriterTests: XCTestCase {
         let csv = try! CSVWriter(stream: stream)
         csv.beginNewRow()
         try! csv.write(field: str + "-1", quoted: true)
-        try! csv.write(field: str + "-2") // quoted: false
+        try! csv.write(field: str + "-2")  // quoted: false
 
         stream.close()
         let data = stream.data!
@@ -116,7 +115,7 @@ class CSVWriterTests: XCTestCase {
 
         let csv = try! CSVWriter(stream: stream)
         csv.beginNewRow()
-        try! csv.write(field: str + "-1") // quoted: false
+        try! csv.write(field: str + "-1")  // quoted: false
         try! csv.write(field: str + "-\n-2", quoted: true)
 
         stream.close()
@@ -133,7 +132,7 @@ class CSVWriterTests: XCTestCase {
 
         let csv = try! CSVWriter(stream: stream)
         csv.beginNewRow()
-        try! csv.write(field: str + "-1") // quoted: false
+        try! csv.write(field: str + "-1")  // quoted: false
         try! csv.write(field: str + "-\"-2", quoted: true)
 
         stream.close()
@@ -150,7 +149,7 @@ class CSVWriterTests: XCTestCase {
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
-        try! csv.write(row: ["id", "testing,\"comma"]) // quoted: false
+        try! csv.write(row: ["id", "testing,\"comma"])  // quoted: false
 
         stream.close()
         let data = stream.data!
@@ -166,7 +165,7 @@ class CSVWriterTests: XCTestCase {
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
-        try! csv.write(row: AnySequence(["id", "cool"])) // quoted: false
+        try! csv.write(row: AnySequence(["id", "cool"]))  // quoted: false
 
         stream.close()
         let data = stream.data!
@@ -182,7 +181,7 @@ class CSVWriterTests: XCTestCase {
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
-        try! csv.write(row: ["id", "testing\rCR", "testing\nLF", "testing\r\nCRLF"]) // quoted: false
+        try! csv.write(row: ["id", "testing\rCR", "testing\nLF", "testing\r\nCRLF"])  // quoted: false
 
         stream.close()
         let data = stream.data!
@@ -199,7 +198,7 @@ class CSVWriterTests: XCTestCase {
         stream.open()
 
         let csv = try! CSVWriter(stream: stream, delimiter: "$")
-        try! csv.write(row: ["id", "testing$dollar"]) // quoted: false
+        try! csv.write(row: ["id", "testing$dollar"])  // quoted: false
 
         stream.close()
         let data = stream.data!
@@ -251,7 +250,7 @@ class CSVWriterTests: XCTestCase {
         let csv = try! CSVWriter(stream: stream)
         csv.beginNewRow()
         try! csv.write(field: str + ",1", quoted: true)
-        try! csv.write(field: str + ",2") // quoted: false
+        try! csv.write(field: str + ",2")  // quoted: false
 
         stream.close()
         let data = stream.data!

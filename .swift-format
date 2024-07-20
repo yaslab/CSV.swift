@@ -1,0 +1,12 @@
+{
+  "indentation": {
+    "spaces": 4
+  },
+  "indentConditionalCompilationBlocks": false,
+  "lineLength": 200,
+  "rules": {
+    "GroupNumericLiterals": false
+  },
+  "spacesAroundRangeFormationOperators": true,
+  "version": 1
+}

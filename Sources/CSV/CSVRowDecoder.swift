@@ -48,7 +48,6 @@ open class CSVRowDecoder {
         case millisecondsSince1970
 
         /// Decode the `Date` as an ISO-8601-formatted string (in RFC 3339 format).
-        @available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *)
         case iso8601
 
         /// Decode the `Date` as a string parsed by the given formatter.
@@ -60,7 +59,7 @@ open class CSVRowDecoder {
 
     /// The strategy to use for decoding `Data` values.
     public enum DataDecodingStrategy {
-        // TODO: Implement unkeyed decoding container.
+        // Note: This is not implemented because the CSV column value cannot represent an array of `UInt8`.
         // /// Defer to `Data` for decoding.
         // case deferredToData
 
@@ -88,19 +87,19 @@ open class CSVRowDecoder {
         }
 
         /// convert snake-case to camelCase
-        /// 
+        ///
         /// `oneTwoThree` -> `oneTwoThree`
         ///
         /// `one_two_three` -> `oneTwoThree`
-        /// 
+        ///
         /// `_one_two_three_` -> `_oneTwoThree_`
-        /// 
+        ///
         /// `__one__two__three__` -> `__oneTwoThree__`
-        /// 
+        ///
         /// `ONE_TWO_THREE` -> `oneTwoThree`
-        /// 
+        ///
         /// `ONE` -> `ONE`
-        /// 
+        ///
         /// - Parameter key: key in snake case format
         /// - Returns: key in camel case format
         private static func _convertFromSnakeCase(_ key: String) -> String {
@@ -118,7 +117,7 @@ open class CSVRowDecoder {
             }
 
             keyParts[0] = keyParts[0].lowercased()
-            for i in 1..<keyParts.count {
+            for i in 1 ..< keyParts.count {
                 keyParts[i] = keyParts[i].capitalized
             }
 
@@ -189,27 +188,29 @@ open class CSVRowDecoder {
 
     /// The options set on the top-level decoder.
     fileprivate var options: _Options {
-        return _Options(boolDecodingStrategy: boolDecodingStrategy,
-                        dateDecodingStrategy: dateDecodingStrategy,
-                        dataDecodingStrategy: dataDecodingStrategy,
-                        keyDecodingStrategy: keyDecodingStrategy,
-                        nilDecodingStrategy: nilDecodingStrategy,
-                        userInfo: userInfo)
+        return _Options(
+            boolDecodingStrategy: boolDecodingStrategy,
+            dateDecodingStrategy: dateDecodingStrategy,
+            dataDecodingStrategy: dataDecodingStrategy,
+            keyDecodingStrategy: keyDecodingStrategy,
+            nilDecodingStrategy: nilDecodingStrategy,
+            userInfo: userInfo
+        )
     }
 
     /// Initializes `self` with default strategies.
     public init() {}
 
     /// Decodes a top-level value of the given type from the given CSV row representation.
-    open func decode<T: Decodable>(_ type: T.Type, from reader: CSVReader) throws -> T {
-        let decoder = _CSVRowDecoder(referencing: reader, options: self.options)
+    open func decode<T: Decodable>(_ type: T.Type, from row: CSVRow) throws -> T {
+        let decoder = _CSVRowDecoder(referencing: row, options: self.options)
         return try type.init(from: decoder)
     }
 
 }
 
-fileprivate extension String {
-    func suffix(while predicate: (Element) throws -> Bool) rethrows -> SubSequence {
+extension String {
+    fileprivate func suffix(while predicate: (Element) throws -> Bool) rethrows -> SubSequence {
         var index = self.index(endIndex, offsetBy: -1)
         while index >= startIndex, try predicate(self[index]) {
             index = self.index(before: index)
@@ -218,13 +219,19 @@ fileprivate extension String {
     }
 }
 
-fileprivate final class _CSVRowDecoder: Decoder {
+private final class _CSVRowDecoder: Decoder {
 
-    fileprivate let reader: CSVReader
+    fileprivate let row: CSVRow
 
     fileprivate let options: CSVRowDecoder._Options
 
     fileprivate let headerRow: [String]?
+
+    fileprivate lazy var _iso8601Formatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = .withInternetDateTime
+        return formatter
+    }()
 
     public var codingPath: [CodingKey] = []
 
@@ -232,12 +239,12 @@ fileprivate final class _CSVRowDecoder: Decoder {
         return self.options.userInfo
     }
 
-    fileprivate init(referencing reader: CSVReader, options: CSVRowDecoder._Options) {
-        self.reader = reader
+    fileprivate init(referencing row: CSVRow, options: CSVRowDecoder._Options) {
+        self.row = row
         self.options = options
 
-        if let headerRow = reader.headerRow {
-            self.headerRow = headerRow.map { options.keyDecodingStrategy.call($0) }
+        if let header = row.header {
+            self.headerRow = header.map { options.keyDecodingStrategy.call($0) }
         } else {
             self.headerRow = nil
         }
@@ -249,9 +256,13 @@ fileprivate final class _CSVRowDecoder: Decoder {
     }
 
     public func unkeyedContainer() throws -> UnkeyedDecodingContainer {
-        throw DecodingError.valueNotFound(UnkeyedDecodingContainer.self,
-                                          DecodingError.Context(codingPath: self.codingPath,
-                                                                debugDescription: "Cannot get unkeyed decoding container -- found null value instead."))
+        throw DecodingError.valueNotFound(
+            UnkeyedDecodingContainer.self,
+            DecodingError.Context(
+                codingPath: self.codingPath,
+                debugDescription: "Cannot get unkeyed decoding container -- found null value instead."
+            )
+        )
     }
 
     public func singleValueContainer() throws -> SingleValueDecodingContainer {
@@ -260,7 +271,7 @@ fileprivate final class _CSVRowDecoder: Decoder {
 
 }
 
-fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingContainerProtocol {
+private final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingContainerProtocol {
 
     typealias Key = K
 
@@ -285,9 +296,9 @@ fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingCo
         }
 
         if let index = key.intValue {
-            return self.decoder[index]!
+            return self.decoder[index]
         } else {
-            return self.decoder[key.stringValue]!
+            return self.decoder[key.stringValue]!  // FIXME: If the return value is nil, throw an error.
         }
     }
 
@@ -297,10 +308,8 @@ fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingCo
     }
 
     public func contains(_ key: Key) -> Bool {
-        guard let row = self.decoder.reader.currentRow else { return false }
-
         if let index = key.intValue {
-            return index < row.count
+            return index < self.decoder.row.columns.count
         } else {
             guard let headerRow = self.decoder.headerRow else {
                 return false
@@ -496,32 +505,40 @@ fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingCo
     public func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> {
         // Not supported
         throw DecodingError.dataCorrupted(
-            DecodingError.Context(codingPath: self.codingPath,
-                                  debugDescription: "nestedContainer(...) CSV does not support nested values")
+            DecodingError.Context(
+                codingPath: self.codingPath,
+                debugDescription: "nestedContainer(...) CSV does not support nested values"
+            )
         )
     }
 
     public func nestedUnkeyedContainer(forKey key: Key) throws -> UnkeyedDecodingContainer {
         // Not supported
         throw DecodingError.dataCorrupted(
-            DecodingError.Context(codingPath: self.codingPath,
-                                  debugDescription: "nestedUnkeyedContainer(...) CSV does not support nested values")
+            DecodingError.Context(
+                codingPath: self.codingPath,
+                debugDescription: "nestedUnkeyedContainer(...) CSV does not support nested values"
+            )
         )
     }
 
     public func superDecoder() throws -> Decoder {
         // Not supported
         throw DecodingError.dataCorrupted(
-            DecodingError.Context(codingPath: self.codingPath,
-                                  debugDescription: "CSV does not support nested values")
+            DecodingError.Context(
+                codingPath: self.codingPath,
+                debugDescription: "CSV does not support nested values"
+            )
         )
     }
 
     public func superDecoder(forKey key: Key) throws -> Decoder {
         // Not supported
         throw DecodingError.dataCorrupted(
-            DecodingError.Context(codingPath: self.codingPath,
-                                  debugDescription: "CSV does not support nested values")
+            DecodingError.Context(
+                codingPath: self.codingPath,
+                debugDescription: "CSV does not support nested values"
+            )
         )
     }
 
@@ -529,8 +546,8 @@ fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingCo
 
 extension _CSVRowDecoder {
 
-    public subscript(index: Int) -> String? {
-        return reader.currentRow![index]
+    public subscript(index: Int) -> String {
+        return row[index]
     }
 
     public subscript(key: String) -> String? {
@@ -540,10 +557,7 @@ extension _CSVRowDecoder {
         guard let index = header.firstIndex(of: key) else {
             return nil
         }
-        guard let row = reader.currentRow else {
-            fatalError("CSVReader.currentRow must not be nil")
-        }
-        guard index < row.count else {
+        guard index < row.columns.count else {
             return ""
         }
         return row[index]
@@ -556,9 +570,9 @@ extension _CSVRowDecoder: SingleValueDecodingContainer {
     private var value: String {
         let key = self.codingPath.last!
         if let index = key.intValue {
-            return self.reader.currentRow![index]
+            return self[index]
         } else {
-            return self[key.stringValue]!
+            return self[key.stringValue]!  // FIXME: If the return value is nil, throw an error.
         }
     }
 
@@ -815,14 +829,10 @@ extension _CSVRowDecoder {
             return Date(timeIntervalSince1970: double / 1000.0)
 
         case .iso8601:
-            if #available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *) {
-                guard let date = _iso8601Formatter.date(from: value) else {
-                    throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Expected date string to be ISO8601-formatted."))
-                }
-                return date
-            } else {
-                fatalError("ISO8601DateFormatter is unavailable on this platform.")
+            guard let date = _iso8601Formatter.date(from: value) else {
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Expected date string to be ISO8601-formatted."))
             }
+            return date
 
         case .formatted(let formatter):
             guard let date = formatter.date(from: value) else {
@@ -839,7 +849,6 @@ extension _CSVRowDecoder {
         if _isNil(value) { return nil }
 
         switch self.options.dataDecodingStrategy {
-        // TODO: Implement unkeyed decoding container.
         // case .deferredToData:
         //     return try Data(from: self)
 
@@ -865,14 +874,22 @@ extension _CSVRowDecoder {
             return (data as! T)
         } else if type == URL.self {
             guard let url = URL(string: value) else {
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath,
-                                                                        debugDescription: "Invalid URL string."))
+                throw DecodingError.dataCorrupted(
+                    DecodingError.Context(
+                        codingPath: self.codingPath,
+                        debugDescription: "Invalid URL string."
+                    )
+                )
             }
             return (url as! T)
         } else if type == Decimal.self {
             guard let decimal = Decimal(string: value) else {
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath,
-                                                                        debugDescription: "Invalid Decimal string."))
+                throw DecodingError.dataCorrupted(
+                    DecodingError.Context(
+                        codingPath: self.codingPath,
+                        debugDescription: "Invalid Decimal string."
+                    )
+                )
             }
             return (decimal as! T)
         } else {
@@ -881,16 +898,3 @@ extension _CSVRowDecoder {
     }
 
 }
-
-//===----------------------------------------------------------------------===//
-// Shared ISO8601 Date Formatter
-//===----------------------------------------------------------------------===//
-// NOTE: This value is implicitly lazy and _must_ be lazy.
-// We're compiled against the latest SDK (w/ ISO8601DateFormatter), but linked against whichever Foundation the user has.
-// ISO8601DateFormatter might not exist, so we better not hit this code path on an older OS.
-@available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *)
-fileprivate var _iso8601Formatter: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = .withInternetDateTime
-    return formatter
-}()

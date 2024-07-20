@@ -7,6 +7,7 @@
 //
 
 import XCTest
+
 @testable import CSV
 
 class LineBreakTests: XCTestCase {
@@ -109,13 +110,13 @@ class LineBreakTests: XCTestCase {
     }
 
     private func parse(csv: String) -> [[String]] {
-        let reader = try! CSVReader(string: csv)
-        return reader.map { $0 }
-//        var records = [[String]]()
-//        try! reader.enumerateRows { (row, _, _) in
-//            records.append(row)
-//        }
-//        return records
+        let reader = CSVReader(string: csv)
+        return reader.map { try! $0.get().columns }
+        //        var records = [[String]]()
+        //        try! reader.enumerateRows { (row, _, _) in
+        //            records.append(row)
+        //        }
+        //        return records
     }
 
 }

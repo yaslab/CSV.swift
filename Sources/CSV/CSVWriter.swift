@@ -8,6 +8,13 @@
 
 import Foundation
 
+private let LF: UnicodeScalar = "\n"
+private let CR: UnicodeScalar = "\r"
+private let DQUOTE: UnicodeScalar = "\""
+
+private let DQUOTE_STR: String = "\""
+private let DQUOTE2_STR: String = "\"\""
+
 public class CSVWriter {
 
     public struct Configuration {
@@ -19,7 +26,7 @@ public class CSVWriter {
             self.delimiter = delimiter
 
             switch newline {
-            case .lf:   self.newline = String(LF)
+            case .lf: self.newline = String(LF)
             case .crlf: self.newline = String(CR) + String(LF)
             }
         }
@@ -45,7 +52,8 @@ public class CSVWriter {
     fileprivate init(
         stream: OutputStream,
         configuration: Configuration,
-        writeScalar: @escaping ((UnicodeScalar) throws -> Void)) throws {
+        writeScalar: @escaping ((UnicodeScalar) throws -> Void)
+    ) throws {
 
         self.stream = stream
         self.configuration = configuration
@@ -75,7 +83,7 @@ extension CSVWriter {
         stream: OutputStream,
         delimiter: String = String(defaultDelimiter),
         newline: Newline = .lf
-        ) throws {
+    ) throws {
 
         try self.init(stream: stream, codecType: UTF8.self, delimiter: delimiter, newline: newline)
     }
@@ -85,7 +93,7 @@ extension CSVWriter {
         codecType: T.Type,
         delimiter: String = String(defaultDelimiter),
         newline: Newline = .lf
-        ) throws where T.CodeUnit == UInt8 {
+    ) throws where T.CodeUnit == UInt8 {
 
         let config = Configuration(delimiter: delimiter, newline: newline)
         try self.init(stream: stream, configuration: config) { (scalar: UnicodeScalar) throws in
@@ -109,7 +117,7 @@ extension CSVWriter {
         endian: Endian = .big,
         delimiter: String = String(defaultDelimiter),
         newline: Newline = .lf
-        ) throws where T.CodeUnit == UInt16 {
+    ) throws where T.CodeUnit == UInt16 {
 
         let config = Configuration(delimiter: delimiter, newline: newline)
         try self.init(stream: stream, configuration: config) { (scalar: UnicodeScalar) throws in
@@ -117,8 +125,9 @@ extension CSVWriter {
             codecType.encode(scalar) { (code: UInt16) in
                 var code = (endian == .big) ? code.bigEndian : code.littleEndian
                 withUnsafeBytes(of: &code) { (buffer) -> Void in
-                    let count = stream.write(buffer.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                                             maxLength: buffer.count)
+                    let count = stream.write(
+                        buffer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+                        maxLength: buffer.count)
                     if count != buffer.count {
                         error = CSVError.cannotWriteStream
                     }
@@ -136,7 +145,7 @@ extension CSVWriter {
         endian: Endian = .big,
         delimiter: String = String(defaultDelimiter),
         newline: Newline = .lf
-        ) throws where T.CodeUnit == UInt32 {
+    ) throws where T.CodeUnit == UInt32 {
 
         let config = Configuration(delimiter: delimiter, newline: newline)
         try self.init(stream: stream, configuration: config) { (scalar: UnicodeScalar) throws in
@@ -144,8 +153,10 @@ extension CSVWriter {
             codecType.encode(scalar) { (code: UInt32) in
                 var code = (endian == .big) ? code.bigEndian : code.littleEndian
                 withUnsafeBytes(of: &code) { (buffer) -> Void in
-                    let count = stream.write(buffer.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                                             maxLength: buffer.count)
+                    let count = stream.write(
+                        buffer.baseAddress!.assumingMemoryBound(to: UInt8.self),
+                        maxLength: buffer.count
+                    )
                     if count != buffer.count {
                         error = CSVError.cannotWriteStream
                     }
