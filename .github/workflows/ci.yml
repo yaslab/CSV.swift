@@ -9,16 +9,24 @@ on:
       - master
 
 jobs:
-  build:
+  test-on-macos:
+    runs-on: macos-latest
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
-
-    runs-on: ${{ matrix.os }}
-
+        xcode-version: ['16.0', '15.4', '15.2', '14.3.1']
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode-version }}.app
     steps:
       - uses: actions/checkout@v4
-      - name: Build
+      - name: Run swift build
         run: swift build
-      - name: Run tests
+      - name: Run swift test
+        run: swift test
+  test-on-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run swift build
+        run: swift build
+      - name: Run swift test
         run: swift test
