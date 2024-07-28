@@ -20,6 +20,18 @@ open class CSVRowDecoder {
         case custom((_ value: String) throws -> Bool)
     }
 
+    /// The strategy to use for decoding `String` values.
+    public enum StringDecodingStrategy {
+        /// Decode empty String to `nil`
+        case `default`
+
+        /// Decode empty String to `""`
+        case allowEmpty
+
+        /// Decode the `Bool` as a custom value decoded by the given closure.
+        case custom((_ value: String) throws -> String)
+    }
+
     /// The strategy to use for decoding `Date` values.
     public enum DateDecodingStrategy {
         /// Defer to `Date` for decoding. This is the default strategy.
@@ -54,7 +66,65 @@ open class CSVRowDecoder {
         /// Decode the `Data` as a custom value decoded by the given closure.
         case custom((_ value: String) throws -> Data)
     }
-    
+
+    public enum KeyDecodingStrategy {
+        case useDefaultKeys
+        case convertFromSnakeCase
+        case custom((_ codingPath: String) -> String)
+
+        func call(_ key: String) -> String {
+            switch self {
+            case .useDefaultKeys:
+                return key
+            case .convertFromSnakeCase:
+                return Self._convertFromSnakeCase(key)
+            case .custom(let converter):
+                return converter(key)
+            }
+        }
+
+        /// convert snake-case to camelCase
+        /// 
+        /// `oneTwoThree` -> `oneTwoThree`
+        ///
+        /// `one_two_three` -> `oneTwoThree`
+        /// 
+        /// `_one_two_three_` -> `_oneTwoThree_`
+        /// 
+        /// `__one__two__three__` -> `__oneTwoThree__`
+        /// 
+        /// `ONE_TWO_THREE` -> `oneTwoThree`
+        /// 
+        /// `ONE` -> `ONE`
+        /// 
+        /// - Parameter key: key in snake case format
+        /// - Returns: key in camel case format
+        private static func _convertFromSnakeCase(_ key: String) -> String {
+            // match anything but underscore
+            let nonUnderscore = try! NSRegularExpression(pattern: "[^_]+")
+
+            let matches = nonUnderscore.matches(in: key, range: NSRange(key.startIndex..., in: key))
+
+            var keyParts = matches.map {
+                String(key[Range($0.range, in: key)!])
+            }
+
+            if keyParts.count <= 1 {
+                return key
+            }
+
+            keyParts[0] = keyParts[0].lowercased()
+            for i in 1..<keyParts.count {
+                keyParts[i] = keyParts[i].capitalized
+            }
+
+            let pre = String(key.prefix(while: { $0 == "_" }))
+            let post = String(key.suffix(while: { $0 == "_" }))
+
+            return pre + keyParts.joined() + post
+        }
+    }
+
     /// The strategy to use for decoding `nil` values.
     public enum NilDecodingStrategy {
         case empty
@@ -64,12 +134,18 @@ open class CSVRowDecoder {
     /// The strategy to use in decoding bools. Defaults to `.default`.
     open var boolDecodingStrategy: BoolDecodingStrategy = .default
 
+    /// The strategy to use in decoding strings. Defaults to `.default`.
+    open var stringDecodingStrategy: StringDecodingStrategy = .default
+
     /// The strategy to use in decoding dates. Defaults to `.deferredToDate`.
     open var dateDecodingStrategy: DateDecodingStrategy = .deferredToDate
 
     /// The strategy to use in decoding binary data. Defaults to `.base64`.
     open var dataDecodingStrategy: DataDecodingStrategy = .base64
-    
+
+    /// The strategy to use in decoding keys. Defaults to `.useDefaultKeys`
+    open var keyDecodingStrategy: KeyDecodingStrategy = .useDefaultKeys
+
     /// The strategy to use in decoding nil data. Defaults to `.empty`.
     open var nilDecodingStrategy: NilDecodingStrategy = .empty
 
@@ -79,8 +155,10 @@ open class CSVRowDecoder {
     /// Options set on the top-level encoder to pass down the decoding hierarchy.
     fileprivate struct _Options {
         let boolDecodingStrategy: BoolDecodingStrategy
+        let stringDecodingStrategy: StringDecodingStrategy
         let dateDecodingStrategy: DateDecodingStrategy
         let dataDecodingStrategy: DataDecodingStrategy
+        let keyDecodingStrategy: KeyDecodingStrategy
         let nilDecodingStrategy: NilDecodingStrategy
         let userInfo: [CodingUserInfoKey: Any]
     }
@@ -88,8 +166,10 @@ open class CSVRowDecoder {
     /// The options set on the top-level decoder.
     fileprivate var options: _Options {
         return _Options(boolDecodingStrategy: boolDecodingStrategy,
+                        stringDecodingStrategy: stringDecodingStrategy,
                         dateDecodingStrategy: dateDecodingStrategy,
                         dataDecodingStrategy: dataDecodingStrategy,
+                        keyDecodingStrategy: keyDecodingStrategy,
                         nilDecodingStrategy: nilDecodingStrategy,
                         userInfo: userInfo)
     }
@@ -105,11 +185,23 @@ open class CSVRowDecoder {
 
 }
 
+fileprivate extension String {
+    func suffix(while predicate: (Element) throws -> Bool) rethrows -> SubSequence {
+        var index = self.index(endIndex, offsetBy: -1)
+        while index >= startIndex, try predicate(self[index]) {
+            index = self.index(before: index)
+        }
+        return index < startIndex ? self[self.index(after: index)...] : ""
+    }
+}
+
 fileprivate final class _CSVRowDecoder: Decoder {
 
     fileprivate let reader: CSVReader
 
     fileprivate let options: CSVRowDecoder._Options
+
+    fileprivate let headerRow: [String]?
 
     public var codingPath: [CodingKey] = []
 
@@ -120,6 +212,12 @@ fileprivate final class _CSVRowDecoder: Decoder {
     fileprivate init(referencing reader: CSVReader, options: CSVRowDecoder._Options) {
         self.reader = reader
         self.options = options
+
+        if let headerRow = reader.headerRow {
+            self.headerRow = headerRow.map { options.keyDecodingStrategy.call($0) }
+        } else {
+            self.headerRow = nil
+        }
     }
 
     public func container<Key: CodingKey>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> {
@@ -150,7 +248,7 @@ fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingCo
     }
 
     public var allKeys: [Key] {
-        guard let headerRow = self.decoder.reader.headerRow else { return [] }
+        guard let headerRow = self.decoder.headerRow else { return [] }
         return headerRow.compactMap { Key(stringValue: $0) }
     }
 
@@ -164,9 +262,9 @@ fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingCo
         }
 
         if let index = key.intValue {
-            return self.decoder.reader.currentRow![index]
+            return self.decoder[index]!
         } else {
-            return self.decoder.reader[key.stringValue]!
+            return self.decoder[key.stringValue]!
         }
     }
 
@@ -181,7 +279,7 @@ fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingCo
         if let index = key.intValue {
             return index < row.count
         } else {
-            guard let headerRow = self.decoder.reader.headerRow else {
+            guard let headerRow = self.decoder.headerRow else {
                 return false
             }
             return headerRow.contains(key.stringValue)
@@ -411,6 +509,30 @@ fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingCo
 
 }
 
+extension _CSVRowDecoder {
+
+    public subscript(index: Int) -> String? {
+        return reader.currentRow![index]
+    }
+
+    public subscript(key: String) -> String? {
+        guard let header = headerRow else {
+            fatalError("CSVReader.headerRow must not be nil")
+        }
+        guard let index = header.firstIndex(of: key) else {
+            return nil
+        }
+        guard let row = reader.currentRow else {
+            fatalError("CSVReader.currentRow must not be nil")
+        }
+        guard index < row.count else {
+            return ""
+        }
+        return row[index]
+    }
+
+}
+
 extension _CSVRowDecoder: SingleValueDecodingContainer {
 
     private var value: String {
@@ -418,7 +540,7 @@ extension _CSVRowDecoder: SingleValueDecodingContainer {
         if let index = key.intValue {
             return self.reader.currentRow![index]
         } else {
-            return self.reader[key.stringValue]!
+            return self[key.stringValue]!
         }
     }
 
@@ -436,7 +558,6 @@ extension _CSVRowDecoder: SingleValueDecodingContainer {
         case .custom(let customClosure):
             return customClosure(self.value)
         }
-        
     }
 
     public func decode(_ type: Bool.Type) throws -> Bool {
@@ -647,9 +768,16 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: String.Type) throws -> String? {
-        if value.isEmpty { return nil }
-
-        return value
+        switch self.options.stringDecodingStrategy {
+        case .default:
+            if value.isEmpty { return nil }
+            return value
+        case .allowEmpty:
+            if value.isEmpty { return "" }
+            return value
+        case .custom(let closure):
+            return try closure(value)
+        }
     }
 
     private func unbox(_ value: String, as type: Date.Type) throws -> Date? {
