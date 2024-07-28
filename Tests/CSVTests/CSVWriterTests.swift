@@ -166,7 +166,7 @@ class CSVWriterTests: XCTestCase {
         stream.open()
 
         let csv = try! CSVWriter(stream: stream)
-        try! csv.write(row: NSArray(["id", "cool"])) // quoted: false
+        try! csv.write(row: AnySequence(["id", "cool"])) // quoted: false
 
         stream.close()
         let data = stream.data!
