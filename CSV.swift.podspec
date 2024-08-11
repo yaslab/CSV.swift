@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'CSV.swift'
-  spec.version      = '2.4.3'
+  spec.version      = '2.5.0'
   spec.license      = { :type => 'MIT' }
   spec.homepage     = 'https://github.com/yaslab/CSV.swift'
   spec.authors      = { 'Yasuhiro Hatta' => 'hatta.yasuhiro@gmail.com' }
