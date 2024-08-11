@@ -168,14 +168,35 @@ csv.stream.close()
 
 ### Swift Package Manager
 
+Add the dependency to your `Package.swift`. For example:
+
 ```swift
-.package(url: "https://github.com/yaslab/CSV.swift.git", from: "2.4.3")
+// swift-tools-version: 5.9
+
+import PackageDescription
+
+let package = Package(
+    name: "MyPackage",
+    dependencies: [
+        // Add `CSV.swift` package here.
+        .package(url: "https://github.com/yaslab/CSV.swift.git", from: "2.5.0")
+    ],
+    targets: [
+        .executableTarget(
+            name: "MyCommand",
+            dependencies: [
+                // Then add it to your module's dependencies.
+                .product(name: "CSV", package: "CSV.swift")
+            ]
+        )
+    ]
+)
 ```
 
 ### CocoaPods
 
 ```ruby
-pod 'CSV.swift', '~> 2.4.3'
+pod 'CSV.swift', '~> 2.5.0'
 ```
 
 ## Reference specification
