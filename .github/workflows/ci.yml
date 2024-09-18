@@ -21,10 +21,11 @@ jobs:
         run: swift build
       - name: Run swift test
         run: swift test
+
   test-on-linux:
     strategy:
       matrix:
-        swift-version: ['6.0-snapshot', '5.10', '5.9', '5.8']
+        swift-version: ['6.0', '5.10', '5.9', '5.8']
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
