@@ -210,6 +210,7 @@ class CSVRowDecoderTests: XCTestCase {
 
         let reader = try! CSVReader(string: csv, hasHeaderRow: true)
         let decoder = CSVRowDecoder()
+        decoder.stringDecodingStrategy = .default
 
         var records = [EmptyStringCsvRow]()
 
@@ -217,6 +218,7 @@ class CSVRowDecoderTests: XCTestCase {
             while reader.next() != nil {
                 try records.append(decoder.decode(EmptyStringCsvRow.self, from: reader))
             }
+            XCTFail("decode<T>() did not throw")
         } catch {}
         XCTAssertEqual(records.count, 0)
     }
@@ -718,6 +720,121 @@ class CSVRowDecoderTests: XCTestCase {
             XCTAssertEqual(row.data, expected)
         } catch {
             XCTFail("\(error)")
+        }
+    }
+
+    //===----------------------------------------------------------------------===//
+
+    fileprivate struct NilDecodingStrategyExample: Decodable {
+        let string: String?
+    }
+
+    func testNilDecodingStrategy_empty() {
+        let csv = """
+        string
+        
+        null
+        """
+
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+
+            let decoder = CSVRowDecoder()
+            decoder.nilDecodingStrategy = .empty
+
+            var rows: [NilDecodingStrategyExample] = []
+            while let _ = reader.next() {
+                let row = try decoder.decode(NilDecodingStrategyExample.self, from: reader)
+                rows.append(row)
+            }
+
+            XCTAssertEqual(rows.count, 2)
+            XCTAssertNil(rows[0].string)
+            XCTAssertEqual(rows[1].string, "null")
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    func testNilDecodingStrategy_never() {
+        let csv = """
+        string
+        
+        null
+        """
+
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+
+            let decoder = CSVRowDecoder()
+            decoder.nilDecodingStrategy = .never
+
+            var rows: [NilDecodingStrategyExample] = []
+            while let _ = reader.next() {
+                let row = try decoder.decode(NilDecodingStrategyExample.self, from: reader)
+                rows.append(row)
+            }
+
+            XCTAssertEqual(rows.count, 2)
+            XCTAssertEqual(rows[0].string, "")
+            XCTAssertEqual(rows[1].string, "null")
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    func testNilDecodingStrategy_custom() {
+        let csv = """
+        string
+        
+        null
+        """
+
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+
+            let decoder = CSVRowDecoder()
+            decoder.nilDecodingStrategy = .custom { $0 == "null" }
+
+            var rows: [NilDecodingStrategyExample] = []
+            while let _ = reader.next() {
+                let row = try decoder.decode(NilDecodingStrategyExample.self, from: reader)
+                rows.append(row)
+            }
+
+            XCTAssertEqual(rows.count, 2)
+            XCTAssertEqual(rows[0].string, "")
+            XCTAssertNil(rows[1].string)
+        } catch {
+            XCTFail("\(error)")
+        }
+    }
+
+    func testNilDecodingStrategy_error() {
+        struct RowModel: Decodable {
+            let a: Int
+        }
+
+        let csv = """
+        a
+        ""
+        """
+
+        do {
+            let reader = try CSVReader(string: csv, hasHeaderRow: true)
+
+            let decoder = CSVRowDecoder()
+            decoder.nilDecodingStrategy = .empty
+
+            var rows: [RowModel] = []
+            while let _ = reader.next() {
+                let row = try decoder.decode(RowModel.self, from: reader)
+                rows.append(row)
+            }
+
+            XCTFail("decode<T>() did not throw")
+        } catch {
+            XCTAssertTrue(error is DecodingError)
         }
     }
 

@@ -21,14 +21,18 @@ open class CSVRowDecoder {
     }
 
     /// The strategy to use for decoding `String` values.
+    @available(*, deprecated, renamed: "NilDecodingStrategy")
     public enum StringDecodingStrategy {
         /// Decode empty String to `nil`
+        @available(*, deprecated, renamed: "NilDecodingStrategy.empty")
         case `default`
 
         /// Decode empty String to `""`
+        @available(*, deprecated, renamed: "NilDecodingStrategy.never")
         case allowEmpty
 
         /// Decode the `Bool` as a custom value decoded by the given closure.
+        @available(*, unavailable, renamed: "NilDecodingStrategy.custom")
         case custom((_ value: String) throws -> String)
     }
 
@@ -127,7 +131,13 @@ open class CSVRowDecoder {
 
     /// The strategy to use for decoding `nil` values.
     public enum NilDecodingStrategy {
+        /// Decode empty String to `nil`. This is the default strategy.
         case empty
+
+        /// Never convert to `nil`.
+        case never
+
+        /// Determines if a String is `nil` using the given closure.
         case custom((_ value: String) -> Bool)
     }
 
@@ -135,7 +145,22 @@ open class CSVRowDecoder {
     open var boolDecodingStrategy: BoolDecodingStrategy = .default
 
     /// The strategy to use in decoding strings. Defaults to `.default`.
-    open var stringDecodingStrategy: StringDecodingStrategy = .default
+    @available(*, deprecated, renamed: "nilDecodingStrategy")
+    open var stringDecodingStrategy: StringDecodingStrategy {
+        get {
+            switch nilDecodingStrategy {
+            case .empty: return .default
+            case .never: return .allowEmpty
+            case .custom: fatalError("'StringDecodingStrategy.custom' is deprecated: renamed to 'NilDecodingStrategy.custom'")
+            }
+        }
+        set {
+            switch newValue {
+            case .default: nilDecodingStrategy = .empty
+            case .allowEmpty: nilDecodingStrategy = .never
+            }
+        }
+    }
 
     /// The strategy to use in decoding dates. Defaults to `.deferredToDate`.
     open var dateDecodingStrategy: DateDecodingStrategy = .deferredToDate
@@ -155,7 +180,6 @@ open class CSVRowDecoder {
     /// Options set on the top-level encoder to pass down the decoding hierarchy.
     fileprivate struct _Options {
         let boolDecodingStrategy: BoolDecodingStrategy
-        let stringDecodingStrategy: StringDecodingStrategy
         let dateDecodingStrategy: DateDecodingStrategy
         let dataDecodingStrategy: DataDecodingStrategy
         let keyDecodingStrategy: KeyDecodingStrategy
@@ -166,7 +190,6 @@ open class CSVRowDecoder {
     /// The options set on the top-level decoder.
     fileprivate var options: _Options {
         return _Options(boolDecodingStrategy: boolDecodingStrategy,
-                        stringDecodingStrategy: stringDecodingStrategy,
                         dateDecodingStrategy: dateDecodingStrategy,
                         dataDecodingStrategy: dataDecodingStrategy,
                         keyDecodingStrategy: keyDecodingStrategy,
@@ -287,12 +310,7 @@ fileprivate final class CSVKeyedDecodingContainer<K: CodingKey>: KeyedDecodingCo
     }
 
     public func decodeNil(forKey key: Key) throws -> Bool {
-        switch decoder.options.nilDecodingStrategy {
-        case .empty:
-            return try self.value(for: key).isEmpty
-        case .custom(let customClosure):
-            return customClosure(try self.value(for: key))
-        }
+        try self.decoder._isNil(self.value(for: key))
     }
 
     public func decode(_ type: Bool.Type, forKey key: Key) throws -> Bool {
@@ -552,12 +570,7 @@ extension _CSVRowDecoder: SingleValueDecodingContainer {
     }
 
     public func decodeNil() -> Bool {
-        switch options.nilDecodingStrategy {
-        case .empty:
-            return self.value.isEmpty
-        case .custom(let customClosure):
-            return customClosure(self.value)
-        }
+        self._isNil(self.value)
     }
 
     public func decode(_ type: Bool.Type) throws -> Bool {
@@ -644,8 +657,21 @@ extension _CSVRowDecoder {
         return .typeMismatch(expectation, DecodingError.Context(codingPath: path, debugDescription: description))
     }
 
+    fileprivate func _isNil(_ value: String) -> Bool {
+        switch self.options.nilDecodingStrategy {
+        case .empty:
+            return value.isEmpty
+
+        case .never:
+            return false
+
+        case .custom(let closure):
+            return closure(value)
+        }
+    }
+
     fileprivate func unbox(_ value: String, as type: Bool.Type) throws -> Bool? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         switch self.options.boolDecodingStrategy {
         case .default:
@@ -660,7 +686,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: Int.Type) throws -> Int? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let int = Int(value, radix: 10) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -669,7 +695,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: Int8.Type) throws -> Int8? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let int8 = Int8(value, radix: 10) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -678,7 +704,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: Int16.Type) throws -> Int16? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let int16 = Int16(value, radix: 10) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -687,7 +713,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: Int32.Type) throws -> Int32? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let int32 = Int32(value, radix: 10) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -696,7 +722,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: Int64.Type) throws -> Int64? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let int64 = Int64(value, radix: 10) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -705,7 +731,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: UInt.Type) throws -> UInt? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let uint = UInt(value, radix: 10) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -714,7 +740,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: UInt8.Type) throws -> UInt8? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let uint8 = UInt8(value, radix: 10) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -723,7 +749,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: UInt16.Type) throws -> UInt16? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let uint16 = UInt16(value, radix: 10) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -732,7 +758,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: UInt32.Type) throws -> UInt32? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let uint32 = UInt32(value, radix: 10) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -741,7 +767,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: UInt64.Type) throws -> UInt64? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let uint64 = UInt64(value, radix: 10) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -750,7 +776,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: Float.Type) throws -> Float? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let float = Float(value) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -759,7 +785,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: Double.Type) throws -> Double? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         guard let double = Double(value) else {
             throw self._typeMismatch(at: self.codingPath, expectation: type, reality: value)
@@ -768,20 +794,13 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox(_ value: String, as type: String.Type) throws -> String? {
-        switch self.options.stringDecodingStrategy {
-        case .default:
-            if value.isEmpty { return nil }
-            return value
-        case .allowEmpty:
-            if value.isEmpty { return "" }
-            return value
-        case .custom(let closure):
-            return try closure(value)
-        }
+        if _isNil(value) { return nil }
+
+        return value
     }
 
     private func unbox(_ value: String, as type: Date.Type) throws -> Date? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         switch self.options.dateDecodingStrategy {
         case .deferredToDate:
@@ -817,7 +836,7 @@ extension _CSVRowDecoder {
     }
 
     private func unbox(_ value: String, as type: Data.Type) throws -> Data? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         switch self.options.dataDecodingStrategy {
         // TODO: Implement unkeyed decoding container.
@@ -836,7 +855,7 @@ extension _CSVRowDecoder {
     }
 
     fileprivate func unbox<T: Decodable>(_ value: String, as type: T.Type) throws -> T? {
-        if value.isEmpty { return nil }
+        if _isNil(value) { return nil }
 
         if type == Date.self {
             guard let date = try self.unbox(value, as: Date.self) else { return nil }
