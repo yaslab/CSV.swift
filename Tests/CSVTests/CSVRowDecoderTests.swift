@@ -587,10 +587,10 @@ class CSVRowDecoderTests: XCTestCase {
     }
 
     func testDateDecodingStrategy_millisecondsSince1970() {
-        let expected = Date()
+        let seconds: TimeInterval = 1542857696.0
         let csv = """
         date
-        \(expected.timeIntervalSince1970 * 1000.0)
+        \(seconds * 1000.0)
         """
         do {
             let reader = try CSVReader(string: csv, hasHeaderRow: true)
@@ -599,7 +599,7 @@ class CSVRowDecoderTests: XCTestCase {
             let decoder = CSVRowDecoder()
             decoder.dateDecodingStrategy = .millisecondsSince1970
             let row = try decoder.decode(DateDecodingStrategyExample.self, from: reader)
-            XCTAssertEqual(row.date.timeIntervalSince1970, expected.timeIntervalSince1970)
+            XCTAssertEqual(row.date.timeIntervalSince1970, seconds)
         } catch {
             XCTFail("\(error)")
         }
