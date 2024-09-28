@@ -12,21 +12,14 @@ import Foundation
 @testable import CSV
 
 struct BinaryReaderTests {
-    private func random(_ count: Int) -> [UInt8] {
-        var array = [UInt8]()
-        for _ in 0 ..< count {
-            array.append(UInt8.random(in: .min ... .max))
-        }
-        return array
-    }
-
-    @Test func testReadUInt8WithSmallBuffer() throws {
+    @Test(arguments: [0, 1, 9, 10, 11, 19, 20, 21])
+    func read(count: Int) throws {
         // Arrange
-        let bytes = [0xcc] + random(99)
+        let bytes = Utils.random(count)
 
-        let read = try withTempURL { url in
+        let read = try Utils.withTempURL { url in
             try Data(bytes).write(to: url)
-            let reader = BinaryReader(url: url, bufferSize: 11)
+            let reader = BinaryReader(url: url, bufferSize: 10)
 
             // Act
             return try reader.map { try $0.get() }
@@ -34,5 +27,22 @@ struct BinaryReaderTests {
 
         // Assert
         #expect(read == bytes)
+    }
+
+    @Test(arguments: [-1, 0, 7, 8, 9])
+    func bufferSize(size: Int) throws {
+        // Arrange
+        let bytes = Utils.random(10)
+
+        try Utils.withTempURL { url in
+            try Data(bytes).write(to: url)
+            let reader = BinaryReader(url: url, bufferSize: size)
+
+            // Act
+            let it = reader.makeIterator()
+
+            // Assert
+            #expect(it.bufferSize == (size < 8 ? 8 : size))
+        }
     }
 }

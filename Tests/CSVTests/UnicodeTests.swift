@@ -17,7 +17,7 @@ struct UnicodeTests {
         var data = Data([0xef, 0xbb, 0xbf])  // UTF-8 BOM
         data.append(contentsOf: csv.utf8)
 
-        let rows = try withTempURL { url in
+        let rows = try Utils.withTempURL { url in
             try data.write(to: url)
             let reader = CSVReader(url: url)
 

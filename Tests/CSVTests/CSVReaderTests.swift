@@ -8,6 +8,7 @@
 
 import Testing
 import CSV
+import Foundation
 
 struct CSVReaderTests {
 
@@ -180,7 +181,8 @@ struct CSVReaderTests {
     @Test
     func testCSVState1() throws {
         // Arrange
-        let data = "あ,い1,\"う\",えお\n,,x,".data(using: .utf8)!
+        let csv = "あ,い1,\"う\",えお\n,,x,"
+        let data = try #require(csv.data(using: .utf8))
         let reader = CSVReader(data: data)
 
         // Act
