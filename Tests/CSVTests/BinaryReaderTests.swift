@@ -21,16 +21,18 @@ struct BinaryReaderTests {
     }
 
     @Test func testReadUInt8WithSmallBuffer() throws {
-        try withTempURL { url in
-            let bytes = [0xcc] + random(99)
+        // Arrange
+        let bytes = [0xcc] + random(99)
+
+        let read = try withTempURL { url in
             try Data(bytes).write(to: url)
-
             let reader = BinaryReader(url: url, bufferSize: 11)
-            for (expected, result) in zip(bytes, reader) {
-                let actual = try result.get()
-                #expect(actual == expected)
-            }
-        }
-    }
 
+            // Act
+            return try reader.map { try $0.get() }
+        }
+
+        // Assert
+        #expect(read == bytes)
+    }
 }
