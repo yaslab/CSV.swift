@@ -6,117 +6,171 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-import XCTest
+import Testing
+import CSV
 
-@testable import CSV
-
-class LineBreakTests: XCTestCase {
-
-    func testLF() {
+struct LineBreakTests {
+    @Test func testLF() throws {
+        // Arrange
         let csv = "abab,cdcd,efef\nzxcv,asdf,qwer"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records[0], ["abab", "cdcd", "efef"])
-        XCTAssertEqual(records[1], ["zxcv", "asdf", "qwer"])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 2)
+        #expect(records[0] == ["abab", "cdcd", "efef"])
+        #expect(records[1] == ["zxcv", "asdf", "qwer"])
     }
 
-    func testCRLF() {
+    @Test func testCRLF() throws {
+        // Arrange
         let csv = "abab,cdcd,efef\r\nzxcv,asdf,qwer"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records[0], ["abab", "cdcd", "efef"])
-        XCTAssertEqual(records[1], ["zxcv", "asdf", "qwer"])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 2)
+        #expect(records[0] == ["abab", "cdcd", "efef"])
+        #expect(records[1] == ["zxcv", "asdf", "qwer"])
     }
 
-    func testLastCR() {
+    @Test func testLastCR() throws {
+        // Arrange
         let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\r"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records.count, 2)
-        XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
-        XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 2)
+        #expect(records[0] == ["abab", "", "cdcd", "efef"])
+        #expect(records[1] == ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    func testLastCRLF() {
+    @Test func testLastCRLF() throws {
+        // Arrange
         let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\r\n"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records.count, 2)
-        XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
-        XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 2)
+        #expect(records[0] == ["abab", "", "cdcd", "efef"])
+        #expect(records[1] == ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    func testLastLF() {
+    @Test func testLastLF() throws {
+        // Arrange
         let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\n"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records.count, 2)
-        XCTAssertEqual(records[0], ["abab", "", "cdcd", "efef"])
-        XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 2)
+        #expect(records[0] == ["abab", "", "cdcd", "efef"])
+        #expect(records[1] == ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    func testLFInQuotationMarks() {
+    @Test func testLFInQuotationMarks() throws {
+        // Arrange
         let csv = "abab,,\"\rcdcd\n\",efef\r\nzxcv,asdf,\"qw\"\"er\",\n"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records.count, 2)
-        XCTAssertEqual(records[0], ["abab", "", "\rcdcd\n", "efef"])
-        XCTAssertEqual(records[1], ["zxcv", "asdf", "qw\"er", ""])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 2)
+        #expect(records[0] == ["abab", "", "\rcdcd\n", "efef"])
+        #expect(records[1] == ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    func testLineBreakLF() {
+    @Test func testLineBreakLF() throws {
+        // Arrange
         let csv = "qwe,asd\nzxc,rty"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records.count, 2)
-        XCTAssertEqual(records[0], ["qwe", "asd"])
-        XCTAssertEqual(records[1], ["zxc", "rty"])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 2)
+        #expect(records[0] == ["qwe", "asd"])
+        #expect(records[1] == ["zxc", "rty"])
     }
 
-    func testLineBreakCR() {
+    @Test func testLineBreakCR() throws {
+        // Arrange
         let csv = "qwe,asd\rzxc,rty"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records.count, 2)
-        XCTAssertEqual(records[0], ["qwe", "asd"])
-        XCTAssertEqual(records[1], ["zxc", "rty"])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 2)
+        #expect(records[0] == ["qwe", "asd"])
+        #expect(records[1] == ["zxc", "rty"])
     }
 
-    func testLineBreakCRLF() {
+    @Test func testLineBreakCRLF() throws {
+        // Arrange
         let csv = "qwe,asd\r\nzxc,rty"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records.count, 2)
-        XCTAssertEqual(records[0], ["qwe", "asd"])
-        XCTAssertEqual(records[1], ["zxc", "rty"])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 2)
+        #expect(records[0] == ["qwe", "asd"])
+        #expect(records[1] == ["zxc", "rty"])
     }
 
-    func testLineBreakLFLF() {
+    @Test func testLineBreakLFLF() throws {
+        // Arrange
         let csv = "qwe,asd\n\nzxc,rty"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records.count, 3)
-        XCTAssertEqual(records[0], ["qwe", "asd"])
-        XCTAssertEqual(records[1], [""])
-        XCTAssertEqual(records[2], ["zxc", "rty"])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 3)
+        #expect(records[0] == ["qwe", "asd"])
+        #expect(records[1] == [""])
+        #expect(records[2] == ["zxc", "rty"])
     }
 
-    func testLineBreakCRCR() {
+    @Test func testLineBreakCRCR() throws {
+        // Arrange
         let csv = "qwe,asd\r\rzxc,rty"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records.count, 3)
-        XCTAssertEqual(records[0], ["qwe", "asd"])
-        XCTAssertEqual(records[1], [""])
-        XCTAssertEqual(records[2], ["zxc", "rty"])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 3)
+        #expect(records[0] == ["qwe", "asd"])
+        #expect(records[1] == [""])
+        #expect(records[2] == ["zxc", "rty"])
     }
 
-    func testLineBreakCRLFCRLF() {
+    @Test func testLineBreakCRLFCRLF() throws {
+        // Arrange
         let csv = "qwe,asd\r\n\r\nzxc,rty"
-        let records = parse(csv: csv)
-        XCTAssertEqual(records.count, 3)
-        XCTAssertEqual(records[0], ["qwe", "asd"])
-        XCTAssertEqual(records[1], [""])
-        XCTAssertEqual(records[2], ["zxc", "rty"])
+
+        // Act
+        let records = try parse(csv: csv)
+
+        // Assert
+        try #require(records.count == 3)
+        #expect(records[0] == ["qwe", "asd"])
+        #expect(records[1] == [""])
+        #expect(records[2] == ["zxc", "rty"])
     }
 
-    private func parse(csv: String) -> [[String]] {
+    private func parse(csv: String) throws -> [[String]] {
         let reader = CSVReader(string: csv)
-        return reader.map { try! $0.get().columns }
-        //        var records = [[String]]()
-        //        try! reader.enumerateRows { (row, _, _) in
-        //            records.append(row)
-        //        }
-        //        return records
+        return try reader.map { try $0.get().columns }
     }
-
 }
