@@ -57,10 +57,14 @@ enum CSVParser {
     ) throws(CSVError) -> ParseResult {
         var string = [UTF8.CodeUnit]()
 
+        func get() -> String {
+            String(decoding: string, as: UTF8.self)
+        }
+
         while let char = try _next(&input) {
             if char == .quotationMark {  // '"'
                 guard var next = try _next(&input) else {
-                    return .columnByEOF(String(decoding: string, as: UTF8.self))
+                    return .columnByEOF(get())
                 }
 
                 if next == .quotationMark {  // '"' (ESC)
@@ -71,14 +75,14 @@ enum CSVParser {
                 if configuration.trim {
                     while configuration.whitespaces.contains(next) {  // ' '
                         guard let next2 = try _next(&input) else {
-                            return .columnByEOF(String(decoding: string, as: UTF8.self))
+                            return .columnByEOF(get())
                         }
                         next = next2
                     }
                 }
 
                 if next == configuration.delimiter {  // ','
-                    return .columnByDelimiter(String(decoding: string, as: UTF8.self))
+                    return .columnByDelimiter(get())
                 } else if next == .newLine || next == .carriageReturn {  // LF or CR
                     if next == .carriageReturn {  // CR
                         if let nextNext = try _next(&input) {
@@ -87,7 +91,7 @@ enum CSVParser {
                             }
                         }
                     }
-                    return .columnByNewLine(String(decoding: string, as: UTF8.self))
+                    return .columnByNewLine(get())
                 } else {
                     throw CSVError.invalidCSVFormat
                 }
@@ -96,7 +100,7 @@ enum CSVParser {
             }
         }
 
-        return .columnByEOF(String(decoding: string, as: UTF8.self))
+        return .columnByEOF(get())
     }
 
     private mutating func column(

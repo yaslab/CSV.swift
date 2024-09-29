@@ -64,15 +64,4 @@ struct _CSVReaderTests {
             }
         }
     }
-
-    @Test func testSample4() throws {
-        let csv = " aaa ,bbb , ccc\r\n \"ddd\" ,\"eee\" , \"fff\""
-        let configuration = CSVReaderConfiguration(hasHeaderRow: true, trim: true)
-        let reader = CSVReader(string: csv, configuration: configuration)
-        var it = reader.makeIterator()
-
-        while let row = try it._nextRow() {
-            print(row)
-        }
-    }
 }

@@ -16,6 +16,10 @@ extension UTF8CodeUnitSequence: Sequence {
     public struct Iterator: IteratorProtocol {
         var it: S.Iterator
 
+        init(it: consuming S.Iterator) {
+            self.it = it
+        }
+
         public mutating func next() -> Result<UTF8.CodeUnit, CSVError>? {
             if let value = it.next() {
                 return .success(value)

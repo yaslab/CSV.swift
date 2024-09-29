@@ -8,11 +8,22 @@
 
 public enum CSVError: Error {
 
-    case cannotOpenFile
-    case cannotReadFile
-    case cannotWriteStream
-    case streamErrorHasOccurred(error: Error)
+    // Reader: common
+
     case cannotReadHeaderRow
     case invalidCSVFormat
+
+    // Reader: file
+
+    case cannotOpenFile
+    case cannotReadFile
+
+    // Writer: file
+
+    case cannotWriteStream
+
+    // Reader / Writer: file
+
+    case streamErrorHasOccurred(error: Error)
 
 }

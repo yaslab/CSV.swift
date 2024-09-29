@@ -11,7 +11,6 @@ import CSV
 import Foundation
 
 struct CSVReaderTests {
-
     @Test
     func testOneLine() throws {
         // Arrange
@@ -328,5 +327,4 @@ struct CSVReaderTests {
             #expect(rows[1] == ["6", "7", "8", "9", "0"])
         }
     }
-
 }

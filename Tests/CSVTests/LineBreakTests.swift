@@ -10,10 +10,13 @@ import Testing
 import CSV
 
 struct LineBreakTests {
-    @Test func testLF() throws {
-        // Arrange
-        let csv = "abab,cdcd,efef\nzxcv,asdf,qwer"
-
+    // Arrange
+    @Test(arguments: [
+        "abab,cdcd,efef\nzxcv,asdf,qwer",  // LF
+        "abab,cdcd,efef\rzxcv,asdf,qwer",  // CR
+        "abab,cdcd,efef\r\nzxcv,asdf,qwer",  // CRLF
+    ])
+    func test(csv: String) throws {
         // Act
         let records = try parse(csv: csv)
 
@@ -23,49 +26,13 @@ struct LineBreakTests {
         #expect(records[1] == ["zxcv", "asdf", "qwer"])
     }
 
-    @Test func testCRLF() throws {
-        // Arrange
-        let csv = "abab,cdcd,efef\r\nzxcv,asdf,qwer"
-
-        // Act
-        let records = try parse(csv: csv)
-
-        // Assert
-        try #require(records.count == 2)
-        #expect(records[0] == ["abab", "cdcd", "efef"])
-        #expect(records[1] == ["zxcv", "asdf", "qwer"])
-    }
-
-    @Test func testLastCR() throws {
-        // Arrange
-        let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\r"
-
-        // Act
-        let records = try parse(csv: csv)
-
-        // Assert
-        try #require(records.count == 2)
-        #expect(records[0] == ["abab", "", "cdcd", "efef"])
-        #expect(records[1] == ["zxcv", "asdf", "qw\"er", ""])
-    }
-
-    @Test func testLastCRLF() throws {
-        // Arrange
-        let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\r\n"
-
-        // Act
-        let records = try parse(csv: csv)
-
-        // Assert
-        try #require(records.count == 2)
-        #expect(records[0] == ["abab", "", "cdcd", "efef"])
-        #expect(records[1] == ["zxcv", "asdf", "qw\"er", ""])
-    }
-
-    @Test func testLastLF() throws {
-        // Arrange
-        let csv = "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\n"
-
+    // Arrange
+    @Test(arguments: [
+        "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\n",  // LF
+        "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\r",  // CR
+        "abab,,cdcd,efef\r\nzxcv,asdf,\"qw\"\"er\",\r\n",  // CRLF
+    ])
+    func testLastEmptyRow(csv: String) throws {
         // Act
         let records = try parse(csv: csv)
 
@@ -88,10 +55,13 @@ struct LineBreakTests {
         #expect(records[1] == ["zxcv", "asdf", "qw\"er", ""])
     }
 
-    @Test func testLineBreakLF() throws {
-        // Arrange
-        let csv = "qwe,asd\nzxc,rty"
-
+    // Arrange
+    @Test(arguments: [
+        "qwe,asd\nzxc,rty",  // LF
+        "qwe,asd\rzxc,rty",  // CR
+        "qwe,asd\r\nzxc,rty",  // CRLF
+    ])
+    func testLineBreak(csv: String) throws {
         // Act
         let records = try parse(csv: csv)
 
@@ -101,36 +71,13 @@ struct LineBreakTests {
         #expect(records[1] == ["zxc", "rty"])
     }
 
-    @Test func testLineBreakCR() throws {
-        // Arrange
-        let csv = "qwe,asd\rzxc,rty"
-
-        // Act
-        let records = try parse(csv: csv)
-
-        // Assert
-        try #require(records.count == 2)
-        #expect(records[0] == ["qwe", "asd"])
-        #expect(records[1] == ["zxc", "rty"])
-    }
-
-    @Test func testLineBreakCRLF() throws {
-        // Arrange
-        let csv = "qwe,asd\r\nzxc,rty"
-
-        // Act
-        let records = try parse(csv: csv)
-
-        // Assert
-        try #require(records.count == 2)
-        #expect(records[0] == ["qwe", "asd"])
-        #expect(records[1] == ["zxc", "rty"])
-    }
-
-    @Test func testLineBreakLFLF() throws {
-        // Arrange
-        let csv = "qwe,asd\n\nzxc,rty"
-
+    // Arrange
+    @Test(arguments: [
+        "qwe,asd\n\nzxc,rty",  // LFLF
+        "qwe,asd\r\rzxc,rty",  // CRCR
+        "qwe,asd\r\n\r\nzxc,rty",  // CRLFCRLF
+    ])
+    func testLineBreakEmptyRow(csv: String) throws {
         // Act
         let records = try parse(csv: csv)
 
@@ -140,35 +87,9 @@ struct LineBreakTests {
         #expect(records[1] == [""])
         #expect(records[2] == ["zxc", "rty"])
     }
+}
 
-    @Test func testLineBreakCRCR() throws {
-        // Arrange
-        let csv = "qwe,asd\r\rzxc,rty"
-
-        // Act
-        let records = try parse(csv: csv)
-
-        // Assert
-        try #require(records.count == 3)
-        #expect(records[0] == ["qwe", "asd"])
-        #expect(records[1] == [""])
-        #expect(records[2] == ["zxc", "rty"])
-    }
-
-    @Test func testLineBreakCRLFCRLF() throws {
-        // Arrange
-        let csv = "qwe,asd\r\n\r\nzxc,rty"
-
-        // Act
-        let records = try parse(csv: csv)
-
-        // Assert
-        try #require(records.count == 3)
-        #expect(records[0] == ["qwe", "asd"])
-        #expect(records[1] == [""])
-        #expect(records[2] == ["zxc", "rty"])
-    }
-
+extension LineBreakTests {
     private func parse(csv: String) throws -> [[String]] {
         let reader = CSVReader(string: csv)
         return try reader.map { try $0.get().columns }

@@ -12,7 +12,7 @@ public struct CSVReader<S> where S: Sequence<Result<UTF8.CodeUnit, CSVError>> {
     let sequence: S
     public let configuration: CSVReaderConfiguration
 
-    public init(sequence: S, configuration: CSVReaderConfiguration? = nil) {
+    public init(sequence: consuming S, configuration: CSVReaderConfiguration? = nil) {
         self.sequence = sequence
         self.configuration = configuration ?? CSVReaderConfiguration()
     }
@@ -20,16 +20,14 @@ public struct CSVReader<S> where S: Sequence<Result<UTF8.CodeUnit, CSVError>> {
 
 extension CSVReader: Sendable where S: Sendable {}
 
-extension CSVReader where S == BinaryReader {
+extension CSVReader where S == BinarySequence {
     public init(
         fileAtPath path: String,
         configuration: CSVReaderConfiguration? = nil,
         bufferSize: Int = 4096
     ) {
-        self.init(
-            sequence: BinaryReader(url: URL(fileURLWithPath: path), bufferSize: bufferSize),
-            configuration: configuration
-        )
+        let seq = BinarySequence(url: URL(fileURLWithPath: path), bufferSize: bufferSize)
+        self.init(sequence: seq, configuration: configuration)
     }
 
     public init(
@@ -37,10 +35,8 @@ extension CSVReader where S == BinaryReader {
         configuration: CSVReaderConfiguration? = nil,
         bufferSize: Int = 4096
     ) {
-        self.init(
-            sequence: BinaryReader(url: url, bufferSize: bufferSize),
-            configuration: configuration
-        )
+        let seq = BinarySequence(url: url, bufferSize: bufferSize)
+        self.init(sequence: seq, configuration: configuration)
     }
 }
 
@@ -65,16 +61,15 @@ extension CSVReader: Sequence {
         var parser = CSVParser()
         var header: [String]? = nil
         var isEOF = false
-        var isError = false
         var row = 0
 
-        init(it: S.Iterator, configuration: CSVReaderConfiguration) {
+        init(it: consuming S.Iterator, configuration: consuming CSVReaderConfiguration) {
             self.it = it
             self.configuration = configuration
         }
 
         public mutating func next() -> Result<CSVRow, CSVError>? {
-            guard !isEOF, !isError else {
+            if isEOF {
                 return nil
             }
 
@@ -85,7 +80,7 @@ extension CSVReader: Sequence {
                     if let columns = try parse() {
                         header = columns
                     } else {
-                        isError = true
+                        isEOF = true
                         return .failure(CSVError.cannotReadHeaderRow)
                     }
                 }
@@ -97,18 +92,9 @@ extension CSVReader: Sequence {
                     return nil
                 }
             } catch {
-                isError = true
+                isEOF = true
                 return .failure(error)
             }
-        }
-
-        // FIXME: remove underscore
-        public mutating func _nextRow() throws(CSVError) -> CSVRow? {
-            guard let result = next() else {
-                return nil
-            }
-
-            return try result.get()
         }
 
         private mutating func parse() throws(CSVError) -> [String]? {
@@ -130,8 +116,6 @@ extension CSVReader: Sequence {
                         columns.append("")
                         return columns
                     }
-                //                case .error:
-                //                    throw CSVError.parse(row: row, column: columns.count + 1)
                 }
             }
         }
