@@ -816,7 +816,7 @@ extension _CSVRowDecoder {
 
         case .iso8601:
             if #available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *) {
-                guard let date = _iso8601Formatter.date(from: value) else {
+                guard let date = _ISO8601DateFormatterWrapper.shared.date(from: value) else {
                     throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "Expected date string to be ISO8601-formatted."))
                 }
                 return date
@@ -889,8 +889,15 @@ extension _CSVRowDecoder {
 // We're compiled against the latest SDK (w/ ISO8601DateFormatter), but linked against whichever Foundation the user has.
 // ISO8601DateFormatter might not exist, so we better not hit this code path on an older OS.
 @available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *)
-fileprivate var _iso8601Formatter: ISO8601DateFormatter = {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = .withInternetDateTime
-    return formatter
-}()
+struct _ISO8601DateFormatterWrapper: @unchecked Sendable {
+  private let formatter: ISO8601DateFormatter
+  init() {
+    self.formatter = ISO8601DateFormatter()
+    self.formatter.formatOptions = .withInternetDateTime
+  }
+  func date(from string: String) -> Date? {
+    return formatter.date(from: string)
+  }
+
+  static let shared: _ISO8601DateFormatterWrapper = .init()
+}
