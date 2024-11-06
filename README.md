@@ -179,7 +179,7 @@ let package = Package(
     name: "MyPackage",
     dependencies: [
         // Add `CSV.swift` package here.
-        .package(url: "https://github.com/yaslab/CSV.swift.git", from: "2.5.1")
+        .package(url: "https://github.com/yaslab/CSV.swift.git", from: "2.5.2")
     ],
     targets: [
         .executableTarget(
@@ -196,7 +196,7 @@ let package = Package(
 ### CocoaPods
 
 ```ruby
-pod 'CSV.swift', '~> 2.5.1'
+pod 'CSV.swift', '~> 2.5.2'
 ```
 
 ## Reference specification
