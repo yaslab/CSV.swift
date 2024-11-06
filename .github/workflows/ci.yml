@@ -22,10 +22,10 @@ jobs:
       - name: Run swift test
         run: swift test
 
-  test-on-linux:
+  test-on-linux-swift-5:
     strategy:
       matrix:
-        swift-version: ['6.0', '5.10', '5.9', '5.8']
+        swift-version: ['5.10', '5.9', '5.8']
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
@@ -39,4 +39,23 @@ jobs:
       - name: Run swift build
         run: swift build
       - name: Run swift test
+        run: swift test
+
+  test-on-linux-swift-6:
+    strategy:
+      matrix:
+        swift-version: ['6.0']
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Swift ${{ matrix.swift-version }}
+        run: |
+          curl -L https://swiftlang.github.io/swiftly/swiftly-install.sh | bash -s -- -y
+          swiftly install ${{ matrix.swift-version }}
+      - name: Run swift --version
+        run: swift --version
+      - name: Run swift build -Xswiftc "-swift-version" -Xswiftc "6"
+        run: swift build
+      - name: Run swift test -Xswiftc "-swift-version" -Xswiftc "6"
         run: swift test
