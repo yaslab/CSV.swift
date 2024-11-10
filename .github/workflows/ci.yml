@@ -55,7 +55,7 @@ jobs:
           swiftly install ${{ matrix.swift-version }}
       - name: Run swift --version
         run: swift --version
-      - name: Run swift build -Xswiftc "-swift-version" -Xswiftc "6"
-        run: swift build
-      - name: Run swift test -Xswiftc "-swift-version" -Xswiftc "6"
-        run: swift test
+      - name: Run swift build
+        run: swift build -Xswiftc "-swift-version" -Xswiftc "6"
+      - name: Run swift test
+        run: swift test -Xswiftc "-swift-version" -Xswiftc "6"
