@@ -6,8 +6,8 @@
 //  Copyright © 2018 yaslab. All rights reserved.
 //
 
-import Testing
 import Foundation
+import Testing
 
 @testable import CSV
 

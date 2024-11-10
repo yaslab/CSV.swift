@@ -6,19 +6,19 @@
 //  Copyright © 2018 yaslab. All rights reserved.
 //
 
-import XCTest
 import CSV
+import XCTest
 
 //===----------------------------------------------------------------------===//
 // Models
 //===----------------------------------------------------------------------===//
 
-fileprivate enum Enum: String, Decodable {
+private enum Enum: String, Decodable {
     case first
     case second
 }
 
-fileprivate protocol DecodableTest: Equatable {
+private protocol DecodableTest: Equatable {
     var intKey: Int { get }
     var stringKey: String { get }
     var optionalStringKey: String? { get }

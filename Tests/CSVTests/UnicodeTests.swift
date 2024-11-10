@@ -6,9 +6,9 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-import Testing
 import CSV
 import Foundation
+import Testing
 
 struct UnicodeTests {
     @Test func utf8WithBOM() throws {

@@ -6,8 +6,8 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-import Testing
 import CSV
+import Testing
 
 struct TrimFieldsTests {
     // Arrange

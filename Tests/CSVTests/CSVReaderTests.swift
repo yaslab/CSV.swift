@@ -6,9 +6,9 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-import Testing
 import CSV
 import Foundation
+import Testing
 
 struct CSVReaderTests {
     @Test
