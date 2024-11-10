@@ -77,19 +77,15 @@ class ReadmeTests: XCTestCase {
             let stringKey: String
             let optionalStringKey: String?
         }
-
         let csvString = """
             intKey,stringKey,optionalStringKey
             1234,abcd,
             """
-
         let reader = CSVReader(
             string: csvString,
             hasHeaderRow: true  // It must be true.
         )
-
         let decoder = CSVRowDecoder()
-
         for result in reader {
             let row = try result.get()
             let model = try decoder.decode(DecodableExample.self, from: row)

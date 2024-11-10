@@ -195,4 +195,4 @@ pod 'CSV.swift', '~> 2.5.1'
 
 ## License
 
-CSV.swift is released under the MIT license. See the [LICENSE](https://github.com/yaslab/CSV.swift/blob/main/LICENSE) file for more info.
+CSV.swift is released under the MIT license. See the [LICENSE](./LICENSE) file for more info.
