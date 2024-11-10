@@ -36,14 +36,38 @@ struct TrimFieldsTests {
 
     // Arrange
     @Test(arguments: [
-        ("\" abc \",\" def \",\" ghi \"", [[" abc ", " def ", " ghi "]]),
-        (" abc \n def ", [["abc"], ["def"]]),
-        (" \"abc \" \n \" def\" ", [["abc "], [" def"]]),
-        ("", []),
-        (" ", [[""]]),
-        (" , ", [["", ""]]),
-        (" , \n", [["", ""]]),
-        (" , \n ", [["", ""], [""]]),
+        (
+            csv: "\" abc \",\" def \",\" ghi \"",
+            expected: [[" abc ", " def ", " ghi "]]
+        ),
+        (
+            csv: " abc \n def ",
+            expected: [["abc"], ["def"]]
+        ),
+        (
+            csv: " \"abc \" \n \" def\" ",
+            expected: [["abc "], [" def"]]
+        ),
+        (
+            csv: "",
+            expected: []
+        ),
+        (
+            csv: " ",
+            expected: [[""]]
+        ),
+        (
+            csv: " , ",
+            expected: [["", ""]]
+        ),
+        (
+            csv: " , \n",
+            expected: [["", ""]]
+        ),
+        (
+            csv: " , \n ",
+            expected: [["", ""], [""]]
+        ),
     ])
     func trimTwoRows(argument: (csv: String, expected: [[String]])) throws {
         // Arrange

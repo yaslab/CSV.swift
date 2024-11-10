@@ -24,7 +24,7 @@ public struct CSVReader<S> where S: Sequence<Result<UTF8.CodeUnit, CSVError>> {
     }
 }
 
-extension CSVReader where S == BinarySequence {
+extension CSVReader where S == BinaryReader {
     public init(
         fileAtPath path: String,
         hasHeaderRow: Bool = false,
@@ -33,7 +33,7 @@ extension CSVReader where S == BinarySequence {
         whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace],
         bufferSize: Int = 4096
     ) {
-        let seq = BinarySequence(url: URL(fileURLWithPath: path), bufferSize: bufferSize)
+        let seq = BinaryReader(url: URL(fileURLWithPath: path), bufferSize: bufferSize)
         self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
     }
 
@@ -45,7 +45,7 @@ extension CSVReader where S == BinarySequence {
         whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace],
         bufferSize: Int = 4096
     ) {
-        let seq = BinarySequence(url: url, bufferSize: bufferSize)
+        let seq = BinaryReader(url: url, bufferSize: bufferSize)
         self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
     }
 }

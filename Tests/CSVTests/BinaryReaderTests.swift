@@ -1,5 +1,5 @@
 //
-//  BinarySequenceTests.swift
+//  BinaryReaderTests.swift
 //  CSV
 //
 //  Created by Yasuhiro Hatta on 2018/11/15.
@@ -11,7 +11,7 @@ import Testing
 
 @testable import CSV
 
-struct BinarySequenceTests {
+struct BinaryReaderTests {
     @Test(arguments: [0, 1, 9, 10, 11, 19, 20, 21])
     func read(count: Int) throws {
         // Arrange
@@ -19,7 +19,7 @@ struct BinarySequenceTests {
 
         let read = try Utils.withTempURL { url in
             try Data(bytes).write(to: url)
-            let reader = BinarySequence(url: url, bufferSize: 10)
+            let reader = BinaryReader(url: url, bufferSize: 10)
 
             // Act
             return try reader.map { try $0.get() }
@@ -36,7 +36,7 @@ struct BinarySequenceTests {
 
         try Utils.withTempURL { url in
             try Data(bytes).write(to: url)
-            let reader = BinarySequence(url: url, bufferSize: size)
+            let reader = BinaryReader(url: url, bufferSize: size)
 
             // Act
             let it = reader.makeIterator()

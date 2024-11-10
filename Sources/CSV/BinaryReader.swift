@@ -1,5 +1,5 @@
 //
-//  BinarySequence.swift
+//  BinaryReader.swift
 //  CSV
 //
 //  Created by Yasuhiro Hatta on 2016/06/20.
@@ -8,12 +8,12 @@
 
 import Foundation
 
-public struct BinarySequence: Sendable {
+public struct BinaryReader: Sendable {
     let url: URL
     let bufferSize: Int
 }
 
-extension BinarySequence: Sequence {
+extension BinaryReader: Sequence {
     public class Iterator: IteratorProtocol {
         let stream: InputStream?
         var isEOF = false

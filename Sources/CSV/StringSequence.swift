@@ -35,20 +35,20 @@ public class StringSequence {
 extension StringSequence: Sequence {
     public class Iterator: IteratorProtocol {
         let buffer: UnsafeBufferPointer<UInt8>
-        var pos = 0
+        var position = 0
 
         init(buffer: UnsafeBufferPointer<UInt8>) {
             self.buffer = buffer
         }
 
         public func next() -> Result<UTF8.CodeUnit, CSVError>? {
-            if buffer.count <= pos {
+            if buffer.count <= position {
                 return nil
             }
 
-            defer { pos += 1 }
+            defer { position += 1 }
 
-            return .success(buffer[pos])
+            return .success(buffer[position])
         }
     }
 

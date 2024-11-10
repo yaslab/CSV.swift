@@ -12,7 +12,6 @@ public struct CSVRow: Sendable {
     public let header: [String]?
     public let columns: [String]
 
-    @usableFromInline
     init(header: consuming [String]?, columns: consuming [String]) {
         self.header = header
         self.columns = columns
