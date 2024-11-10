@@ -14,26 +14,26 @@ CSV reading and writing library written in Swift.
 import CSV
 
 let csvString = "1,foo\n2,bar"
-let csv = try! CSVReader(string: csvString)
-while let row = csv.next() {
-    print("\(row)")
+let reader = CSVReader(string: csvString)
+for result in reader {
+    let row = try result.get()
+    print("\(row.columns)")
 }
+// output:
 // => ["1", "foo"]
 // => ["2", "bar"]
 ```
 
 ### From file
 
-NOTE: The default character encoding is `UTF8`.
-
 ```swift
-import Foundation
 import CSV
 
-let stream = InputStream(fileAtPath: "/path/to/file.csv")!
-let csv = try! CSVReader(stream: stream)
-while let row = csv.next() {
-    print("\(row)")
+let csvURL = URL(filePath: "/path/to/file.csv")
+let reader = CSVReader(url: csvURL)
+for result in reader {
+    let row = try result.get()
+    print("\(row.columns)")
 }
 ```
 
@@ -42,18 +42,19 @@ while let row = csv.next() {
 ```swift
 import CSV
 
-let csvString = "id,name\n1,foo\n2,bar"
-let csv = try! CSVReader(string: csvString,
-                         hasHeaderRow: true) // It must be true.
-
-let headerRow = csv.headerRow!
-print("\(headerRow)") // => ["id", "name"]
-
-while let row = csv.next() {
-    print("\(row)")
+let csvString = "id,name\n1,foo"
+let reader = CSVReader(
+    string: csvString,
+    hasHeaderRow: true  // It must be true.
+)
+for result in reader {
+    let row = try result.get()
+    print("\(row.header!)")
+    print("\(row.columns)")
 }
+// output:
+// => ["id", "name"]
 // => ["1", "foo"]
-// => ["2", "bar"]
 ```
 
 ### Get the field value using subscript
@@ -61,28 +62,18 @@ while let row = csv.next() {
 ```swift
 import CSV
 
-let csvString = "id,name\n1,foo"
-let csv = try! CSVReader(string: csvString,
-                         hasHeaderRow: true) // It must be true.
-
-while csv.next() != nil {
-    print("\(csv["id"]!)")   // => "1"
-    print("\(csv["name"]!)") // => "foo"
+let csvString = "id,name\n1,foo\n2,bar"
+let reader = CSVReader(
+    string: csvString,
+    hasHeaderRow: true  // It must be true.
+)
+for result in reader {
+    let row = try result.get()
+    print("id: \(row["id"]!), name: \(row["name"]!)")
 }
-```
-
-### Provide the character encoding
-
-If you use a file path, you can provide the character encoding to initializer.
-
-```swift
-import Foundation
-import CSV
-
-let stream = InputStream(fileAtPath: "/path/to/file.csv")!
-let csv = try! CSVReader(stream: stream,
-                         codecType: UTF16.self,
-                         endian: .big)
+// output:
+// => id: 1, name: foo
+// => id: 2, name: bar
 ```
 
 ### Reading a row into a Decodable object
@@ -95,23 +86,22 @@ struct DecodableExample: Decodable {
     let stringKey: String
     let optionalStringKey: String?
 }
-
-let csv = """
+let csvString = """
     intKey,stringKey,optionalStringKey
     1234,abcd,
     """
-
-var records = [DecodableExample]()
-do {
-    let reader = try CSVReader(string: csv, hasHeaderRow: true)
-    let decoder = CSVRowDecoder()
-    while reader.next() != nil {
-        let row = try decoder.decode(DecodableExample.self, from: reader)
-        records.append(row)
-    }
-} catch {
-    // Invalid row format
+let reader = CSVReader(
+    string: csvString,
+    hasHeaderRow: true  // It must be true.
+)
+let decoder = CSVRowDecoder()
+for result in reader {
+    let row = try result.get()
+    let model = try decoder.decode(DecodableExample.self, from: row)
+    print("\(model)")
 }
+// output:
+// => DecodableExample(intKey: 1234, stringKey: "abcd", optionalStringKey: nil)
 ```
 
 ## Usage for writing CSV
@@ -205,4 +195,4 @@ pod 'CSV.swift', '~> 2.5.1'
 
 ## License
 
-CSV.swift is released under the MIT license. See the [LICENSE](https://github.com/yaslab/CSV.swift/blob/master/LICENSE) file for more info.
+CSV.swift is released under the MIT license. See the [LICENSE](https://github.com/yaslab/CSV.swift/blob/main/LICENSE) file for more info.

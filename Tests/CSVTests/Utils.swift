@@ -21,7 +21,7 @@ enum Utils {
     static func withTempURL<T>(_ block: (URL) throws -> T) throws -> T {
         let fm = FileManager.default
 
-        let directory = URL(fileURLWithPath: NSTemporaryDirectory())
+        let directory = URL(filePath: NSTemporaryDirectory())
             .appendingPathComponent("net.yaslab.csv-swift", isDirectory: true)
 
         if !fm.fileExists(atPath: directory.path()) {

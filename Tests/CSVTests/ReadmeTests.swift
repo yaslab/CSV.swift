@@ -16,55 +16,87 @@ class ReadmeTests: XCTestCase {
 
     func testFromCSVString() throws {
         let csvString = "1,foo\n2,bar"
-        let csv = CSVReader(string: csvString)
-        for result in csv {
+        let reader = CSVReader(string: csvString)
+        for result in reader {
             let row = try result.get()
             print("\(row.columns)")
         }
+        // output:
         // => ["1", "foo"]
         // => ["2", "bar"]
     }
 
-    func testFromFile() {
-        //        let stream = InputStream(fileAtPath: "/path/to/file.csv")!
-        //        let csv = try! CSVReader(stream: stream)
-        //        while let row = csv.next() {
-        //            print("\(row)")
-        //        }
+    func testFromFile() throws {
+        try Utils.withTempURL { csvURL in
+            try "1,foo\n2,bar".data(using: .utf8)!.write(to: csvURL)
+            let reader = CSVReader(url: csvURL)
+            for result in reader {
+                let row = try result.get()
+                print("\(row.columns)")
+            }
+            // output:
+            // => ["1", "foo"]
+            // => ["2", "bar"]
+        }
     }
 
     func testGettingTheHeaderRow() throws {
-        let csvString = "id,name\n1,foo\n2,bar"
-        let csv = CSVReader(
+        let csvString = "id,name\n1,foo"
+        let reader = CSVReader(
             string: csvString,
-            hasHeaderRow: true)  // It must be true.
-
-        for result in csv {
+            hasHeaderRow: true  // It must be true.
+        )
+        for result in reader {
             let row = try result.get()
-            print("\(row.header!), \(row.columns)")
+            print("\(row.header!)")
+            print("\(row.columns)")
         }
-        // => ["id", "name"], ["1", "foo"]
-        // => ["id", "name"], ["2", "bar"]
+        // output:
+        // => ["id", "name"]
+        // => ["1", "foo"]
     }
 
     func testGetTheFieldValueUsingKey() throws {
-        let csvString = "id,name\n1,foo"
-        let csv = CSVReader(
+        let csvString = "id,name\n1,foo\n2,bar"
+        let reader = CSVReader(
             string: csvString,
-            hasHeaderRow: true)  // It must be true.
-
-        for result in csv {
+            hasHeaderRow: true  // It must be true.
+        )
+        for result in reader {
             let row = try result.get()
-            print("\(row["id"]!)")  // => "1"
-            print("\(row["name"]!)")  // => "foo"
+            print("id: \(row["id"]!), name: \(row["name"]!)")
         }
+        // output:
+        // => id: 1, name: foo
+        // => id: 2, name: bar
     }
 
-    func testProvideTheCharacterEncoding() {
-        //        let stream = InputStream(fileAtPath: "/path/to/file.csv")!
-        //        let csv = try! CSVReader(stream: stream,
-        //                                 codecType: UTF16.self,
-        //                                 endian: .big)
+    func testDecodable() throws {
+        struct DecodableExample: Decodable {
+            let intKey: Int
+            let stringKey: String
+            let optionalStringKey: String?
+        }
+
+        let csvString = """
+            intKey,stringKey,optionalStringKey
+            1234,abcd,
+            """
+
+        let reader = CSVReader(
+            string: csvString,
+            hasHeaderRow: true  // It must be true.
+        )
+
+        let decoder = CSVRowDecoder()
+
+        for result in reader {
+            let row = try result.get()
+            let model = try decoder.decode(DecodableExample.self, from: row)
+            print("\(model)")
+        }
+        // output:
+        // => DecodableExample(intKey: 1234, stringKey: "abcd", optionalStringKey: nil)
     }
 
     // MARK: - Writing
