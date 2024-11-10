@@ -17,14 +17,12 @@ extension BinarySequence: Sequence {
     public class Iterator: IteratorProtocol {
         let stream: InputStream?
         var isEOF = false
-        var isError = false
 
         let buffer: UnsafeMutablePointer<UTF8.CodeUnit>
         let bufferSize: Int
         var _position = 0
         var _count = 0
-
-        var isFirst = true
+        var _total: Int64 = 0
 
         init(url: URL, bufferSize size: Int) {
             stream = InputStream(url: url)
@@ -41,19 +39,19 @@ extension BinarySequence: Sequence {
         }
 
         public func next() -> Result<UTF8.CodeUnit, CSVError>? {
-            guard !isEOF, !isError else {
+            if isEOF {
                 return nil
             }
 
             if _count <= _position {
                 guard let stream else {
-                    isError = true
-                    return .failure(.cannotOpenFile)
+                    isEOF = true
+                    return .failure(.cannotOpenStream)
                 }
 
                 guard case .open = stream.streamStatus else {
-                    isError = true
-                    return .failure(.cannotOpenFile)
+                    isEOF = true
+                    return .failure(.cannotOpenStream)
                 }
 
                 let result = stream.read(buffer, maxLength: bufferSize)
@@ -61,23 +59,23 @@ extension BinarySequence: Sequence {
                     isEOF = true
                     return nil
                 } else if result < 0 {
-                    isError = true
+                    isEOF = true
                     if let error = stream.streamError {
                         return .failure(.streamErrorHasOccurred(error: error))
                     } else {
-                        return .failure(.cannotReadFile)
+                        return .failure(.cannotReadStream)
                     }
                 }
 
-                _count = result
                 _position = 0
 
                 // Skip UTF-8 BOM (0xef, 0xbb, 0xbf)
-                if isFirst, _count >= 3, buffer[0] == 0xef, buffer[1] == 0xbb, buffer[2] == 0xbf {
+                if _total == 0, result >= 3, buffer[0] == 0xef, buffer[1] == 0xbb, buffer[2] == 0xbf {
                     _position += 3
                 }
 
-                isFirst = false
+                _count = result
+                _total += Int64(result)
             }
 
             defer { _position += 1 }

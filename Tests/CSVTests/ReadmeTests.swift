@@ -37,7 +37,7 @@ class ReadmeTests: XCTestCase {
         let csvString = "id,name\n1,foo\n2,bar"
         let csv = CSVReader(
             string: csvString,
-            configuration: .init(hasHeaderRow: true))  // It must be true.
+            hasHeaderRow: true)  // It must be true.
 
         for result in csv {
             let row = try result.get()
@@ -51,7 +51,7 @@ class ReadmeTests: XCTestCase {
         let csvString = "id,name\n1,foo"
         let csv = CSVReader(
             string: csvString,
-            configuration: .init(hasHeaderRow: true))  // It must be true.
+            hasHeaderRow: true)  // It must be true.
 
         for result in csv {
             let row = try result.get()

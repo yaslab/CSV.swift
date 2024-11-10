@@ -10,21 +10,9 @@ import Foundation
 
 public struct CSVReaderConfiguration: Sendable {
     public var hasHeaderRow: Bool
-    public var trim: Bool
+    public var trimFields: Bool
     public var delimiter: UTF8.CodeUnit
     public var whitespaces: Set<UTF8.CodeUnit>
-
-    public init(
-        hasHeaderRow: Bool = false,
-        trim: Bool = false,
-        delimiter: UTF8.CodeUnit = .comma,
-        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
-    ) {
-        self.hasHeaderRow = hasHeaderRow
-        self.trim = trim
-        self.delimiter = delimiter
-        self.whitespaces = whitespaces
-    }
 
     func copy() -> CSVReaderConfiguration {
         var whitespaces = whitespaces
@@ -34,7 +22,7 @@ public struct CSVReaderConfiguration: Sendable {
 
         return CSVReaderConfiguration(
             hasHeaderRow: hasHeaderRow,
-            trim: trim,
+            trimFields: trimFields,
             delimiter: delimiter,
             whitespaces: whitespaces
         )

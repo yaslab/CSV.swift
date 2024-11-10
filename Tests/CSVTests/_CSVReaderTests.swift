@@ -37,8 +37,7 @@ struct _CSVReaderTests {
 
     @Test func testSample2() {
         let csv = " aaa ,bbb , ccc\r\n \"ddd\" ,\"eee\" , \"fff\""
-        let configuration = CSVReaderConfiguration(trim: true)
-        let reader = CSVReader(string: csv, configuration: configuration)
+        let reader = CSVReader(string: csv, trimFields: true)
 
         for result in reader {
             do {
@@ -52,8 +51,7 @@ struct _CSVReaderTests {
 
     @Test func testSample3() {
         let csv = " aaa ,bbb , ccc\r\n \"ddd\" ,\"eee\" , \"fff\""
-        let configuration = CSVReaderConfiguration(hasHeaderRow: true, trim: true)
-        let reader = CSVReader(string: csv, configuration: configuration)
+        let reader = CSVReader(string: csv, hasHeaderRow: true, trimFields: true)
 
         for result in reader {
             do {

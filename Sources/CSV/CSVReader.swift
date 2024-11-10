@@ -10,47 +10,71 @@ import Foundation
 
 public struct CSVReader<S> where S: Sequence<Result<UTF8.CodeUnit, CSVError>> {
     let sequence: S
-    public let configuration: CSVReaderConfiguration
+    public var configuration: CSVReaderConfiguration
 
-    public init(sequence: consuming S, configuration: CSVReaderConfiguration? = nil) {
+    public init(
+        sequence: consuming S,
+        hasHeaderRow: Bool = false,
+        trimFields: Bool = false,
+        delimiter: UTF8.CodeUnit = .comma,
+        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
+    ) {
         self.sequence = sequence
-        self.configuration = configuration ?? CSVReaderConfiguration()
+        self.configuration = CSVReaderConfiguration(hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
     }
 }
-
-extension CSVReader: Sendable where S: Sendable {}
 
 extension CSVReader where S == BinarySequence {
     public init(
         fileAtPath path: String,
-        configuration: CSVReaderConfiguration? = nil,
+        hasHeaderRow: Bool = false,
+        trimFields: Bool = false,
+        delimiter: UTF8.CodeUnit = .comma,
+        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace],
         bufferSize: Int = 4096
     ) {
         let seq = BinarySequence(url: URL(fileURLWithPath: path), bufferSize: bufferSize)
-        self.init(sequence: seq, configuration: configuration)
+        self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
     }
 
     public init(
         url: URL,
-        configuration: CSVReaderConfiguration? = nil,
+        hasHeaderRow: Bool = false,
+        trimFields: Bool = false,
+        delimiter: UTF8.CodeUnit = .comma,
+        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace],
         bufferSize: Int = 4096
     ) {
         let seq = BinarySequence(url: url, bufferSize: bufferSize)
-        self.init(sequence: seq, configuration: configuration)
+        self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
     }
 }
 
 extension CSVReader where S == UTF8CodeUnitSequence<Data> {
-    public init(data: Data, configuration: CSVReaderConfiguration? = nil) {
-        self.init(sequence: UTF8CodeUnitSequence(sequence: data), configuration: configuration)
+    public init(
+        data: Data,
+        hasHeaderRow: Bool = false,
+        trimFields: Bool = false,
+        delimiter: UTF8.CodeUnit = .comma,
+        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
+    ) {
+        let seq = UTF8CodeUnitSequence(sequence: data)
+        self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
     }
 }
 
 extension CSVReader where S == UTF8CodeUnitSequence<String.UTF8View> {
-    public init(string: String, configuration: CSVReaderConfiguration? = nil) {
+    public init(
+        string: String,
+        hasHeaderRow: Bool = false,
+        trimFields: Bool = false,
+        delimiter: UTF8.CodeUnit = .comma,
+        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
+    ) {
         var string = string
         string.makeContiguousUTF8()
-        self.init(sequence: UTF8CodeUnitSequence(sequence: string.utf8), configuration: configuration)
+        let seq = UTF8CodeUnitSequence(sequence: string.utf8)
+        self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
     }
 }
 
@@ -125,3 +149,5 @@ extension CSVReader: Sequence {
         Iterator(it: sequence.makeIterator(), configuration: configuration.copy())
     }
 }
+
+extension CSVReader: Sendable where S: Sendable {}

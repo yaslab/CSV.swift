@@ -24,8 +24,7 @@ struct TrimFieldsTests {
     ])
     func trimOneRow(csv: String) throws {
         // Arrange
-        let config = CSVReaderConfiguration(trim: true)
-        let reader = CSVReader(string: csv, configuration: config)
+        let reader = CSVReader(string: csv, trimFields: true)
 
         // Act
         let rows = try reader.map { try $0.get().columns }
@@ -48,8 +47,7 @@ struct TrimFieldsTests {
     ])
     func trimTwoRows(argument: (csv: String, expected: [[String]])) throws {
         // Arrange
-        let config = CSVReaderConfiguration(trim: true)
-        let reader = CSVReader(string: argument.csv, configuration: config)
+        let reader = CSVReader(string: argument.csv, trimFields: true)
 
         // Act
         let rows = try reader.map { try $0.get().columns }
@@ -61,8 +59,7 @@ struct TrimFieldsTests {
     @Test func trimTSV() throws {
         // Arrange
         let tsv = " abc \t\tdef\t ghi "
-        let config = CSVReaderConfiguration(trim: true, delimiter: .horizontalTabulation)
-        let reader = CSVReader(string: tsv, configuration: config)
+        let reader = CSVReader(string: tsv, trimFields: true, delimiter: .horizontalTabulation)
 
         // Act
         let rows = try reader.map { try $0.get().columns }

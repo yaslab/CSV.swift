@@ -8,10 +8,6 @@
 
 import Foundation
 
-// build command:
-// swift build -Xswiftc "-swift-version" -Xswiftc "5" -Xswiftc "-strict-concurrency=complete"
-// swift build -Xswiftc "-swift-version" -Xswiftc "6"
-
 enum CSVParser {
     enum ParseResult {
         case columnByDelimiter(String)
@@ -34,7 +30,7 @@ enum CSVParser {
             return .emptyInput
         }
 
-        if configuration.trim {
+        if configuration.trimFields {
             while configuration.whitespaces.contains(char) {  // ' '
                 guard let next = try _next(&input) else {
                     return .columnByEOF("")
@@ -72,7 +68,7 @@ enum CSVParser {
                     continue
                 }
 
-                if configuration.trim {
+                if configuration.trimFields {
                     while configuration.whitespaces.contains(next) {  // ' '
                         guard let next2 = try _next(&input) else {
                             return .columnByEOF(get())
@@ -111,7 +107,7 @@ enum CSVParser {
         var count = 0
 
         func get() -> String {
-            if configuration.trim {
+            if configuration.trimFields {
                 return String(decoding: string[0 ..< count], as: UTF8.self)
             } else {
                 return String(decoding: string, as: UTF8.self)
@@ -132,7 +128,7 @@ enum CSVParser {
                 return .columnByNewLine(get())
             } else {
                 string.append(char)
-                if configuration.trim, !configuration.whitespaces.contains(char) {  // ' '
+                if configuration.trimFields, !configuration.whitespaces.contains(char) {  // ' '
                     count = string.count
                 }
             }

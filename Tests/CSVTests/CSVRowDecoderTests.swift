@@ -99,7 +99,7 @@ class CSVRowDecoderTests: XCTestCase {
             string 0  0 first
             string,0,,0,first
             """
-        let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
         do {
             let decoder = CSVRowDecoder()
@@ -123,7 +123,7 @@ class CSVRowDecoderTests: XCTestCase {
         let header = SupportedDecodableExample.headerRow()
         let allRows = exampleRecords.reduce(into: header) { $0 += $1.toRow() }
 
-        let headerCSV = CSVReader(string: allRows, configuration: .init(hasHeaderRow: true))
+        let headerCSV = CSVReader(string: allRows, hasHeaderRow: true)
 
         var records = [SupportedDecodableExample]()
         do {
@@ -152,7 +152,7 @@ class CSVRowDecoderTests: XCTestCase {
             let secondColumn: String
         }
 
-        let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
         let decoder = CSVRowDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -183,7 +183,7 @@ class CSVRowDecoderTests: XCTestCase {
             let secondColumn: String
         }
 
-        let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
         let decoder = CSVRowDecoder()
         decoder.keyDecodingStrategy = .custom({ $0.replacingOccurrences(of: " ", with: "") })
@@ -214,7 +214,7 @@ class CSVRowDecoderTests: XCTestCase {
             let b: String
         }
 
-        let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
         let decoder = CSVRowDecoder()
         decoder.stringDecodingStrategy = .default
 
@@ -241,7 +241,7 @@ class CSVRowDecoderTests: XCTestCase {
             let b: String
         }
 
-        let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
         let decoder = CSVRowDecoder()
         decoder.stringDecodingStrategy = .allowEmpty
 
@@ -266,7 +266,7 @@ class CSVRowDecoderTests: XCTestCase {
             dateKey,stringKey,optionalStringKey,intKey,ignored
             al;ksdjf;akjsdf,asldkj,,1234,
             """
-        let invalidFieldTypeCSV = CSVReader(string: invalidFieldTypeStr, configuration: .init(hasHeaderRow: true))
+        let invalidFieldTypeCSV = CSVReader(string: invalidFieldTypeStr, hasHeaderRow: true)
 
         do {
             let decoder = CSVRowDecoder()
@@ -345,7 +345,7 @@ class CSVRowDecoderTests: XCTestCase {
         let header = IntKeyedDecodableExample.headerRow()
         let allRows = exampleRecords.reduce(into: header) { $0 += $1.toRow() }
 
-        let headerCSV = CSVReader(string: allRows, configuration: .init(hasHeaderRow: true))
+        let headerCSV = CSVReader(string: allRows, hasHeaderRow: true)
 
         var records = [IntKeyedDecodableExample]()
         do {
@@ -371,7 +371,7 @@ class CSVRowDecoderTests: XCTestCase {
             \(exampleRecords[0].stringKey),,this is a string where we expect an Int,
             \(exampleRecords[1].stringKey),\(exampleRecords[1].optionalStringKey!),\(exampleRecords[1].intKey),
             """
-        let invalidFieldTypeCSV = CSVReader(string: invalidFieldTypeStr, configuration: .init(hasHeaderRow: true))
+        let invalidFieldTypeCSV = CSVReader(string: invalidFieldTypeStr, hasHeaderRow: true)
 
         do {
             let decoder = CSVRowDecoder()
@@ -416,7 +416,7 @@ class CSVRowDecoderTests: XCTestCase {
             \(exampleRecords[1].enumKey),,54231,,
             \("third"),,54231,,
             """
-        let headerCSV = CSVReader(string: headerStr, configuration: .init(hasHeaderRow: true))
+        let headerCSV = CSVReader(string: headerStr, hasHeaderRow: true)
 
         var records = [UnsupportedDecodableExample]()
         do {
@@ -465,7 +465,7 @@ class CSVRowDecoderTests: XCTestCase {
             0,123,4567,89012,345678901234567890,1,124,4568,89013,345678901234567891
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
 
@@ -501,7 +501,7 @@ class CSVRowDecoderTests: XCTestCase {
             123.456,7890.1234
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             for result in reader {
                 let decoder = CSVRowDecoder()
@@ -528,7 +528,7 @@ class CSVRowDecoderTests: XCTestCase {
             false,true
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.boolDecodingStrategy = .default
@@ -550,7 +550,7 @@ class CSVRowDecoderTests: XCTestCase {
             0,1
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.boolDecodingStrategy = .custom({ $0 != "0" })
@@ -579,7 +579,7 @@ class CSVRowDecoderTests: XCTestCase {
             \(expected.timeIntervalSinceReferenceDate)
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.dateDecodingStrategy = .deferredToDate
@@ -601,7 +601,7 @@ class CSVRowDecoderTests: XCTestCase {
             \(expected.timeIntervalSince1970)
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.dateDecodingStrategy = .secondsSince1970
@@ -623,7 +623,7 @@ class CSVRowDecoderTests: XCTestCase {
             \(seconds * 1000.0)
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.dateDecodingStrategy = .millisecondsSince1970
@@ -645,7 +645,7 @@ class CSVRowDecoderTests: XCTestCase {
             2018-11-22T12:34:56+09:00
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.dateDecodingStrategy = .iso8601
@@ -671,7 +671,7 @@ class CSVRowDecoderTests: XCTestCase {
             formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
             formatter.dateFormat = "yyyy/MM/dd"
 
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.dateDecodingStrategy = .formatted(formatter)
@@ -698,7 +698,7 @@ class CSVRowDecoderTests: XCTestCase {
             formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
             formatter.dateFormat = "yyyy/MM/dd"
 
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.dateDecodingStrategy = .custom({ Date(timeIntervalSinceReferenceDate: Double($0)!) })
@@ -726,7 +726,7 @@ class CSVRowDecoderTests: XCTestCase {
             "\(expected.base64EncodedString())"
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.dataDecodingStrategy = .base64
@@ -748,7 +748,7 @@ class CSVRowDecoderTests: XCTestCase {
             "\(expected.map({ String(format: "%02x", $0) }).joined())"
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.dataDecodingStrategy = .custom { value in
@@ -785,7 +785,7 @@ class CSVRowDecoderTests: XCTestCase {
             """
 
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.nilDecodingStrategy = .empty
@@ -812,7 +812,7 @@ class CSVRowDecoderTests: XCTestCase {
             """
 
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.nilDecodingStrategy = .never
@@ -839,7 +839,7 @@ class CSVRowDecoderTests: XCTestCase {
             """
 
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.nilDecodingStrategy = .custom { $0 == "null" }
@@ -869,7 +869,7 @@ class CSVRowDecoderTests: XCTestCase {
             """
 
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
             decoder.nilDecodingStrategy = .empty
@@ -899,7 +899,7 @@ class CSVRowDecoderTests: XCTestCase {
             "https://www.example.com/path?param=1",99999999999999999999.9999999999999999
             """
         do {
-            let reader = CSVReader(string: csv, configuration: .init(hasHeaderRow: true))
+            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
 

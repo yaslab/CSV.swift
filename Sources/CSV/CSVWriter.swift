@@ -63,7 +63,7 @@ public class CSVWriter {
             stream.open()
         }
         if stream.streamStatus != .open {
-            throw CSVError.cannotOpenFile
+            throw CSVError.cannotOpenStream
         }
     }
 

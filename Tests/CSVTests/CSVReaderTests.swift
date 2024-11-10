@@ -214,8 +214,7 @@ struct CSVReaderTests {
     func testHasHeaderRow1() throws {
         // Arrange
         let csv = "key1,key2\nvalue1,value2"
-        let config = CSVReaderConfiguration(hasHeaderRow: true)
-        let reader = CSVReader(string: csv, configuration: config)
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
         // Act
         let rows = try reader.map { try $0.get() }
@@ -233,8 +232,7 @@ struct CSVReaderTests {
     ])
     func testHasHeaderRow2(csv: String) throws {
         // Arrange
-        let config = CSVReaderConfiguration(hasHeaderRow: true)
-        let reader = CSVReader(string: csv, configuration: config)
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
         // Act
         let rows = try reader.map { try $0.get() }
@@ -247,8 +245,7 @@ struct CSVReaderTests {
     func testHasHeaderRow4() throws {
         // Arrange
         let csv = ""
-        let config = CSVReaderConfiguration(hasHeaderRow: true)
-        let reader = CSVReader(string: csv, configuration: config)
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
         #expect {
             // Act
@@ -269,8 +266,7 @@ struct CSVReaderTests {
     func testSubscript1() throws {
         // Arrange
         let csv = "key1,key2\nvalue1,value2"
-        let config = CSVReaderConfiguration(hasHeaderRow: true)
-        let reader = CSVReader(string: csv, configuration: config)
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
         // Act
         let rows = try reader.map { try $0.get() }
@@ -287,8 +283,7 @@ struct CSVReaderTests {
     func testSubscript2() throws {
         // Arrange
         let csv = "key1,key2\nvalue1"
-        let config = CSVReaderConfiguration(hasHeaderRow: true)
-        let reader = CSVReader(string: csv, configuration: config)
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
         // Act
         let rows = try reader.map { try $0.get() }
