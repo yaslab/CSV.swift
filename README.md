@@ -17,7 +17,7 @@ let csvString = "1,foo\n2,bar"
 let reader = CSVReader(string: csvString)
 for result in reader {
     let row = try result.get()
-    print("\(row.columns)")
+    print("=> \(row.columns)")
 }
 // output:
 // => ["1", "foo"]
@@ -33,7 +33,7 @@ let csvURL = URL(filePath: "/path/to/file.csv")
 let reader = CSVReader(url: csvURL)
 for result in reader {
     let row = try result.get()
-    print("\(row.columns)")
+    print("=> \(row.columns)")
 }
 ```
 
@@ -49,8 +49,8 @@ let reader = CSVReader(
 )
 for result in reader {
     let row = try result.get()
-    print("\(row.header!)")
-    print("\(row.columns)")
+    print("=> \(row.header!)")
+    print("=> \(row.columns)")
 }
 // output:
 // => ["id", "name"]
@@ -69,7 +69,7 @@ let reader = CSVReader(
 )
 for result in reader {
     let row = try result.get()
-    print("id: \(row["id"]!), name: \(row["name"]!)")
+    print("=> id: \(row["id"]!), name: \(row["name"]!)")
 }
 // output:
 // => id: 1, name: foo
@@ -98,7 +98,7 @@ let decoder = CSVRowDecoder()
 for result in reader {
     let row = try result.get()
     let model = try decoder.decode(DecodableExample.self, from: row)
-    print("\(model)")
+    print("=> \(model)")
 }
 // output:
 // => DecodableExample(intKey: 1234, stringKey: "abcd", optionalStringKey: nil)

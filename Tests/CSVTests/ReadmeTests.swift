@@ -19,7 +19,7 @@ class ReadmeTests: XCTestCase {
         let reader = CSVReader(string: csvString)
         for result in reader {
             let row = try result.get()
-            print("\(row.columns)")
+            print("=> \(row.columns)")
         }
         // output:
         // => ["1", "foo"]
@@ -32,7 +32,7 @@ class ReadmeTests: XCTestCase {
             let reader = CSVReader(url: csvURL)
             for result in reader {
                 let row = try result.get()
-                print("\(row.columns)")
+                print("=> \(row.columns)")
             }
             // output:
             // => ["1", "foo"]
@@ -48,8 +48,8 @@ class ReadmeTests: XCTestCase {
         )
         for result in reader {
             let row = try result.get()
-            print("\(row.header!)")
-            print("\(row.columns)")
+            print("=> \(row.header!)")
+            print("=> \(row.columns)")
         }
         // output:
         // => ["id", "name"]
@@ -64,7 +64,7 @@ class ReadmeTests: XCTestCase {
         )
         for result in reader {
             let row = try result.get()
-            print("id: \(row["id"]!), name: \(row["name"]!)")
+            print("=> id: \(row["id"]!), name: \(row["name"]!)")
         }
         // output:
         // => id: 1, name: foo
@@ -89,7 +89,7 @@ class ReadmeTests: XCTestCase {
         for result in reader {
             let row = try result.get()
             let model = try decoder.decode(DecodableExample.self, from: row)
-            print("\(model)")
+            print("=> \(model)")
         }
         // output:
         // => DecodableExample(intKey: 1234, stringKey: "abcd", optionalStringKey: nil)
