@@ -50,7 +50,7 @@ extension CSVReader where S == BinarySequence {
     }
 }
 
-extension CSVReader where S == UTF8CodeUnitSequence<Data> {
+extension CSVReader where S == StringSequence {
     public init(
         data: Data,
         hasHeaderRow: Bool = false,
@@ -58,12 +58,10 @@ extension CSVReader where S == UTF8CodeUnitSequence<Data> {
         delimiter: UTF8.CodeUnit = .comma,
         whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
     ) {
-        let seq = UTF8CodeUnitSequence(sequence: data)
+        let seq = StringSequence(data: data)
         self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
     }
-}
 
-extension CSVReader where S == UTF8CodeUnitSequence<String.UTF8View> {
     public init(
         string: String,
         hasHeaderRow: Bool = false,
@@ -71,15 +69,13 @@ extension CSVReader where S == UTF8CodeUnitSequence<String.UTF8View> {
         delimiter: UTF8.CodeUnit = .comma,
         whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
     ) {
-        var string = string
-        string.makeContiguousUTF8()
-        let seq = UTF8CodeUnitSequence(sequence: string.utf8)
+        let seq = StringSequence(string: string)
         self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
     }
 }
 
 extension CSVReader: Sequence {
-    public struct Iterator: IteratorProtocol {
+    public class Iterator: IteratorProtocol {
         var it: S.Iterator
         let configuration: CSVReaderConfiguration
         var parser = CSVParser()
@@ -92,7 +88,7 @@ extension CSVReader: Sequence {
             self.configuration = configuration
         }
 
-        public mutating func next() -> Result<CSVRow, CSVError>? {
+        public func next() -> Result<CSVRow, CSVError>? {
             if isEOF {
                 return nil
             }
@@ -121,7 +117,7 @@ extension CSVReader: Sequence {
             }
         }
 
-        private mutating func parse() throws(CSVError) -> [String]? {
+        func parse() throws(CSVError) -> [String]? {
             var columns = [String]()
             while true {
                 switch try parser.parse(&it, configuration: configuration) {

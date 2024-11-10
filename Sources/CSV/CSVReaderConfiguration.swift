@@ -6,8 +6,6 @@
 //  Copyright © 2024 yaslab. All rights reserved.
 //
 
-import Foundation
-
 public struct CSVReaderConfiguration: Sendable {
     public var hasHeaderRow: Bool
     public var trimFields: Bool
