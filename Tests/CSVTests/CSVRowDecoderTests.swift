@@ -2,12 +2,13 @@
 //  CSVRowDecoderTests.swift
 //  CSV
 //
-//  Created by Ian Grossberg on 9/11/18.
+//  Created by Ian Grossberg on 2018/09/11.
 //  Copyright © 2018 yaslab. All rights reserved.
 //
 
 import CSV
-import XCTest
+import Foundation
+import Testing
 
 //===----------------------------------------------------------------------===//
 // Models
@@ -60,7 +61,7 @@ extension Equatable where Self: DecodableTest {
 // CSVRowDecoderTests
 //===----------------------------------------------------------------------===//
 
-class CSVRowDecoderTests: XCTestCase {
+struct CSVRowDecoderTests {
 
     //===----------------------------------------------------------------------===//
 
@@ -79,21 +80,21 @@ class CSVRowDecoderTests: XCTestCase {
         }
     }
 
-    func testNoHeader() throws {
+    @Test func testNoHeader() throws {
         let noHeaderStr = "あ,い1,\"う\",えお\n,,x,"
         let noHeaderCSV = CSVReader(string: noHeaderStr)
         let row = try Array(noHeaderCSV).first!.get()
 
-        do {
+        #expect {
             let decoder = CSVRowDecoder()
             let _ = try decoder.decode(SupportedDecodableExample.self, from: row)
-            XCTFail("Expect DecodingError.typeMismatch Error thrown")
-        } catch {
-            // Success
+        } throws: { error in
+            // FIXME: Assert error
+            return true
         }
     }
 
-    func testNumberOfFieldsIsSmall() throws {
+    @Test func testNumberOfFieldsIsSmall() throws {
         let csv = """
             stringKey,intKey,optionalStringKey,dateKey,enumKey
             string 0  0 first
@@ -101,23 +102,25 @@ class CSVRowDecoderTests: XCTestCase {
             """
         let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-        do {
+        #expect {
             let decoder = CSVRowDecoder()
             for result in reader {
                 let row = try result.get()
                 _ = try decoder.decode(SupportedDecodableExample.self, from: row)
                 break
             }
-            XCTFail("decode<T>() did not threw error")
-        } catch let DecodingError.valueNotFound(_, context) {
-            // Success
-            XCTAssertEqual("intKey", context.codingPath.last!.stringValue)
-        } catch {
-            XCTFail("The error thrown is not a DecodingError.valueNotFound")
+        } throws: {
+            guard let error = $0 as? DecodingError else {
+                return false
+            }
+            guard case .valueNotFound(_, let context) = error else {
+                return false
+            }
+            return context.codingPath.last!.stringValue == "intKey"
         }
     }
 
-    func testStringCodingKey() {
+    @Test func testStringCodingKey() throws {
         let exampleRecords = SupportedDecodableExample.examples
 
         let header = SupportedDecodableExample.headerRow()
@@ -126,22 +129,19 @@ class CSVRowDecoderTests: XCTestCase {
         let headerCSV = CSVReader(string: allRows, hasHeaderRow: true)
 
         var records = [SupportedDecodableExample]()
-        do {
-            let decoder = CSVRowDecoder()
-            for result in headerCSV {
-                let row = try result.get()
-                try records.append(decoder.decode(SupportedDecodableExample.self, from: row))
-            }
-        } catch {
-            XCTFail("decode<T>() threw error: \(error)")
-            return
+
+        let decoder = CSVRowDecoder()
+        for result in headerCSV {
+            let row = try result.get()
+            try records.append(decoder.decode(SupportedDecodableExample.self, from: row))
         }
-        XCTAssertEqual(records.count, 2)
-        XCTAssertEqual(records[0], exampleRecords[0])
-        XCTAssertEqual(records[1], exampleRecords[1])
+
+        try #require(records.count == 2)
+        #expect(records[0] == exampleRecords[0])
+        #expect(records[1] == exampleRecords[1])
     }
 
-    func testConvertFromSnakeCase() {
+    @Test func testConvertFromSnakeCase() throws {
         let csv = """
             first_column,SECOND_COLUMN
             first_value,SECOND_VALUE
@@ -159,20 +159,16 @@ class CSVRowDecoderTests: XCTestCase {
 
         var records = [SnakeCaseCsvRow]()
 
-        do {
-            for result in reader {
-                let row = try result.get()
-                try records.append(decoder.decode(SnakeCaseCsvRow.self, from: row))
-            }
-        } catch {
-            XCTFail("decode<T>() threw error: \(error)")
-            return
+        for result in reader {
+            let row = try result.get()
+            try records.append(decoder.decode(SnakeCaseCsvRow.self, from: row))
         }
-        XCTAssertEqual(records.count, 1)
-        XCTAssertEqual(records[0], SnakeCaseCsvRow(firstColumn: "first_value", secondColumn: "SECOND_VALUE"))
+
+        try #require(records.count == 1)
+        #expect(records[0] == SnakeCaseCsvRow(firstColumn: "first_value", secondColumn: "SECOND_VALUE"))
     }
 
-    func testConvertFromCustom() {
+    @Test func testConvertFromCustom() throws {
         let csv = """
             first Column,second Column
             first_value,second_value
@@ -190,20 +186,16 @@ class CSVRowDecoderTests: XCTestCase {
 
         var records = [CustomCsvRow]()
 
-        do {
-            for result in reader {
-                let row = try result.get()
-                try records.append(decoder.decode(CustomCsvRow.self, from: row))
-            }
-        } catch {
-            XCTFail("decode<T>() threw error: \(error)")
-            return
+        for result in reader {
+            let row = try result.get()
+            try records.append(decoder.decode(CustomCsvRow.self, from: row))
         }
-        XCTAssertEqual(records.count, 1)
-        XCTAssertEqual(records[0], CustomCsvRow(firstColumn: "first_value", secondColumn: "second_value"))
+
+        try #require(records.count == 1)
+        #expect(records[0] == CustomCsvRow(firstColumn: "first_value", secondColumn: "second_value"))
     }
 
-    func testEmptyStringDecodingFail() throws {
+    @Test func testEmptyStringDecodingFail() throws {
         let csv = """
             a,"b"
             ,""
@@ -220,17 +212,18 @@ class CSVRowDecoderTests: XCTestCase {
 
         var records = [EmptyStringCsvRow]()
 
-        do {
+        #expect {
             for result in reader {
                 let row = try result.get()
                 try records.append(decoder.decode(EmptyStringCsvRow.self, from: row))
             }
-            XCTFail("decode<T>() did not throw")
-        } catch {}
-        XCTAssertEqual(records.count, 0)
+        } throws: { error in
+            // FIXME: Assert error
+            return true
+        }
     }
 
-    func testEmptyStringDecodingSuccess() throws {
+    @Test func testEmptyStringDecodingSuccess() throws {
         let csv = """
             a,"b"
             ,""
@@ -247,45 +240,39 @@ class CSVRowDecoderTests: XCTestCase {
 
         var records = [EmptyStringCsvRow]()
 
-        do {
-            for result in reader {
-                let row = try result.get()
-                try records.append(decoder.decode(EmptyStringCsvRow.self, from: row))
-            }
-        } catch {
-            XCTFail("decode<T>() threw error: \(error)")
-            return
+        for result in reader {
+            let row = try result.get()
+            try records.append(decoder.decode(EmptyStringCsvRow.self, from: row))
         }
-        XCTAssertEqual(records.count, 1)
-        XCTAssertEqual(records[0].a, "")
-        XCTAssertEqual(records[0].b, "")
+
+        try #require(records.count == 1)
+        #expect(records[0].a == "")
+        #expect(records[0].b == "")
     }
 
-    func testTypeInvalidDateFormat() {
+    @Test func testTypeInvalidDateFormat() {
         let invalidFieldTypeStr = """
             dateKey,stringKey,optionalStringKey,intKey,ignored
             al;ksdjf;akjsdf,asldkj,,1234,
             """
         let invalidFieldTypeCSV = CSVReader(string: invalidFieldTypeStr, hasHeaderRow: true)
 
-        do {
+        #expect("Type Mismatch Error on unexpected field") {
             let decoder = CSVRowDecoder()
             for result in invalidFieldTypeCSV {
                 let row = try result.get()
                 _ = try decoder.decode(SupportedDecodableExample.self, from: row)
             }
-            XCTFail("Expect DecodingError.dataCorrupted Error thrown")
-        } catch {
-            guard let error = error as? DecodingError else {
-                XCTFail("Expect DecodingError Error thrown")
-                return
+        } throws: {
+            guard let error = $0 as? DecodingError else {
+                return false
             }
             switch error {
             case let DecodingError.typeMismatch(type, context):
-                XCTAssert(type == Double.self)
-                XCTAssertEqual(context.codingPath[0].stringValue, "dateKey", "Type Mismatch Error on unexpected field")
+                return type == Double.self
+                    && context.codingPath[0].stringValue == "dateKey"
             default:
-                XCTFail("Expect DecodingError.dataCorrupted Error thrown, got \(error)")
+                return false
             }
         }
     }
@@ -315,7 +302,7 @@ class CSVRowDecoderTests: XCTestCase {
         }
     }
 
-    func testIntCodingKey() {
+    @Test func testIntCodingKey() throws {
         let exampleRecords = IntKeyedDecodableExample.examples
 
         let allRows = IntKeyedDecodableExample.examples.reduce(into: "") { $0 += $1.toRow() }
@@ -324,22 +311,19 @@ class CSVRowDecoderTests: XCTestCase {
         let headerCSV = CSVReader(string: allRows)
 
         var records = [IntKeyedDecodableExample]()
-        do {
-            let decoder = CSVRowDecoder()
-            for result in headerCSV {
-                let row = try result.get()
-                try records.append(decoder.decode(IntKeyedDecodableExample.self, from: row))
-            }
-        } catch {
-            XCTFail("decode<T>() threw error: \(error)")
-            return
+
+        let decoder = CSVRowDecoder()
+        for result in headerCSV {
+            let row = try result.get()
+            try records.append(decoder.decode(IntKeyedDecodableExample.self, from: row))
         }
-        XCTAssertEqual(records.count, 2)
-        XCTAssertEqual(records[0], exampleRecords[0])
-        XCTAssertEqual(records[1], exampleRecords[1])
+
+        try #require(records.count == 2)
+        #expect(records[0] == exampleRecords[0])
+        #expect(records[1] == exampleRecords[1])
     }
 
-    func testIntCodingKeyWhileIgnoringHeaders() {
+    @Test func testIntCodingKeyWhileIgnoringHeaders() throws {
         let exampleRecords = IntKeyedDecodableExample.examples
 
         let header = IntKeyedDecodableExample.headerRow()
@@ -348,22 +332,19 @@ class CSVRowDecoderTests: XCTestCase {
         let headerCSV = CSVReader(string: allRows, hasHeaderRow: true)
 
         var records = [IntKeyedDecodableExample]()
-        do {
-            let decoder = CSVRowDecoder()
-            for result in headerCSV {
-                let row = try result.get()
-                try records.append(decoder.decode(IntKeyedDecodableExample.self, from: row))
-            }
-        } catch {
-            XCTFail("decode<T>() threw error: \(error)")
-            return
+
+        let decoder = CSVRowDecoder()
+        for result in headerCSV {
+            let row = try result.get()
+            try records.append(decoder.decode(IntKeyedDecodableExample.self, from: row))
         }
-        XCTAssertEqual(records.count, 2)
-        XCTAssertEqual(records[0], exampleRecords[0])
-        XCTAssertEqual(records[1], exampleRecords[1])
+
+        try #require(records.count == 2)
+        #expect(records[0] == exampleRecords[0])
+        #expect(records[1] == exampleRecords[1])
     }
 
-    func testTypeMismatch() {
+    @Test func testTypeMismatch() {
         let exampleRecords = SupportedDecodableExample.examples
 
         let invalidFieldTypeStr = """
@@ -373,23 +354,21 @@ class CSVRowDecoderTests: XCTestCase {
             """
         let invalidFieldTypeCSV = CSVReader(string: invalidFieldTypeStr, hasHeaderRow: true)
 
-        do {
+        #expect("Type Mismatch Error on unexpected field") {
             let decoder = CSVRowDecoder()
             for result in invalidFieldTypeCSV {
                 let row = try result.get()
                 _ = try decoder.decode(IntKeyedDecodableExample.self, from: row)
             }
-            XCTFail("Expect DecodingError.typeMismatch Error thrown")
-        } catch {
-            guard let error = error as? DecodingError else {
-                XCTFail("Expect DecodingError Error thrown")
-                return
+        } throws: {
+            guard let error = $0 as? DecodingError else {
+                return false
             }
             switch error {
             case let .typeMismatch(_, context):
-                XCTAssertEqual(context.codingPath[0].stringValue, "intKey", "Type Mismatch Error on unexpected field")
+                return context.codingPath[0].stringValue == "intKey"
             default:
-                XCTFail("Expect Type Mismatch Error thrown")
+                return false
             }
         }
     }
@@ -407,7 +386,7 @@ class CSVRowDecoderTests: XCTestCase {
         }
     }
 
-    func testUnsupportedDecodableField() {
+    @Test func testUnsupportedDecodableField() {
         let exampleRecords = UnsupportedDecodableExample.examples
 
         let headerStr = """
@@ -419,27 +398,25 @@ class CSVRowDecoderTests: XCTestCase {
         let headerCSV = CSVReader(string: headerStr, hasHeaderRow: true)
 
         var records = [UnsupportedDecodableExample]()
-        do {
+
+        #expect {
             let decoder = CSVRowDecoder()
             for result in headerCSV {
                 let row = try result.get()
                 try records.append(decoder.decode(UnsupportedDecodableExample.self, from: row))
             }
-            XCTFail("Expect Data Corrupted Error thrown")
-        } catch {
-            XCTAssertEqual(records.count, 2)
-            guard let decodingError = error as? DecodingError else {
-                XCTFail("Expect DecodingError Error thrown, instead we go \(error)")
-                return
+        } throws: {
+            guard records.count == 2 else {
+                return false
+            }
+            guard let decodingError = $0 as? DecodingError else {
+                return false
             }
             switch decodingError {
             case let .dataCorrupted(context):
-                guard context.codingPath[0].stringValue == "enumKey" else {
-                    XCTFail("Data Corrupted Error on unexpected field")
-                    return
-                }
+                return context.codingPath[0].stringValue == "enumKey"
             default:
-                XCTFail("Expect Data Corrupted Error thrown, instead we got \(decodingError)")
+                return false
             }
         }
     }
@@ -459,32 +436,29 @@ class CSVRowDecoderTests: XCTestCase {
         let uint64Value: UInt64
     }
 
-    func testDecodeInteger() {
+    @Test func testDecodeInteger() throws {
         let csv = """
             intValue,int8Value,int16Value,int32Value,int64Value,uintValue,uint8Value,uint16Value,uint32Value,uint64Value
             0,123,4567,89012,345678901234567890,1,124,4568,89013,345678901234567891
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(IntegerDecodableExample.self, from: result.get())
-                XCTAssertEqual(row.intValue, 0)
-                XCTAssertEqual(row.int8Value, 123)
-                XCTAssertEqual(row.int16Value, 4567)
-                XCTAssertEqual(row.int32Value, 89012)
-                XCTAssertEqual(row.int64Value, 345678901234567890)
-                XCTAssertEqual(row.uintValue, 1)
-                XCTAssertEqual(row.uint8Value, 124)
-                XCTAssertEqual(row.uint16Value, 4568)
-                XCTAssertEqual(row.uint32Value, 89013)
-                XCTAssertEqual(row.uint64Value, 345678901234567891)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+
+        for result in reader {
+            let row = try decoder.decode(IntegerDecodableExample.self, from: result.get())
+            #expect(row.intValue == 0)
+            #expect(row.int8Value == 123)
+            #expect(row.int16Value == 4567)
+            #expect(row.int32Value == 89012)
+            #expect(row.int64Value == 345678901234567890)
+            #expect(row.uintValue == 1)
+            #expect(row.uint8Value == 124)
+            #expect(row.uint16Value == 4568)
+            #expect(row.uint32Value == 89013)
+            #expect(row.uint64Value == 345678901234567891)
+            break
         }
     }
 
@@ -495,23 +469,20 @@ class CSVRowDecoderTests: XCTestCase {
         let doubleValue: Double
     }
 
-    func testDecodeFloat() {
+    @Test func testDecodeFloat() throws {
         let csv = """
             floatValue,doubleValue
             123.456,7890.1234
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let decoder = CSVRowDecoder()
-                let row = try decoder.decode(FloatDecodableExample.self, from: result.get())
-                XCTAssertEqual(row.floatValue, 123.456)
-                XCTAssertEqual(row.doubleValue, 7890.1234)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
+
+        for result in reader {
+            let decoder = CSVRowDecoder()
+            let row = try decoder.decode(FloatDecodableExample.self, from: result.get())
+            #expect(row.floatValue == 123.456)
+            #expect(row.doubleValue == 7890.1234)
+            break
         }
     }
 
@@ -522,47 +493,41 @@ class CSVRowDecoderTests: XCTestCase {
         let trueValue: Bool
     }
 
-    func testBoolDecodingStrategy_default() {
+    @Test func testBoolDecodingStrategy_default() throws {
         let csv = """
             falseValue,trueValue
             false,true
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.boolDecodingStrategy = .default
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(BoolDecodingStrategyExample.self, from: result.get())
-                XCTAssertEqual(row.falseValue, false)
-                XCTAssertEqual(row.trueValue, true)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+        decoder.boolDecodingStrategy = .default
+
+        for result in reader {
+            let row = try decoder.decode(BoolDecodingStrategyExample.self, from: result.get())
+            #expect(row.falseValue == false)
+            #expect(row.trueValue == true)
+            break
         }
     }
 
-    func testBoolDecodingStrategy_custom() {
+    @Test func testBoolDecodingStrategy_custom() throws {
         let csv = """
             falseValue,trueValue
             0,1
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.boolDecodingStrategy = .custom({ $0 != "0" })
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(BoolDecodingStrategyExample.self, from: result.get())
-                XCTAssertEqual(row.falseValue, false)
-                XCTAssertEqual(row.trueValue, true)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+        decoder.boolDecodingStrategy = .custom({ $0 != "0" })
+
+        for result in reader {
+            let row = try decoder.decode(BoolDecodingStrategyExample.self, from: result.get())
+            #expect(row.falseValue == false)
+            #expect(row.trueValue == true)
+            break
         }
     }
 
@@ -572,144 +537,125 @@ class CSVRowDecoderTests: XCTestCase {
         let date: Date
     }
 
-    func testDateDecodingStrategy_deferredToDate() {
+    @Test func testDateDecodingStrategy_deferredToDate() throws {
         let expected = Date()
         let csv = """
             date
             \(expected.timeIntervalSinceReferenceDate)
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.dateDecodingStrategy = .deferredToDate
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
-                XCTAssertEqual(row.date, expected)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+        decoder.dateDecodingStrategy = .deferredToDate
+
+        for result in reader {
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
+            #expect(row.date == expected)
+            break
         }
     }
 
-    func testDateDecodingStrategy_secondsSince1970() {
+    @Test func testDateDecodingStrategy_secondsSince1970() throws {
         let expected = Date()
         let csv = """
             date
             \(expected.timeIntervalSince1970)
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.dateDecodingStrategy = .secondsSince1970
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
-                XCTAssertEqual(row.date.timeIntervalSince1970, expected.timeIntervalSince1970)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+
+        for result in reader {
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
+            #expect(row.date.timeIntervalSince1970 == expected.timeIntervalSince1970)
+            break
         }
     }
 
-    func testDateDecodingStrategy_millisecondsSince1970() {
+    @Test func testDateDecodingStrategy_millisecondsSince1970() throws {
         let seconds: TimeInterval = 1542857696.0
         let csv = """
             date
             \(seconds * 1000.0)
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.dateDecodingStrategy = .millisecondsSince1970
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
-                XCTAssertEqual(row.date.timeIntervalSince1970, seconds)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+        decoder.dateDecodingStrategy = .millisecondsSince1970
+
+        for result in reader {
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
+            #expect(row.date.timeIntervalSince1970 == seconds)
+            break
         }
     }
 
-    @available(macOS 10.12, iOS 10.0, watchOS 3.0, tvOS 10.0, *)
-    func testDateDecodingStrategy_iso8601() {
+    @Test func testDateDecodingStrategy_iso8601() throws {
         let csv = """
             date
             2018-11-22T12:34:56+09:00
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.dateDecodingStrategy = .iso8601
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
-                XCTAssertEqual(row.date.timeIntervalSince1970, 1542857696)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+
+        for result in reader {
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
+            #expect(row.date.timeIntervalSince1970 == 1542857696)
+            break
         }
     }
 
-    func testDateDecodingStrategy_formatted() {
+    @Test func testDateDecodingStrategy_formatted() throws {
         let csv = """
             date
             2018/11/22
             """
-        do {
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
-            formatter.dateFormat = "yyyy/MM/dd"
 
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
+        formatter.dateFormat = "yyyy/MM/dd"
 
-            let decoder = CSVRowDecoder()
-            decoder.dateDecodingStrategy = .formatted(formatter)
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
-                XCTAssertEqual(row.date.timeIntervalSince1970, 1542812400)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+        decoder.dateDecodingStrategy = .formatted(formatter)
+
+        for result in reader {
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
+            #expect(row.date.timeIntervalSince1970 == 1542812400)
+            break
         }
     }
 
-    func testDateDecodingStrategy_custom() {
+    @Test func testDateDecodingStrategy_custom() throws {
         let expected = Date()
         let csv = """
             date
             \(expected.timeIntervalSinceReferenceDate)
             """
-        do {
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
-            formatter.dateFormat = "yyyy/MM/dd"
 
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
+        formatter.dateFormat = "yyyy/MM/dd"
 
-            let decoder = CSVRowDecoder()
-            decoder.dateDecodingStrategy = .custom({ Date(timeIntervalSinceReferenceDate: Double($0)!) })
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
-                XCTAssertEqual(row.date, expected)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+        decoder.dateDecodingStrategy = .custom({ Date(timeIntervalSinceReferenceDate: Double($0)!) })
+
+        for result in reader {
+            let row = try decoder.decode(DateDecodingStrategyExample.self, from: result.get())
+            #expect(row.date == expected)
+            break
         }
     }
 
@@ -719,55 +665,49 @@ class CSVRowDecoderTests: XCTestCase {
         let data: Data
     }
 
-    func testDataDecodingStrategy_base64() {
+    @Test func testDataDecodingStrategy_base64() throws {
         let expected = Data([0x56, 0x12, 0x00, 0x34, 0x1a, 0xfe])
         let csv = """
             data
             "\(expected.base64EncodedString())"
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.dataDecodingStrategy = .base64
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(DataDecodingStrategyExample.self, from: result.get())
-                XCTAssertEqual(row.data, expected)
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+        decoder.dataDecodingStrategy = .base64
+
+        for result in reader {
+            let row = try decoder.decode(DataDecodingStrategyExample.self, from: result.get())
+            #expect(row.data == expected)
+            break
         }
     }
 
-    func testDataDecodingStrategy_custom() {
+    @Test func testDataDecodingStrategy_custom() throws {
         let expected = Data([0x34, 0x1a, 0xfe, 0x56, 0x12, 0x00])
         let csv = """
             data
             "\(expected.map({ String(format: "%02x", $0) }).joined())"
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.dataDecodingStrategy = .custom { value in
-                var bytes = [UInt8]()
-                for i in stride(from: 0, to: value.count, by: 2) {
-                    let start = value.index(value.startIndex, offsetBy: i)
-                    let end = value.index(value.startIndex, offsetBy: i + 1)
-                    bytes.append(UInt8(value[start ... end], radix: 16)!)
-                }
-                return Data(bytes)
-            }
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(DataDecodingStrategyExample.self, from: result.get())
-                XCTAssertEqual(row.data, expected)
-                break
+        let decoder = CSVRowDecoder()
+        decoder.dataDecodingStrategy = .custom { value in
+            var bytes = [UInt8]()
+            for i in stride(from: 0, to: value.count, by: 2) {
+                let start = value.index(value.startIndex, offsetBy: i)
+                let end = value.index(value.startIndex, offsetBy: i + 1)
+                bytes.append(UInt8(value[start ... end], radix: 16)!)
             }
-        } catch {
-            XCTFail("\(error)")
+            return Data(bytes)
+        }
+
+        for result in reader {
+            let row = try decoder.decode(DataDecodingStrategyExample.self, from: result.get())
+            #expect(row.data == expected)
+            break
         }
     }
 
@@ -777,88 +717,76 @@ class CSVRowDecoderTests: XCTestCase {
         let string: String?
     }
 
-    func testNilDecodingStrategy_empty() {
+    @Test func testNilDecodingStrategy_empty() throws {
         let csv = """
             string
 
             null
             """
 
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.nilDecodingStrategy = .empty
+        let decoder = CSVRowDecoder()
+        decoder.nilDecodingStrategy = .empty
 
-            var rows: [NilDecodingStrategyExample] = []
-            for result in reader {
-                let row = try decoder.decode(NilDecodingStrategyExample.self, from: result.get())
-                rows.append(row)
-            }
-
-            XCTAssertEqual(rows.count, 2)
-            XCTAssertNil(rows[0].string)
-            XCTAssertEqual(rows[1].string, "null")
-        } catch {
-            XCTFail("\(error)")
+        var rows: [NilDecodingStrategyExample] = []
+        for result in reader {
+            let row = try decoder.decode(NilDecodingStrategyExample.self, from: result.get())
+            rows.append(row)
         }
+
+        try #require(rows.count == 2)
+        #expect(rows[0].string == nil)
+        #expect(rows[1].string == "null")
     }
 
-    func testNilDecodingStrategy_never() {
+    @Test func testNilDecodingStrategy_never() throws {
         let csv = """
             string
 
             null
             """
 
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.nilDecodingStrategy = .never
+        let decoder = CSVRowDecoder()
+        decoder.nilDecodingStrategy = .never
 
-            var rows: [NilDecodingStrategyExample] = []
-            for result in reader {
-                let row = try decoder.decode(NilDecodingStrategyExample.self, from: result.get())
-                rows.append(row)
-            }
-
-            XCTAssertEqual(rows.count, 2)
-            XCTAssertEqual(rows[0].string, "")
-            XCTAssertEqual(rows[1].string, "null")
-        } catch {
-            XCTFail("\(error)")
+        var rows: [NilDecodingStrategyExample] = []
+        for result in reader {
+            let row = try decoder.decode(NilDecodingStrategyExample.self, from: result.get())
+            rows.append(row)
         }
+
+        try #require(rows.count == 2)
+        #expect(rows[0].string == "")
+        #expect(rows[1].string == "null")
     }
 
-    func testNilDecodingStrategy_custom() {
+    @Test func testNilDecodingStrategy_custom() throws {
         let csv = """
             string
 
             null
             """
 
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
-            decoder.nilDecodingStrategy = .custom { $0 == "null" }
+        let decoder = CSVRowDecoder()
+        decoder.nilDecodingStrategy = .custom { $0 == "null" }
 
-            var rows: [NilDecodingStrategyExample] = []
-            for result in reader {
-                let row = try decoder.decode(NilDecodingStrategyExample.self, from: result.get())
-                rows.append(row)
-            }
-
-            XCTAssertEqual(rows.count, 2)
-            XCTAssertEqual(rows[0].string, "")
-            XCTAssertNil(rows[1].string)
-        } catch {
-            XCTFail("\(error)")
+        var rows: [NilDecodingStrategyExample] = []
+        for result in reader {
+            let row = try decoder.decode(NilDecodingStrategyExample.self, from: result.get())
+            rows.append(row)
         }
+
+        try #require(rows.count == 2)
+        #expect(rows[0].string == "")
+        #expect(rows[1].string == nil)
     }
 
-    func testNilDecodingStrategy_error() {
+    @Test func testNilDecodingStrategy_error() {
         struct RowModel: Decodable {
             let a: Int
         }
@@ -868,7 +796,7 @@ class CSVRowDecoderTests: XCTestCase {
             ""
             """
 
-        do {
+        #expect(throws: DecodingError.self) {
             let reader = CSVReader(string: csv, hasHeaderRow: true)
 
             let decoder = CSVRowDecoder()
@@ -879,10 +807,6 @@ class CSVRowDecoderTests: XCTestCase {
                 let row = try decoder.decode(RowModel.self, from: result.get())
                 rows.append(row)
             }
-
-            XCTFail("decode<T>() did not throw")
-        } catch {
-            XCTAssertTrue(error is DecodingError)
         }
     }
 
@@ -893,24 +817,21 @@ class CSVRowDecoderTests: XCTestCase {
         let decimal: Decimal
     }
 
-    func testFoundationDecoding() {
+    @Test func testFoundationDecoding() throws {
         let csv = """
             url,decimal
             "https://www.example.com/path?param=1",99999999999999999999.9999999999999999
             """
-        do {
-            let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            let decoder = CSVRowDecoder()
+        let reader = CSVReader(string: csv, hasHeaderRow: true)
 
-            for result in reader {
-                let row = try decoder.decode(FoundationDecodingExample.self, from: result.get())
-                XCTAssertEqual(row.url.absoluteString, "https://www.example.com/path?param=1")
-                XCTAssertEqual(row.decimal.description, "99999999999999999999.9999999999999999")
-                break
-            }
-        } catch {
-            XCTFail("\(error)")
+        let decoder = CSVRowDecoder()
+
+        for result in reader {
+            let row = try decoder.decode(FoundationDecodingExample.self, from: result.get())
+            #expect(row.url.absoluteString == "https://www.example.com/path?param=1")
+            #expect(row.decimal.description == "99999999999999999999.9999999999999999")
+            break
         }
     }
 

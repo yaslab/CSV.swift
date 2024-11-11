@@ -7,6 +7,7 @@
 //
 
 import CSV
+import Foundation
 import Testing
 
 struct TrimFieldsTests {
