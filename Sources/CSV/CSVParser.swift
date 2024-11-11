@@ -8,18 +8,56 @@
 
 import Foundation
 
-enum CSVParser {
+struct UTF8Array: ~Copyable {
+    private(set) var bytes: UnsafeMutablePointer<UInt8>
+    private var capacity = 8
+    private(set) var count = 0
+
+    init() {
+        bytes = UnsafeMutablePointer<UInt8>.allocate(capacity: capacity)
+        bytes.initialize(repeating: 0, count: capacity)
+    }
+
+    deinit {
+        bytes.deallocate()
+    }
+
+    mutating func append(_ value: consuming UInt8) {
+        if capacity <= count {
+            let newCapacity = capacity * 2
+            let newBytes = UnsafeMutablePointer<UInt8>.allocate(capacity: newCapacity)
+            newBytes.moveInitialize(from: bytes, count: count)
+            newBytes.advanced(by: count).initialize(repeating: 0, count: newCapacity - count)
+            bytes.deallocate()
+            bytes = newBytes
+            capacity = newCapacity
+        }
+        bytes[count] = value
+        count += 1
+    }
+
+    mutating func removeAll() {
+        count = 0
+    }
+
+    func string(maxLength: consuming Int = .max) -> String {
+        let length = min(count, maxLength)
+        return String(unsafeUninitializedCapacity: length) {
+            $0.baseAddress.unsafelyUnwrapped.initialize(from: bytes, count: length)
+            return length
+        }
+    }
+}
+
+struct CSVParser: ~Copyable {
+    var state: UTF8.CodeUnit?
+    var array = UTF8Array()
+
     enum ParseResult {
         case columnByDelimiter(String)
         case columnByNewLine(String)
         case columnByEOF(String)
         case emptyInput
-    }
-
-    case state(UTF8.CodeUnit?)
-
-    init() {
-        self = .state(nil)
     }
 
     mutating func parse(
@@ -51,34 +89,30 @@ enum CSVParser {
         _ input: inout some IteratorProtocol<Result<UTF8.CodeUnit, CSVError>>,
         configuration: borrowing CSVReaderConfiguration
     ) throws(CSVError) -> ParseResult {
-        var string = [UTF8.CodeUnit]()
-
-        func get() -> String {
-            String(decoding: string, as: UTF8.self)
-        }
+        array.removeAll()
 
         while let char = try _next(&input) {
             if char == .quotationMark {  // '"'
                 guard var next = try _next(&input) else {
-                    return .columnByEOF(get())
+                    return .columnByEOF(array.string())
                 }
 
                 if next == .quotationMark {  // '"' (ESC)
-                    string.append(next)
+                    array.append(next)
                     continue
                 }
 
                 if configuration.trimFields {
                     while configuration.whitespaces.contains(next) {  // ' '
                         guard let next2 = try _next(&input) else {
-                            return .columnByEOF(get())
+                            return .columnByEOF(array.string())
                         }
                         next = next2
                     }
                 }
 
                 if next == configuration.delimiter {  // ','
-                    return .columnByDelimiter(get())
+                    return .columnByDelimiter(array.string())
                 } else if next == .newLine || next == .carriageReturn {  // LF or CR
                     if next == .carriageReturn {  // CR
                         if let nextNext = try _next(&input) {
@@ -87,36 +121,33 @@ enum CSVParser {
                             }
                         }
                     }
-                    return .columnByNewLine(get())
+                    return .columnByNewLine(array.string())
                 } else {
                     throw CSVError.invalidCSVFormat
                 }
             } else {
-                string.append(char)
+                array.append(char)
             }
         }
 
-        return .columnByEOF(get())
+        return .columnByEOF(array.string())
     }
 
     private mutating func column(
         _ input: inout some IteratorProtocol<Result<UTF8.CodeUnit, CSVError>>,
         configuration: borrowing CSVReaderConfiguration
     ) throws(CSVError) -> ParseResult {
-        var string = [UTF8.CodeUnit]()
         var count = 0
 
-        func get() -> String {
-            if configuration.trimFields {
-                return String(decoding: string[0 ..< count], as: UTF8.self)
-            } else {
-                return String(decoding: string, as: UTF8.self)
-            }
+        array.removeAll()
+
+        func string() -> String {
+            array.string(maxLength: configuration.trimFields ? count : .max)
         }
 
         while let char = try _next(&input) {
             if char == configuration.delimiter {  // ','
-                return .columnByDelimiter(get())
+                return .columnByDelimiter(string())
             } else if char == .newLine || char == .carriageReturn {  // LF or CR
                 if char == .carriageReturn {  // CR
                     if let next = try _next(&input) {
@@ -125,23 +156,23 @@ enum CSVParser {
                         }
                     }
                 }
-                return .columnByNewLine(get())
+                return .columnByNewLine(string())
             } else {
-                string.append(char)
+                array.append(char)
                 if configuration.trimFields, !configuration.whitespaces.contains(char) {  // ' '
-                    count = string.count
+                    count = array.count
                 }
             }
         }
 
-        return .columnByEOF(get())
+        return .columnByEOF(string())
     }
 
     private mutating func _next(
         _ input: inout some IteratorProtocol<Result<UTF8.CodeUnit, CSVError>>
     ) throws(CSVError) -> UTF8.CodeUnit? {
-        if case .state(let char) = self, let char {
-            self = .state(nil)
+        if let char = state {
+            state = nil
             return char
         } else if let next = input.next() {
             return try next.get()
@@ -150,7 +181,7 @@ enum CSVParser {
         }
     }
 
-    private mutating func _prev(_ char: UTF8.CodeUnit) {
-        self = .state(char)
+    private mutating func _prev(_ char: consuming UTF8.CodeUnit) {
+        state = char
     }
 }

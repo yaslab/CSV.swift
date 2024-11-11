@@ -6,15 +6,15 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
-import XCTest
+import CSV
+import Foundation
+import Testing
 
-@testable import CSV
-
-class ReadmeTests: XCTestCase {
+struct ReadmeTests {
 
     // MARK: - Reading
 
-    func testFromCSVString() throws {
+    @Test func testFromCSVString() throws {
         let csvString = "1,foo\n2,bar"
         let reader = CSVReader(string: csvString)
         for result in reader {
@@ -26,7 +26,7 @@ class ReadmeTests: XCTestCase {
         // => ["2", "bar"]
     }
 
-    func testFromFile() throws {
+    @Test func testFromFile() throws {
         try Utils.withTempURL { csvURL in
             try "1,foo\n2,bar".data(using: .utf8)!.write(to: csvURL)
             let reader = CSVReader(url: csvURL)
@@ -40,7 +40,7 @@ class ReadmeTests: XCTestCase {
         }
     }
 
-    func testGettingTheHeaderRow() throws {
+    @Test func testGettingTheHeaderRow() throws {
         let csvString = "id,name\n1,foo"
         let reader = CSVReader(
             string: csvString,
@@ -56,7 +56,7 @@ class ReadmeTests: XCTestCase {
         // => ["1", "foo"]
     }
 
-    func testGetTheFieldValueUsingKey() throws {
+    @Test func testGetTheFieldValueUsingKey() throws {
         let csvString = "id,name\n1,foo\n2,bar"
         let reader = CSVReader(
             string: csvString,
@@ -71,7 +71,7 @@ class ReadmeTests: XCTestCase {
         // => id: 2, name: bar
     }
 
-    func testDecodable() throws {
+    @Test func testDecodable() throws {
         struct DecodableExample: Decodable {
             let intKey: Int
             let stringKey: String
@@ -97,7 +97,7 @@ class ReadmeTests: XCTestCase {
 
     // MARK: - Writing
 
-    func testWriteToMemory() {
+    @Test func testWriteToMemory() {
         let stream = OutputStream(toMemory: ())
         let csv = try! CSVWriter(stream: stream)
 
@@ -121,7 +121,7 @@ class ReadmeTests: XCTestCase {
         // => "id,name\n1,foo\n2,bar"
     }
 
-    func testWriteToFile() {
+    @Test func testWriteToFile() {
         //        let stream = OutputStream(toFileAtPath: "/path/to/file.csv", append: false)!
         //        let csv = try! CSVWriter(stream: stream)
         //

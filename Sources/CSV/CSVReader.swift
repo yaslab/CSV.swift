@@ -52,7 +52,7 @@ extension CSVReader where S == BinaryReader {
 
 extension CSVReader where S == StringSequence {
     public init(
-        data: Data,
+        data: consuming Data,
         hasHeaderRow: Bool = false,
         trimFields: Bool = false,
         delimiter: UTF8.CodeUnit = .comma,
@@ -63,7 +63,7 @@ extension CSVReader where S == StringSequence {
     }
 
     public init(
-        string: String,
+        string: consuming String,
         hasHeaderRow: Bool = false,
         trimFields: Bool = false,
         delimiter: UTF8.CodeUnit = .comma,

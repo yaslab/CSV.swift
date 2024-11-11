@@ -19,6 +19,8 @@ extension UTF8.CodeUnit {
     public static let quotationMark: UTF8.CodeUnit = 0x22
     /// Comma ','
     public static let comma: UTF8.CodeUnit = 0x2c
+    /// Semicolon ';'
+    public static let semicolon: UTF8.CodeUnit = 0x3b
     /// No-Break Space ' '
     public static let noBreakSpace: UTF8.CodeUnit = 0xa0
 }

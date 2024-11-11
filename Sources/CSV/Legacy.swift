@@ -8,21 +8,22 @@
 
 import Foundation
 
-@available(*, unavailable, renamed: "CSVReader")
-public enum CSV {}
+@available(*, deprecated, renamed: "CSVReader")
+public typealias CSV = CSVReader
 
-extension CSVReader {
-    @available(*, unavailable, renamed: "CSVReader.init(string:)")
-    public init(
-        string: String,
-        hasHeaderRow: Bool = false,
-        trimFields: Bool = false,
-        delimiter: UnicodeScalar = ",",
-        whitespaces: CharacterSet = .whitespaces
-    ) throws {
-        fatalError()
+public struct _LegacySequence: Sequence {
+    public struct Iterator: IteratorProtocol {
+        public mutating func next() -> Result<UTF8.CodeUnit, CSVError>? {
+            fatalError()
+        }
     }
 
+    public func makeIterator() -> Iterator {
+        fatalError()
+    }
+}
+
+extension CSVReader where S == _LegacySequence {
     @available(*, unavailable, renamed: "CSVReader.init(fileAtPath:)")
     public init(
         stream: InputStream,
@@ -71,16 +72,18 @@ extension CSVReader {
     ) throws where T: UnicodeCodec, T.CodeUnit == UInt32 {
         fatalError()
     }
+}
 
-    @available(*, unavailable, renamed: "CSVRow")
+extension CSVReader {
+    @available(*, unavailable, renamed: "CSVRow.header")
     public var headerRow: [String]? { nil }
 
-    @available(*, unavailable, renamed: "CSVRow")
+    @available(*, unavailable, renamed: "CSVRow.columns")
     public var currentRow: [String]? { nil }
 
     @available(*, unavailable, renamed: "CSVError")
     public var error: Error? { nil }
 
-    @available(*, unavailable, renamed: "CSVRow")
+    @available(*, unavailable, renamed: "CSVRow.subscript(_:)")
     public subscript(key: String) -> String? { nil }
 }
