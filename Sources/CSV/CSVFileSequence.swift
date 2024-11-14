@@ -9,8 +9,23 @@
 import Foundation
 
 public struct CSVFileSequence: Sendable {
-    let url: URL
+    enum Source: Sendable {
+        case path(String)
+        case url(URL)
+    }
+
+    let source: Source
     let bufferSize: Int
+
+    init(fileAtPath path: String, bufferSize: Int) {
+        self.source = .path(path)
+        self.bufferSize = bufferSize
+    }
+
+    init(url: URL, bufferSize: Int) {
+        self.source = .url(url)
+        self.bufferSize = bufferSize
+    }
 }
 
 extension CSVFileSequence: Sequence {
@@ -24,8 +39,13 @@ extension CSVFileSequence: Sequence {
         var _count = 0
         var _total: Int64 = 0
 
-        init(url: URL, bufferSize size: Int) {
-            stream = InputStream(url: url)
+        init(source: Source, bufferSize size: Int) {
+            switch source {
+            case .path(let path):
+                stream = InputStream(fileAtPath: path)
+            case .url(let url):
+                stream = InputStream(url: url)
+            }
             stream?.open()
 
             let capacity = Swift.max(8, size)
@@ -85,6 +105,6 @@ extension CSVFileSequence: Sequence {
     }
 
     public func makeIterator() -> Iterator {
-        Iterator(url: url, bufferSize: bufferSize)
+        Iterator(source: source, bufferSize: bufferSize)
     }
 }

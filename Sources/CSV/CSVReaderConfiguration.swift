@@ -7,22 +7,22 @@
 //
 
 public struct CSVReaderConfiguration: Sendable {
+    public var delimiter: UTF8.CodeUnit
     public var hasHeaderRow: Bool
     public var trimFields: Bool
-    public var delimiter: UTF8.CodeUnit
     public var whitespaces: Set<UTF8.CodeUnit>
 }
 
 extension CSVReaderConfiguration {
-    public static func `default`(
+    public static func csv(
         hasHeaderRow: Bool = false,
         trimFields: Bool = false,
         whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
     ) -> CSVReaderConfiguration {
         return CSVReaderConfiguration(
+            delimiter: .comma,
             hasHeaderRow: hasHeaderRow,
             trimFields: trimFields,
-            delimiter: .comma,
             whitespaces: whitespaces
         )
     }
@@ -33,9 +33,23 @@ extension CSVReaderConfiguration {
         whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
     ) -> CSVReaderConfiguration {
         return CSVReaderConfiguration(
+            delimiter: .horizontalTabulation,
             hasHeaderRow: hasHeaderRow,
             trimFields: trimFields,
-            delimiter: .horizontalTabulation,
+            whitespaces: whitespaces
+        )
+    }
+
+    public static func custom(
+        delimiter: UTF8.CodeUnit,
+        hasHeaderRow: Bool = false,
+        trimFields: Bool = false,
+        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
+    ) -> CSVReaderConfiguration {
+        return CSVReaderConfiguration(
+            delimiter: delimiter,
+            hasHeaderRow: hasHeaderRow,
+            trimFields: trimFields,
             whitespaces: whitespaces
         )
     }
@@ -49,9 +63,9 @@ extension CSVReaderConfiguration {
         }
 
         return CSVReaderConfiguration(
+            delimiter: delimiter,
             hasHeaderRow: hasHeaderRow,
             trimFields: trimFields,
-            delimiter: delimiter,
             whitespaces: whitespaces
         )
     }

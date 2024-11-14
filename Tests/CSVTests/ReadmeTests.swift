@@ -44,7 +44,7 @@ struct ReadmeTests {
         let csvString = "id,name\n1,foo"
         let reader = CSVReader(
             string: csvString,
-            configuration: .default(hasHeaderRow: true) // It must be true.
+            configuration: .csv(hasHeaderRow: true)  // It must be true.
         )
         for result in reader {
             let row = try result.get()
@@ -60,7 +60,7 @@ struct ReadmeTests {
         let csvString = "id,name\n1,foo\n2,bar"
         let reader = CSVReader(
             string: csvString,
-            configuration: .default(hasHeaderRow: true) // It must be true.
+            configuration: .csv(hasHeaderRow: true)  // It must be true.
         )
         for result in reader {
             let row = try result.get()
@@ -83,7 +83,7 @@ struct ReadmeTests {
             """
         let reader = CSVReader(
             string: csvString,
-            configuration: .default(hasHeaderRow: true) // It must be true.
+            configuration: .csv(hasHeaderRow: true)  // It must be true.
         )
         let decoder = CSVRowDecoder()
         for result in reader {

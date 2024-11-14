@@ -18,7 +18,7 @@ public struct CSVReader<S> where S: Sequence<Result<UTF8.CodeUnit, CSVError>> {
 
     public init(
         sequence: consuming S,
-        configuration: CSVReaderConfiguration = .default()
+        configuration: CSVReaderConfiguration = .csv()
     ) {
         self.sequence = sequence
         self.configuration = configuration
@@ -28,17 +28,17 @@ public struct CSVReader<S> where S: Sequence<Result<UTF8.CodeUnit, CSVError>> {
 extension CSVReader where S == CSVFileSequence {
     public init(
         fileAtPath path: String,
-        configuration: CSVReaderConfiguration = .default(),
-        bufferSize: Int = 4096
+        bufferSize: Int = 4096,
+        configuration: CSVReaderConfiguration = .csv()
     ) {
-        let seq = CSVFileSequence(url: URL(fileURLWithPath: path), bufferSize: bufferSize)
+        let seq = CSVFileSequence(fileAtPath: path, bufferSize: bufferSize)
         self.init(sequence: seq, configuration: configuration)
     }
 
     public init(
         url: URL,
-        configuration: CSVReaderConfiguration = .default(),
-        bufferSize: Int = 4096
+        bufferSize: Int = 4096,
+        configuration: CSVReaderConfiguration = .csv()
     ) {
         let seq = CSVFileSequence(url: url, bufferSize: bufferSize)
         self.init(sequence: seq, configuration: configuration)
@@ -48,7 +48,7 @@ extension CSVReader where S == CSVFileSequence {
 extension CSVReader where S == CSVStringSequence {
     public init(
         data: consuming Data,
-        configuration: CSVReaderConfiguration = .default()
+        configuration: CSVReaderConfiguration = .csv()
     ) {
         let seq = CSVStringSequence(data: data)
         self.init(sequence: seq, configuration: configuration)
@@ -56,7 +56,7 @@ extension CSVReader where S == CSVStringSequence {
 
     public init(
         string: consuming String,
-        configuration: CSVReaderConfiguration = .default()
+        configuration: CSVReaderConfiguration = .csv()
     ) {
         let seq = CSVStringSequence(string: string)
         self.init(sequence: seq, configuration: configuration)
