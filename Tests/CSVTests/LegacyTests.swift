@@ -27,6 +27,9 @@ struct LegacyTests {
         // _ = try CSVReader(stream: stream, codecType: UTF8.self, hasHeaderRow: false, trimFields: false, delimiter: ",", whitespaces: .whitespaces)
         // _ = try CSVReader(stream: stream, codecType: UTF16.self)
         // _ = try CSVReader(stream: stream, codecType: UTF32.self)
+
+        // _ = try CSVReader(string: "")
+        // _ = try CSVReader(string: "", hasHeaderRow: false, trimFields: false, delimiter: ",", whitespaces: .whitespaces)
     }
 
     @Test func testProperty() {

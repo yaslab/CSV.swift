@@ -8,7 +8,7 @@
 
 import Foundation
 
-@available(*, deprecated, renamed: "CSVReader")
+@available(*, unavailable, renamed: "CSVReader")
 public typealias CSV = CSVReader
 
 public struct _LegacySequence: Sequence {
@@ -24,7 +24,18 @@ public struct _LegacySequence: Sequence {
 }
 
 extension CSVReader where S == _LegacySequence {
-    @available(*, unavailable, renamed: "CSVReader.init(fileAtPath:)")
+    @available(*, unavailable, renamed: "CSVReader.init(string:configuration:)")
+    public init(
+        string: String,
+        hasHeaderRow: Bool = false,
+        trimFields: Bool = false,
+        delimiter: UnicodeScalar = ",",
+        whitespaces: CharacterSet = .whitespaces
+    ) throws {
+        fatalError()
+    }
+
+    @available(*, unavailable, renamed: "CSVReader.init(fileAtPath:configuration:)")
     public init(
         stream: InputStream,
         hasHeaderRow: Bool = false,
@@ -35,7 +46,7 @@ extension CSVReader where S == _LegacySequence {
         fatalError()
     }
 
-    @available(*, unavailable, renamed: "CSVReader.init(fileAtPath:)")
+    @available(*, unavailable, renamed: "CSVReader.init(fileAtPath:configuration:)")
     public init<T>(
         stream: InputStream,
         codecType: T.Type,
