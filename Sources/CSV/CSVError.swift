@@ -15,12 +15,12 @@ public enum CSVError: Error {
 
     // File Stream (for Reader)
 
-    case cannotOpenStream
-    case cannotReadStream
+    case cannotOpenFile
+    case cannotReadFile
 
     // File Stream (for Writer)
 
-    case cannotWriteStream
+    case cannotWriteFile
 
     // File Stream (for Reader / Writer)
 

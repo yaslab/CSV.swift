@@ -6,6 +6,10 @@
 //  Copyright © 2016 yaslab. All rights reserved.
 //
 
+// build command:
+// swift build -Xswiftc "-swift-version" -Xswiftc "5" -Xswiftc "-strict-concurrency=complete"
+// swift build -Xswiftc "-swift-version" -Xswiftc "6"
+
 import Foundation
 
 public struct CSVReader<S> where S: Sequence<Result<UTF8.CodeUnit, CSVError>> {

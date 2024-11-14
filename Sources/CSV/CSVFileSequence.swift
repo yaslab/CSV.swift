@@ -46,12 +46,12 @@ extension CSVFileSequence: Sequence {
             if _count <= _position {
                 guard let stream else {
                     isEOF = true
-                    return .failure(.cannotOpenStream)
+                    return .failure(.cannotOpenFile)
                 }
 
                 guard case .open = stream.streamStatus else {
                     isEOF = true
-                    return .failure(.cannotOpenStream)
+                    return .failure(.cannotOpenFile)
                 }
 
                 let result = stream.read(buffer, maxLength: bufferSize)
@@ -63,7 +63,7 @@ extension CSVFileSequence: Sequence {
                     if let error = stream.streamError {
                         return .failure(.streamErrorHasOccurred(error: error))
                     } else {
-                        return .failure(.cannotReadStream)
+                        return .failure(.cannotReadFile)
                     }
                 }
 

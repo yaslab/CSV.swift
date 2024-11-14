@@ -302,7 +302,7 @@ struct CSVReaderTests {
     }
 
     @Test
-    func testToArray() throws {
+    func testIterateTwice() throws {
         // Arrange
         let csv = "1,2,3,4,5\n6,7,8,9,0"
         let reader = CSVReader(string: csv)

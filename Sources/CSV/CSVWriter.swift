@@ -63,7 +63,7 @@ public class CSVWriter {
             stream.open()
         }
         if stream.streamStatus != .open {
-            throw CSVError.cannotOpenStream
+            throw CSVError.cannotOpenFile
         }
     }
 
@@ -102,7 +102,7 @@ extension CSVWriter {
                 var code = code
                 let count = stream.write(&code, maxLength: 1)
                 if count != 1 {
-                    error = CSVError.cannotWriteStream
+                    error = CSVError.cannotWriteFile
                 }
             }
             if let error = error {
@@ -129,7 +129,7 @@ extension CSVWriter {
                         buffer.baseAddress!.assumingMemoryBound(to: UInt8.self),
                         maxLength: buffer.count)
                     if count != buffer.count {
-                        error = CSVError.cannotWriteStream
+                        error = CSVError.cannotWriteFile
                     }
                 }
             }
@@ -158,7 +158,7 @@ extension CSVWriter {
                         maxLength: buffer.count
                     )
                     if count != buffer.count {
-                        error = CSVError.cannotWriteStream
+                        error = CSVError.cannotWriteFile
                     }
                 }
             }

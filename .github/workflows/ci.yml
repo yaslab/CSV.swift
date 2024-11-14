@@ -40,7 +40,3 @@ jobs:
         run: swift build
       - name: Run swift test
         run: swift test
-
-# build command:
-# swift build -Xswiftc "-swift-version" -Xswiftc "5" -Xswiftc "-strict-concurrency=complete"
-# swift build -Xswiftc "-swift-version" -Xswiftc "6"
