@@ -86,9 +86,7 @@ struct TrimFieldsTests {
     @Test func trimTSV() throws {
         // Arrange
         let tsv = " abc \t\tdef\t ghi "
-        var reader = CSVReader(string: tsv)
-        reader.configuration.trimFields = true
-        reader.configuration.delimiter = .horizontalTabulation
+        let reader = CSVReader(string: tsv, configuration: .tsv(trimFields: true))
 
         // Act
         let rows = try reader.map { try $0.get().columns }
