@@ -62,7 +62,9 @@ func read_from_file(_ url: URL, hasHeaderRow: Bool, trimFields: Bool) throws {
       }
     }
 #else
-    let reader = CSVReader(url: url, hasHeaderRow: hasHeaderRow, trimFields: trimFields)
+    var reader = CSVReader(url: url)
+    reader.configuration.hasHeaderRow = hasHeaderRow
+    reader.configuration.trimFields = trimFields
     for result in reader {
       _ = try result.get()
     }
@@ -86,7 +88,9 @@ func read_from_data(_ data: Data, hasHeaderRow: Bool, trimFields: Bool) throws {
       }
     }
 #else
-    let reader = CSVReader(data: data, hasHeaderRow: hasHeaderRow, trimFields: trimFields)
+    var reader = CSVReader(data: data)
+    reader.configuration.hasHeaderRow = hasHeaderRow
+    reader.configuration.trimFields = trimFields
     for result in reader {
       _ = try result.get()
     }
@@ -109,7 +113,9 @@ func read_from_string(_ string: String, hasHeaderRow: Bool, trimFields: Bool) th
       }
     }
 #else
-    let reader = CSVReader(string: string, hasHeaderRow: hasHeaderRow, trimFields: trimFields)
+    var reader = CSVReader(string: string)
+    reader.configuration.hasHeaderRow = hasHeaderRow
+    reader.configuration.trimFields = trimFields
     for result in reader {
       _ = try result.get()
     }

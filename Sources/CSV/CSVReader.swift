@@ -14,63 +14,48 @@ public struct CSVReader<S> where S: Sequence<Result<UTF8.CodeUnit, CSVError>> {
 
     public init(
         sequence: consuming S,
-        hasHeaderRow: Bool = false,
-        trimFields: Bool = false,
-        delimiter: UTF8.CodeUnit = .comma,
-        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
+        configuration: CSVReaderConfiguration = .default()
     ) {
         self.sequence = sequence
-        self.configuration = CSVReaderConfiguration(hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
+        self.configuration = configuration
     }
 }
 
-extension CSVReader where S == BinaryReader {
+extension CSVReader where S == CSVFileSequence {
     public init(
         fileAtPath path: String,
-        hasHeaderRow: Bool = false,
-        trimFields: Bool = false,
-        delimiter: UTF8.CodeUnit = .comma,
-        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace],
+        configuration: CSVReaderConfiguration = .default(),
         bufferSize: Int = 4096
     ) {
-        let seq = BinaryReader(url: URL(fileURLWithPath: path), bufferSize: bufferSize)
-        self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
+        let seq = CSVFileSequence(url: URL(fileURLWithPath: path), bufferSize: bufferSize)
+        self.init(sequence: seq, configuration: configuration)
     }
 
     public init(
         url: URL,
-        hasHeaderRow: Bool = false,
-        trimFields: Bool = false,
-        delimiter: UTF8.CodeUnit = .comma,
-        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace],
+        configuration: CSVReaderConfiguration = .default(),
         bufferSize: Int = 4096
     ) {
-        let seq = BinaryReader(url: url, bufferSize: bufferSize)
-        self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
+        let seq = CSVFileSequence(url: url, bufferSize: bufferSize)
+        self.init(sequence: seq, configuration: configuration)
     }
 }
 
-extension CSVReader where S == StringSequence {
+extension CSVReader where S == CSVStringSequence {
     public init(
         data: consuming Data,
-        hasHeaderRow: Bool = false,
-        trimFields: Bool = false,
-        delimiter: UTF8.CodeUnit = .comma,
-        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
+        configuration: CSVReaderConfiguration = .default()
     ) {
-        let seq = StringSequence(data: data)
-        self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
+        let seq = CSVStringSequence(data: data)
+        self.init(sequence: seq, configuration: configuration)
     }
 
     public init(
         string: consuming String,
-        hasHeaderRow: Bool = false,
-        trimFields: Bool = false,
-        delimiter: UTF8.CodeUnit = .comma,
-        whitespaces: Set<UTF8.CodeUnit> = [.horizontalTabulation, .space, .noBreakSpace]
+        configuration: CSVReaderConfiguration = .default()
     ) {
-        let seq = StringSequence(string: string)
-        self.init(sequence: seq, hasHeaderRow: hasHeaderRow, trimFields: trimFields, delimiter: delimiter, whitespaces: whitespaces)
+        let seq = CSVStringSequence(string: string)
+        self.init(sequence: seq, configuration: configuration)
     }
 }
 
