@@ -12,127 +12,112 @@
 
 import Foundation
 
-public struct CSVReader<S> where S: Sequence<Result<UTF8.CodeUnit, CSVError>> {
-    let sequence: S
-    public var configuration: CSVReaderConfiguration
+public class CSVReader<Input> where Input: IteratorProtocol<Result<UTF8.CodeUnit, CSVError>> {
+    var input: Input
+    public let configuration: CSVReaderConfiguration
+
+    var parser = CSVParser()
+    var header: [String]? = nil
+    var isEOF = false
+    var row = 0
 
     public init(
-        sequence: consuming S,
+        input: consuming Input,
         configuration: CSVReaderConfiguration = .csv()
     ) {
-        self.sequence = sequence
-        self.configuration = configuration
+        self.input = input
+        self.configuration = configuration.copy()
     }
 }
 
-extension CSVReader where S == CSVFileSequence {
-    public init(
+extension CSVReader where Input == CSVFileSequence {
+    public convenience init(
         fileAtPath path: String,
-        bufferSize: Int = 4096,
-        configuration: CSVReaderConfiguration = .csv()
+        configuration: CSVReaderConfiguration = .csv(),
+        bufferSize: Int = 4096
     ) {
         let seq = CSVFileSequence(fileAtPath: path, bufferSize: bufferSize)
-        self.init(sequence: seq, configuration: configuration)
+        self.init(input: seq, configuration: configuration)
     }
 
-    public init(
+    public convenience init(
         url: URL,
-        bufferSize: Int = 4096,
-        configuration: CSVReaderConfiguration = .csv()
+        configuration: CSVReaderConfiguration = .csv(),
+        bufferSize: Int = 4096
     ) {
         let seq = CSVFileSequence(url: url, bufferSize: bufferSize)
-        self.init(sequence: seq, configuration: configuration)
+        self.init(input: seq, configuration: configuration)
     }
 }
 
-extension CSVReader where S == CSVStringSequence {
-    public init(
+extension CSVReader where Input == CSVStringSequence {
+    public convenience init(
         data: consuming Data,
         configuration: CSVReaderConfiguration = .csv()
     ) {
         let seq = CSVStringSequence(data: data)
-        self.init(sequence: seq, configuration: configuration)
+        self.init(input: seq, configuration: configuration)
     }
 
-    public init(
+    public convenience init(
         string: consuming String,
         configuration: CSVReaderConfiguration = .csv()
     ) {
         let seq = CSVStringSequence(string: string)
-        self.init(sequence: seq, configuration: configuration)
+        self.init(input: seq, configuration: configuration)
     }
 }
 
-extension CSVReader: Sequence {
-    public class Iterator: IteratorProtocol {
-        var it: S.Iterator
-        let configuration: CSVReaderConfiguration
-        var parser = CSVParser()
-        var header: [String]? = nil
-        var isEOF = false
-        var row = 0
-
-        init(it: consuming S.Iterator, configuration: consuming CSVReaderConfiguration) {
-            self.it = it
-            self.configuration = configuration
+extension CSVReader: Sequence, IteratorProtocol {
+    public func next() -> Result<CSVRow, CSVError>? {
+        if isEOF {
+            return nil
         }
 
-        public func next() -> Result<CSVRow, CSVError>? {
-            if isEOF {
-                return nil
-            }
+        row += 1
 
-            row += 1
-
-            do {
-                if row == 1, configuration.hasHeaderRow {
-                    if let columns = try parse() {
-                        header = columns
-                    } else {
-                        isEOF = true
-                        return .failure(CSVError.cannotReadHeaderRow)
-                    }
-                }
-
+        do {
+            if row == 1, configuration.hasHeaderRow {
                 if let columns = try parse() {
-                    return .success(CSVRow(header: header, columns: columns))
+                    header = columns
                 } else {
                     isEOF = true
-                    return nil
+                    return .failure(CSVError.cannotReadHeaderRow)
                 }
-            } catch {
-                isEOF = true
-                return .failure(error)
             }
-        }
 
-        func parse() throws(CSVError) -> [String]? {
-            var columns = [String]()
-            while true {
-                switch try parser.parse(&it, configuration: configuration) {
-                case .columnByDelimiter(let column):
-                    columns.append(column)
-                case .columnByNewLine(let column):
-                    columns.append(column)
-                    return columns
-                case .columnByEOF(let column):
-                    columns.append(column)
-                    return columns
-                case .emptyInput:
-                    if columns.isEmpty {
-                        return nil
-                    } else {
-                        columns.append("")
-                        return columns
-                    }
-                }
+            if let columns = try parse() {
+                return .success(CSVRow(header: header, columns: columns))
+            } else {
+                isEOF = true
+                return nil
             }
+        } catch {
+            isEOF = true
+            return .failure(error)
         }
     }
 
-    public func makeIterator() -> Iterator {
-        Iterator(it: sequence.makeIterator(), configuration: configuration.copy())
+    func parse() throws(CSVError) -> [String]? {
+        var columns = [String]()
+        while true {
+            switch try parser.parse(&input, configuration: configuration) {
+            case .columnByDelimiter(let column):
+                columns.append(column)
+            case .columnByNewLine(let column):
+                columns.append(column)
+                return columns
+            case .columnByEOF(let column):
+                columns.append(column)
+                return columns
+            case .emptyInput:
+                if columns.isEmpty {
+                    return nil
+                } else {
+                    columns.append("")
+                    return columns
+                }
+            }
+        }
     }
 }
-
-extension CSVReader: Sendable where S: Sendable {}

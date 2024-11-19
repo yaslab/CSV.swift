@@ -8,103 +8,84 @@
 
 import Foundation
 
-public struct CSVFileSequence: Sendable {
-    enum Source: Sendable {
-        case path(String)
-        case url(URL)
-    }
+public class CSVFileSequence {
+    let stream: InputStream?
+    var isEOF = false
 
-    let source: Source
+    let buffer: UnsafeMutablePointer<UTF8.CodeUnit>
     let bufferSize: Int
+    var _position = 0
+    var _count = 0
+    var _total: Int64 = 0
 
-    init(fileAtPath path: String, bufferSize: Int) {
-        self.source = .path(path)
-        self.bufferSize = bufferSize
+    private init(stream: InputStream?, bufferSize size: Int) {
+        self.stream = stream
+        stream?.open()
+
+        let capacity = Swift.max(8, size)
+        buffer = UnsafeMutablePointer.allocate(capacity: capacity)
+        bufferSize = capacity
     }
 
-    init(url: URL, bufferSize: Int) {
-        self.source = .url(url)
-        self.bufferSize = bufferSize
+    deinit {
+        stream?.close()
+        buffer.deallocate()
     }
 }
 
-extension CSVFileSequence: Sequence {
-    public class Iterator: IteratorProtocol {
-        let stream: InputStream?
-        var isEOF = false
-
-        let buffer: UnsafeMutablePointer<UTF8.CodeUnit>
-        let bufferSize: Int
-        var _position = 0
-        var _count = 0
-        var _total: Int64 = 0
-
-        init(source: Source, bufferSize size: Int) {
-            switch source {
-            case .path(let path):
-                stream = InputStream(fileAtPath: path)
-            case .url(let url):
-                stream = InputStream(url: url)
-            }
-            stream?.open()
-
-            let capacity = Swift.max(8, size)
-            buffer = UnsafeMutablePointer.allocate(capacity: capacity)
-            bufferSize = capacity
-        }
-
-        deinit {
-            stream?.close()
-            buffer.deallocate()
-        }
-
-        public func next() -> Result<UTF8.CodeUnit, CSVError>? {
-            if isEOF {
-                return nil
-            }
-
-            if _count <= _position {
-                guard let stream else {
-                    isEOF = true
-                    return .failure(.cannotOpenFile)
-                }
-
-                guard case .open = stream.streamStatus else {
-                    isEOF = true
-                    return .failure(.cannotOpenFile)
-                }
-
-                let result = stream.read(buffer, maxLength: bufferSize)
-                if result == 0 {
-                    isEOF = true
-                    return nil
-                } else if result < 0 {
-                    isEOF = true
-                    if let error = stream.streamError {
-                        return .failure(.streamErrorHasOccurred(error: error))
-                    } else {
-                        return .failure(.cannotReadFile)
-                    }
-                }
-
-                _position = 0
-
-                // Skip UTF-8 BOM (0xef, 0xbb, 0xbf)
-                if _total == 0, result >= 3, buffer[0] == 0xef, buffer[1] == 0xbb, buffer[2] == 0xbf {
-                    _position += 3
-                }
-
-                _count = result
-                _total += Int64(result)
-            }
-
-            defer { _position += 1 }
-
-            return .success(buffer[_position])
-        }
+extension CSVFileSequence {
+    convenience init(fileAtPath path: String, bufferSize: Int) {
+        self.init(stream: InputStream(fileAtPath: path), bufferSize: bufferSize)
     }
 
-    public func makeIterator() -> Iterator {
-        Iterator(source: source, bufferSize: bufferSize)
+    convenience init(url: URL, bufferSize: Int) {
+        self.init(stream: InputStream(url: url), bufferSize: bufferSize)
+    }
+}
+
+extension CSVFileSequence: Sequence, IteratorProtocol {
+    public func next() -> Result<UTF8.CodeUnit, CSVError>? {
+        if isEOF {
+            return nil
+        }
+
+        if _count <= _position {
+            guard let stream else {
+                isEOF = true
+                return .failure(.cannotOpenFile)
+            }
+
+            guard case .open = stream.streamStatus else {
+                isEOF = true
+                return .failure(.cannotOpenFile)
+            }
+
+            let result = stream.read(buffer, maxLength: bufferSize)
+            if result == 0 {
+                isEOF = true
+                return nil
+            } else if result < 0 {
+                isEOF = true
+                if let error = stream.streamError {
+                    return .failure(.streamErrorHasOccurred(error: error))
+                } else {
+                    return .failure(.cannotReadFile)
+                }
+            }
+
+            _position = 0
+
+            // Skip UTF-8 BOM (0xef, 0xbb, 0xbf)
+            if _total == 0, result >= 3, buffer[0] == 0xef, buffer[1] == 0xbb, buffer[2] == 0xbf {
+                _position += 3
+            }
+
+            _count = result
+            _total += Int64(result)
+        }
+
+        defer { _position += 1 }
+
+        return .success(buffer[_position])
     }
 }

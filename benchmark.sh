@@ -47,7 +47,7 @@ print("method | hasHeaderRow | trimFields | time (sec)")
 print("--- | --- | --- | ---")
 
 @inline(never)
-func read_from_file(_ url: URL, hasHeaderRow: Bool, trimFields: Bool) throws {
+func read_from_file(_ url: URL, config: CSVReaderConfiguration) throws {
   let start = Date()
   
   for _ in 0 ..< _loop {
@@ -55,74 +55,68 @@ func read_from_file(_ url: URL, hasHeaderRow: Bool, trimFields: Bool) throws {
     guard let stream = InputStream(url: url) else {
       throw NSError(domain: "Cannot open stream", code: -1)
     }
-    let reader = try CSVReader(stream: stream, hasHeaderRow: hasHeaderRow, trimFields: trimFields)
+    let reader = try CSVReader(stream: stream, hasHeaderRow: config.hasHeaderRow, trimFields: config.trimFields)
     while let _ = reader.next() {
       if let error = reader.error {
         throw error
       }
     }
 #else
-    var reader = CSVReader(url: url)
-    reader.configuration.hasHeaderRow = hasHeaderRow
-    reader.configuration.trimFields = trimFields
+    let reader = CSVReader(url: url, configuration: config)
     for result in reader {
       _ = try result.get()
     }
 #endif
   }
 
-  print("read_from_file | \(hasHeaderRow) | \(trimFields) | " + String(format: "%.4f", Date().timeIntervalSince(start)))
+  print("read_from_file | \(config.hasHeaderRow) | \(config.trimFields) | " + String(format: "%.4f", Date().timeIntervalSince(start)))
 }
 
 @inline(never)
-func read_from_data(_ data: Data, hasHeaderRow: Bool, trimFields: Bool) throws {
+func read_from_data(_ data: Data, config: CSVReaderConfiguration) throws {
   let start = Date()
   
   for _ in 0 ..< _loop {
 #if LEGACY
     let stream = InputStream(data: data)
-    let reader = try CSVReader(stream: stream, hasHeaderRow: hasHeaderRow, trimFields: trimFields)
+    let reader = try CSVReader(stream: stream, hasHeaderRow: config.hasHeaderRow, trimFields: config.trimFields)
     while let _ = reader.next() {
       if let error = reader.error {
         throw error
       }
     }
 #else
-    var reader = CSVReader(data: data)
-    reader.configuration.hasHeaderRow = hasHeaderRow
-    reader.configuration.trimFields = trimFields
+    let reader = CSVReader(data: data, configuration: config)
     for result in reader {
       _ = try result.get()
     }
 #endif
   }
 
-  print("read_from_data | \(hasHeaderRow) | \(trimFields) | " + String(format: "%.4f", Date().timeIntervalSince(start)))
+  print("read_from_data | \(config.hasHeaderRow) | \(config.trimFields) | " + String(format: "%.4f", Date().timeIntervalSince(start)))
 }
 
 @inline(never)
-func read_from_string(_ string: String, hasHeaderRow: Bool, trimFields: Bool) throws {
+func read_from_string(_ string: String, config: CSVReaderConfiguration) throws {
   let start = Date()
   
   for _ in 0 ..< _loop {
 #if LEGACY
-    let reader = try CSVReader(string: string, hasHeaderRow: hasHeaderRow, trimFields: trimFields)
+    let reader = try CSVReader(string: string, hasHeaderRow: config.hasHeaderRow, trimFields: config.trimFields)
     while let _ = reader.next() {
       if let error = reader.error {
         throw error
       }
     }
 #else
-    var reader = CSVReader(string: string)
-    reader.configuration.hasHeaderRow = hasHeaderRow
-    reader.configuration.trimFields = trimFields
+    let reader = CSVReader(string: string, configuration: config)
     for result in reader {
       _ = try result.get()
     }
 #endif
   }
 
-  print("read_from_string | \(hasHeaderRow) | \(trimFields) | " + String(format: "%.4f", Date().timeIntervalSince(start)))
+  print("read_from_string | \(config.hasHeaderRow) | \(config.trimFields) | " + String(format: "%.4f", Date().timeIntervalSince(start)))
 }
 
 guard let path = CommandLine.arguments.dropFirst().first else {
@@ -133,21 +127,21 @@ guard let path = CommandLine.arguments.dropFirst().first else {
 do {
   let url = URL(filePath: path)
 
-  try read_from_file(url, hasHeaderRow: false, trimFields: false)
-  try read_from_file(url, hasHeaderRow: true, trimFields: false)
-  try read_from_file(url, hasHeaderRow: false, trimFields: true)
+  try read_from_file(url, config: .csv(hasHeaderRow: false, trimFields: false))
+  try read_from_file(url, config: .csv(hasHeaderRow: true, trimFields: false))
+  try read_from_file(url, config: .csv(hasHeaderRow: false, trimFields: true))
 
   let data = try Data(contentsOf: url)
 
-  try read_from_data(data, hasHeaderRow: false, trimFields: false)
-  try read_from_data(data, hasHeaderRow: true, trimFields: false)
-  try read_from_data(data, hasHeaderRow: false, trimFields: true)
+  try read_from_data(data, config: .csv(hasHeaderRow: false, trimFields: false))
+  try read_from_data(data, config: .csv(hasHeaderRow: true, trimFields: false))
+  try read_from_data(data, config: .csv(hasHeaderRow: false, trimFields: true))
 
   let string = String(decoding: data, as: UTF8.self)
 
-  try read_from_string(string, hasHeaderRow: false, trimFields: false)
-  try read_from_string(string, hasHeaderRow: true, trimFields: false)
-  try read_from_string(string, hasHeaderRow: false, trimFields: true)
+  try read_from_string(string, config: .csv(hasHeaderRow: false, trimFields: false))
+  try read_from_string(string, config: .csv(hasHeaderRow: true, trimFields: false))
+  try read_from_string(string, config: .csv(hasHeaderRow: false, trimFields: true))
 } catch {
   print("error:", error)
 }
@@ -159,4 +153,10 @@ if [ ! -f ./list_person_all_extended_utf8.zip ]; then
 fi
 
 swift package clean
-swift run -c release -Xswiftc "$FLAG" benchmark "`pwd`/list_person_all_extended_utf8.csv"
+
+swift run \
+  -c release \
+  -Xswiftc "-swift-version" \
+  -Xswiftc "6" \
+  -Xswiftc "$FLAG" \
+  benchmark "`pwd`/list_person_all_extended_utf8.csv"

@@ -100,8 +100,7 @@ struct CSVRowDecoderTests {
             string 0  0 first
             string,0,,0,first
             """
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         #expect {
             let decoder = CSVRowDecoder()
@@ -127,8 +126,7 @@ struct CSVRowDecoderTests {
         let header = SupportedDecodableExample.headerRow()
         let allRows = exampleRecords.reduce(into: header) { $0 += $1.toRow() }
 
-        var reader = CSVReader(string: allRows)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: allRows, configuration: .csv(hasHeaderRow: true))
 
         var records = [SupportedDecodableExample]()
 
@@ -154,8 +152,7 @@ struct CSVRowDecoderTests {
             let secondColumn: String
         }
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -182,8 +179,7 @@ struct CSVRowDecoderTests {
             let secondColumn: String
         }
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.keyDecodingStrategy = .custom({ $0.replacingOccurrences(of: " ", with: "") })
@@ -210,8 +206,8 @@ struct CSVRowDecoderTests {
             let b: String
         }
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
+
         let decoder = CSVRowDecoder()
         decoder.stringDecodingStrategy = .default
 
@@ -239,8 +235,8 @@ struct CSVRowDecoderTests {
             let b: String
         }
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
+
         let decoder = CSVRowDecoder()
         decoder.stringDecodingStrategy = .allowEmpty
 
@@ -261,8 +257,7 @@ struct CSVRowDecoderTests {
             dateKey,stringKey,optionalStringKey,intKey,ignored
             al;ksdjf;akjsdf,asldkj,,1234,
             """
-        var reader = CSVReader(string: invalidFieldTypeStr)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: invalidFieldTypeStr, configuration: .csv(hasHeaderRow: true))
 
         #expect("Type Mismatch Error on unexpected field") {
             let decoder = CSVRowDecoder()
@@ -336,8 +331,7 @@ struct CSVRowDecoderTests {
         let header = IntKeyedDecodableExample.headerRow()
         let allRows = exampleRecords.reduce(into: header) { $0 += $1.toRow() }
 
-        var reader = CSVReader(string: allRows)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: allRows, configuration: .csv(hasHeaderRow: true))
 
         var records = [IntKeyedDecodableExample]()
 
@@ -360,8 +354,7 @@ struct CSVRowDecoderTests {
             \(exampleRecords[0].stringKey),,this is a string where we expect an Int,
             \(exampleRecords[1].stringKey),\(exampleRecords[1].optionalStringKey!),\(exampleRecords[1].intKey),
             """
-        var reader = CSVReader(string: invalidFieldTypeStr)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: invalidFieldTypeStr, configuration: .csv(hasHeaderRow: true))
 
         #expect("Type Mismatch Error on unexpected field") {
             let decoder = CSVRowDecoder()
@@ -404,8 +397,7 @@ struct CSVRowDecoderTests {
             \(exampleRecords[1].enumKey),,54231,,
             \("third"),,54231,,
             """
-        var reader = CSVReader(string: headerStr)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: headerStr, configuration: .csv(hasHeaderRow: true))
 
         var records = [UnsupportedDecodableExample]()
 
@@ -452,8 +444,7 @@ struct CSVRowDecoderTests {
             0,123,4567,89012,345678901234567890,1,124,4568,89013,345678901234567891
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
 
@@ -486,8 +477,7 @@ struct CSVRowDecoderTests {
             123.456,7890.1234
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         for result in reader {
             let decoder = CSVRowDecoder()
@@ -511,8 +501,7 @@ struct CSVRowDecoderTests {
             false,true
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.boolDecodingStrategy = .default
@@ -531,8 +520,7 @@ struct CSVRowDecoderTests {
             0,1
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.boolDecodingStrategy = .custom({ $0 != "0" })
@@ -558,8 +546,7 @@ struct CSVRowDecoderTests {
             \(expected.timeIntervalSinceReferenceDate)
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.dateDecodingStrategy = .deferredToDate
@@ -578,8 +565,7 @@ struct CSVRowDecoderTests {
             \(expected.timeIntervalSince1970)
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.dateDecodingStrategy = .secondsSince1970
@@ -598,8 +584,7 @@ struct CSVRowDecoderTests {
             \(seconds * 1000.0)
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.dateDecodingStrategy = .millisecondsSince1970
@@ -617,8 +602,7 @@ struct CSVRowDecoderTests {
             2018-11-22T12:34:56+09:00
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.dateDecodingStrategy = .iso8601
@@ -641,8 +625,7 @@ struct CSVRowDecoderTests {
         formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
         formatter.dateFormat = "yyyy/MM/dd"
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.dateDecodingStrategy = .formatted(formatter)
@@ -666,8 +649,7 @@ struct CSVRowDecoderTests {
         formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
         formatter.dateFormat = "yyyy/MM/dd"
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.dateDecodingStrategy = .custom({ Date(timeIntervalSinceReferenceDate: Double($0)!) })
@@ -692,8 +674,7 @@ struct CSVRowDecoderTests {
             "\(expected.base64EncodedString())"
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.dataDecodingStrategy = .base64
@@ -712,8 +693,7 @@ struct CSVRowDecoderTests {
             "\(expected.map({ String(format: "%02x", $0) }).joined())"
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.dataDecodingStrategy = .custom { value in
@@ -746,8 +726,7 @@ struct CSVRowDecoderTests {
             null
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.nilDecodingStrategy = .empty
@@ -770,8 +749,7 @@ struct CSVRowDecoderTests {
             null
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.nilDecodingStrategy = .never
@@ -794,8 +772,7 @@ struct CSVRowDecoderTests {
             null
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
         decoder.nilDecodingStrategy = .custom { $0 == "null" }
@@ -822,8 +799,7 @@ struct CSVRowDecoderTests {
             """
 
         #expect(throws: DecodingError.self) {
-            var reader = CSVReader(string: csv)
-            reader.configuration.hasHeaderRow = true
+            let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
             let decoder = CSVRowDecoder()
             decoder.nilDecodingStrategy = .empty
@@ -849,8 +825,7 @@ struct CSVRowDecoderTests {
             "https://www.example.com/path?param=1",99999999999999999999.9999999999999999
             """
 
-        var reader = CSVReader(string: csv)
-        reader.configuration.hasHeaderRow = true
+        let reader = CSVReader(string: csv, configuration: .csv(hasHeaderRow: true))
 
         let decoder = CSVRowDecoder()
 

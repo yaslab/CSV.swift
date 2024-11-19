@@ -11,21 +11,15 @@ import Foundation
 @available(*, unavailable, renamed: "CSVReader")
 public typealias CSV = CSVReader
 
-public struct _LegacySequence: Sequence {
-    public struct Iterator: IteratorProtocol {
-        public mutating func next() -> Result<UTF8.CodeUnit, CSVError>? {
-            fatalError()
-        }
-    }
-
-    public func makeIterator() -> Iterator {
+public struct _LegacySequence: Sequence, IteratorProtocol {
+    public mutating func next() -> Result<UTF8.CodeUnit, CSVError>? {
         fatalError()
     }
 }
 
-extension CSVReader where S == _LegacySequence {
+extension CSVReader where Input == _LegacySequence {
     @available(*, unavailable, renamed: "CSVReader.init(string:configuration:)")
-    public init(
+    public convenience init(
         string: String,
         hasHeaderRow: Bool = false,
         trimFields: Bool = false,
@@ -36,7 +30,7 @@ extension CSVReader where S == _LegacySequence {
     }
 
     @available(*, unavailable, renamed: "CSVReader.init(fileAtPath:configuration:)")
-    public init(
+    public convenience init(
         stream: InputStream,
         hasHeaderRow: Bool = false,
         trimFields: Bool = false,
@@ -47,7 +41,7 @@ extension CSVReader where S == _LegacySequence {
     }
 
     @available(*, unavailable, renamed: "CSVReader.init(fileAtPath:configuration:)")
-    public init<T>(
+    public convenience init<T>(
         stream: InputStream,
         codecType: T.Type,
         hasHeaderRow: Bool = false,
@@ -59,7 +53,7 @@ extension CSVReader where S == _LegacySequence {
     }
 
     @available(*, unavailable)
-    public init<T>(
+    public convenience init<T>(
         stream: InputStream,
         codecType: T.Type,
         endian: Endian = .big,
@@ -72,7 +66,7 @@ extension CSVReader where S == _LegacySequence {
     }
 
     @available(*, unavailable)
-    public init<T>(
+    public convenience init<T>(
         stream: InputStream,
         codecType: T.Type,
         endian: Endian = .big,
