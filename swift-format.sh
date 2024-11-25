@@ -2,6 +2,6 @@
 
 set -eu
 
-SCRIPT_DIT=$(cd "$(dirname "$0")"; pwd)
+SCRIPT_DIR=$(cd "$(dirname "$0")"; pwd)
 
-swift format --in-place --parallel --recursive "$SCRIPT_DIT"
+swift format --in-place --parallel --recursive "$SCRIPT_DIR"
